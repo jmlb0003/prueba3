@@ -3,10 +3,10 @@ package controlador;
 
 import android.location.Location;
 import android.util.Log;
-
 import modelo.Marker;
 import utilidades.Matrix;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +31,7 @@ public abstract class ARDataSource {
     private static final List<Marker> CACHE = new CopyOnWriteArrayList<Marker>();
     private static final AtomicBoolean COMPUTING = new AtomicBoolean(false);
     private static final float[] LOCATION_ARRAY = new float[3];
+	private static final DecimalFormat FORMAT = new DecimalFormat("#.##");
     
     //TODO: aqui hay que hacer algo...meter la ultima ubicacion, o por lo menos un mensaje de que no hay ubicaciones
     public static final Location HARD_FIX = new Location("ATL");  
@@ -97,7 +98,7 @@ public abstract class ARDataSource {
     
     /**
      * Modifica el radio actual del radar con uno nuevo
-     * @param radius	Nuevo valor del radio del radar
+     * @param radius	Nuevo valor del radio del radar en metros
      */
     public static void setRadius(float radius) {
         synchronized (ARDataSource.RADIUS_LOCK) {
@@ -252,6 +253,19 @@ public abstract class ARDataSource {
             Log.v("ARDataSource", "Setting DIRTY flag!");
             CACHE.clear();
         }
+    }
+    
+    
+    /**
+     * Método para filtrar los datos que se muestran en pantalla según la distancia máxima
+     * @param newMaxDistance Distancia máxima a la que pueden estar los markers que se muestren en pantalla
+     */
+    public static void updateDataWithMaxDistance(float newMaxDistance) {
+		
+        //float zoomLevel = calcZoomLevel();
+        ARDataSource.setRadius(newMaxDistance);
+        ARDataSource.setZoomLevel(FORMAT.format(newMaxDistance));
+        //ARDataSource.setZoomProgress(myZoomBar.getProgress());
     }
 
 }

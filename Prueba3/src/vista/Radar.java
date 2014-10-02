@@ -45,7 +45,7 @@ public class Radar {
     private static float sPad_X = 10;
     private static float sPad_Y = 20;
     private static float sPixelsDensity = 1.0f;	//Esta es la densidad de píxeles de la pantalla
-    private static float sRadius = 40;
+    private static float sRadarRadius = 40;
 
     
     
@@ -71,7 +71,7 @@ public class Radar {
         }
         
         sPixelsDensity = pixelDensity;
-        sRadius *= sPixelsDensity;
+        sRadarRadius *= sPixelsDensity;
         sPad_X *= sPixelsDensity;
         sPad_Y *= sPixelsDensity;
     }
@@ -103,7 +103,7 @@ public class Radar {
      * @return Valor en unidades DP del radio del radar
      */
     public static float getRadius() {
-    	return sRadius;
+    	return sRadarRadius;
     }
     
     
@@ -127,29 +127,34 @@ public class Radar {
     	}
     	
         if (circleContainer == null) {
-            PaintableCircle paintableCircle = new PaintableCircle(RADAR_COLOR,sRadius,true);
-            circleContainer = new PaintablePosition(paintableCircle,sPad_X+sRadius,sPad_Y+sRadius,0,1);
+            PaintableCircle paintableCircle = new PaintableCircle(RADAR_COLOR,sRadarRadius,true);
+            circleContainer = new PaintablePosition(paintableCircle,sPad_X+sRadarRadius,sPad_Y+sRadarRadius,0,1);
         }
         circleContainer.paint(canvas);
     }
     
     private void drawRadarPoints(Canvas canvas) {
-    	if (canvas==null) throw new NullPointerException();
+    	if (canvas == null) {
+    		throw new NullPointerException();
+    	}
     	
-        if (radarPoints==null) radarPoints = new PaintableRadarPoints();
+        if (radarPoints == null) {
+        	radarPoints = new PaintableRadarPoints();
+        }
         
-        if (pointsContainer==null) 
+        if (pointsContainer == null) {
         	pointsContainer = new PaintablePosition( radarPoints,
         												sPad_X,
         												sPad_Y,
         												-ARDataSource.getAzimuth(),
         												1);
-        else 
+        }else {
         	pointsContainer.set(radarPoints, 
 				        			sPad_X,
 									sPad_Y,
 									-ARDataSource.getAzimuth(),
 									1);
+        }
         
         pointsContainer.paint(canvas);
     }
@@ -160,35 +165,36 @@ public class Radar {
     	}
     	
         if (leftLineContainer == null) {
-            leftRadarLine.set(0, -sRadius);
+            leftRadarLine.set(0, -sRadarRadius);
             leftRadarLine.rotate(-CameraModel.DEFAULT_VIEW_ANGLE / 2);
-            leftRadarLine.add(sPad_X+sRadius, sPad_Y+sRadius);
+            leftRadarLine.add(sPad_X+sRadarRadius, sPad_Y+sRadarRadius);
 
-            float leftX = leftRadarLine.getX()-(sPad_X+sRadius);
-            float leftY = leftRadarLine.getY()-(sPad_Y+sRadius);
+            float leftX = leftRadarLine.getX()-(sPad_X+sRadarRadius);
+            float leftY = leftRadarLine.getY()-(sPad_Y+sRadarRadius);
             PaintableLine leftLine = new PaintableLine(LINE_COLOR, leftX, leftY);
             leftLineContainer = new PaintablePosition(  leftLine, 
-            		sPad_X+sRadius, 
-            		sPad_Y+sRadius, 
+            		sPad_X+sRadarRadius, 
+            		sPad_Y+sRadarRadius, 
                                                         0, 
                                                         1);
         }
         leftLineContainer.paint(canvas);
         
-        if (rightLineContainer==null) {
-            rightRadarLine.set(0, -sRadius);
+        if (rightLineContainer == null) {
+            rightRadarLine.set(0, -sRadarRadius);
             rightRadarLine.rotate(CameraModel.DEFAULT_VIEW_ANGLE / 2);
-            rightRadarLine.add(sPad_X+sRadius, sPad_Y+sRadius);
+            rightRadarLine.add(sPad_X+sRadarRadius, sPad_Y+sRadarRadius);
             
-            float rightX = rightRadarLine.getX()-(sPad_X+sRadius);
-            float rightY = rightRadarLine.getY()-(sPad_Y+sRadius);
+            float rightX = rightRadarLine.getX()-(sPad_X+sRadarRadius);
+            float rightY = rightRadarLine.getY()-(sPad_Y+sRadarRadius);
             PaintableLine rightLine = new PaintableLine(LINE_COLOR, rightX, rightY);
             rightLineContainer = new PaintablePosition( rightLine, 
-            		sPad_X+sRadius, 
-            		sPad_Y+sRadius, 
+            		sPad_X+sRadarRadius, 
+            		sPad_Y+sRadarRadius, 
                                                         0, 
                                                         1);
         }
+        
         rightLineContainer.paint(canvas);
     }
 
@@ -207,27 +213,35 @@ public class Radar {
         int bearing = (int) ARDataSource.getAzimuth(); 
         radarText(  canvas, 
                     ""+bearing+((char)176)+" "+dirTxt, 
-                    (sPad_X + sRadius), 
+                    (sPad_X + sRadarRadius), 
                     (sPad_Y - 5), 
                     true
                  );
         
         radarText(  canvas, 
                     formatDist(ARDataSource.getRadius() * 1000), 
-                    (sPad_X + sRadius), 
-                    (sPad_Y + sRadius*2 -10), 
+                    (sPad_X + sRadarRadius), 
+                    (sPad_Y + sRadarRadius*2 -10), 
                     false
                  );
     }
     
     private void radarText(Canvas canvas, String txt, float x, float y, boolean bg) {
-    	if (canvas==null || txt==null) throw new NullPointerException();
+    	if (canvas== null || txt == null) {
+    		throw new NullPointerException();
+    	}
     	
-        if (paintableText==null) paintableText = new PaintableText(txt,TEXT_COLOR,TEXT_SIZE,bg);
-        else paintableText.set(txt,TEXT_COLOR,TEXT_SIZE,bg);
+        if (paintableText == null) {
+        	paintableText = new PaintableText(txt,TEXT_COLOR,TEXT_SIZE,bg);
+        }else {
+        	paintableText.set(txt,TEXT_COLOR,TEXT_SIZE,bg);
+        }
         
-        if (paintedContainer==null) paintedContainer = new PaintablePosition(paintableText,x,y,0,1);
-        else paintedContainer.set(paintableText,x,y,0,1);
+        if (paintedContainer == null) {
+        	paintedContainer = new PaintablePosition(paintableText,x,y,0,1);
+        }else {
+        	paintedContainer.set(paintableText,x,y,0,1);
+        }
         
         paintedContainer.paint(canvas);
     }

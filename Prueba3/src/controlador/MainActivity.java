@@ -127,8 +127,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				new ArrayAdapter<String>(actionBar.getThemedContext(),
 						android.R.layout.simple_list_item_1,
 						android.R.id.text1, new String[] {
-								getString(R.string.title_section1),
-								getString(R.string.title_section2) }), this);
+								getString(R.string.title_section_modoCamara),
+								getString(R.string.title_section_modoMapa) }), this);
 		
 		
 		
@@ -146,6 +146,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         //Se añaden recursos a la colección SOURCES para descargar PIs
         NetworkDataProvider wikipedia = new WikipediaDataProvider(this.getResources());
         SOURCES.put("wiki",wikipedia);
+        
+        //TODO: Aquí hay que pasarle el máximo de sharedPreferences
+        ARDataSource.updateDataWithMaxDistance(12);
 		
 	}// Fin de onCreate()
 	

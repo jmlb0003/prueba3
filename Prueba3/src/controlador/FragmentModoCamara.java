@@ -28,9 +28,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.example.prueba3.R;
 
@@ -39,6 +37,7 @@ import com.example.prueba3.R;
 public class FragmentModoCamara extends Fragment implements SensorEventListener, OnTouchListener {
 	
 	private static final String CLASS_TAG = "FragmentModoCamara";
+
 	
 	/***************CONSTANTES ORIENTACION*******************************************/
 	//Flag para controlar si los sensores se pueden leer o no
@@ -80,9 +79,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 
     /***************VISTAS MODO RA**************************************/
     protected static CameraSurface sCameraScreen = null;   
-    //TODO: implementar la barra en las preferencias  protected static VerticalSeekBar sMyZoomBar = null;
-    protected static TextView sEndLabel = null;
-    protected static LinearLayout sZoomLayout = null;
     
     /***************VARIABLES PRIVADAS*******************************************/
     private AugmentedView mAugmentedView;
@@ -128,7 +124,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         DisplayMetrics dm = new DisplayMetrics();        
         mActivity.getWindowManager().getDefaultDisplay().getMetrics(dm);
         mDp = dm.density;
-
+        
     }// Fin de onCreate()
     
     
@@ -352,6 +348,9 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	private void markerTouched(Marker marker) {
 		Log.w("FragmentModoCamara","markerTouched() not implemented.");
 	}
+	
+	
+	
 
 
 }
