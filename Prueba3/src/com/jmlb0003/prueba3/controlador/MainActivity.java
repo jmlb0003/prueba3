@@ -532,28 +532,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	   /************************************/
 	   
    }
-
-
-
-
-//@Override
-//public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-//	
-//	if ( key.equals(getString(R.string.pref_seekBar_distance_key)) ) {
-//		Log.d("MainActivity","En el main, ha cambiado la barra"+sharedPreferences.getInt(key, 123456));
-//	}
-//}
    
-   
-
-//    @Override
-//	protected void updateDataOnZoom() {
-//	    super.updateDataOnZoom();
-//        Location last = ARData.getCurrentLocation();
-//        updateData(last.getLatitude(),last.getLongitude(),last.getAltitude());
-//        Log.d("mainActivity","La posicion actual es: LAT:"+last.getLatitude()+" - LON:"+last.getLongitude()+" - ALT:"+last.getAltitude());
-//	}
-    
    
    
 
