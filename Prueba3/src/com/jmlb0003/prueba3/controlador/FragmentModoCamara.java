@@ -41,8 +41,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	/***************CONSTANTES ORIENTACION*******************************************/
 	//Flag para controlar si los sensores se pueden leer o no
     private static final AtomicBoolean COMPUTING = new AtomicBoolean(false);
-  //Matriz para información temporal de las rotaciones del dispositivo
-    private static final float TEMP[] = new float[9];
     //Matriz de rotación final
     private static final float ROTATION_MATRIX[] = new float[9];
     //Array con los datos de los acelerómetros
@@ -102,6 +100,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         		0f, (float) Math.cos(Math.toRadians(-90)), (float) -Math.sin(Math.toRadians(-90)),
         		0f, (float) Math.sin(Math.toRadians(-90)), (float) Math.cos(Math.toRadians(-90))
         );
+    	
 
 		mActivity = getActivity();
 		
@@ -242,16 +241,20 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         }
 
         /**
+         * Originalmente, se usaba TEMP en lugar de ROTATION_MATRIX para luego transformar los ejes
+         * con la funcion remapCoordinateSystem al tener modo landscape. Como ya no se usa,
+         * directamente cogemos la matriz de rotación para usarla sin remapearla.
          * @see http://developer.android.com/reference/android/hardware/SensorManager.html#getRotationMatrix(float[], float[], float[], float[])
          */
-        SensorManager.getRotationMatrix(TEMP, null, GRAVITY_ORIENTATION, MAGNETIC_ORIENTATION);
+        SensorManager.getRotationMatrix(ROTATION_MATRIX, null, GRAVITY_ORIENTATION, MAGNETIC_ORIENTATION);
 
         /**
          * @see http://developer.android.com/reference/android/hardware/SensorManager.html#remapCoordinateSystem(float[], int, int, float[])
          */
         // Hasta aquí, se han hecho las operaciones necesarias para obtener la rotación del
         // dispositivo (en modo apaisado)
-        SensorManager.remapCoordinateSystem(TEMP, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, ROTATION_MATRIX);
+        //ORIGINAL
+//        SensorManager.remapCoordinateSystem(TEMP, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, ROTATION_MATRIX);
 
         WORLD_COORDINATES.set(ROTATION_MATRIX[0], ROTATION_MATRIX[1], ROTATION_MATRIX[2], ROTATION_MATRIX[3], ROTATION_MATRIX[4], ROTATION_MATRIX[5], ROTATION_MATRIX[6], ROTATION_MATRIX[7], ROTATION_MATRIX[8]);
 

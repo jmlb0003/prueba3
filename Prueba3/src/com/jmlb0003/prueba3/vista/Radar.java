@@ -44,6 +44,8 @@ public class Radar {
     
     /********Variables con valores en píxeles**********/
     private static float sPad_X = 10;
+    private float mPad_X;
+    private float mPad_Y;
     private static float sPad_Y = 20;
     private static float sPixelsDensity = 1.0f;	//Esta es la densidad de píxeles de la pantalla
     private static float sRadarRadius = 40;
@@ -73,8 +75,8 @@ public class Radar {
         
         sPixelsDensity = pixelDensity;
         sRadarRadius *= sPixelsDensity;
-        sPad_X *= sPixelsDensity;
-        sPad_Y *= sPixelsDensity;
+        mPad_X = sPad_X * sPixelsDensity;
+        mPad_Y = sPad_Y * sPixelsDensity;
     }
 
     
@@ -129,7 +131,7 @@ public class Radar {
     	
         if (circleContainer == null) {
             PaintableCircle paintableCircle = new PaintableCircle(RADAR_COLOR,sRadarRadius,true);
-            circleContainer = new PaintablePosition(paintableCircle,sPad_X+sRadarRadius,sPad_Y+sRadarRadius,0,1);
+            circleContainer = new PaintablePosition(paintableCircle,mPad_X+sRadarRadius,mPad_Y+sRadarRadius,0,1);
         }
         circleContainer.paint(canvas);
     }
@@ -145,14 +147,14 @@ public class Radar {
         
         if (pointsContainer == null) {
         	pointsContainer = new PaintablePosition( radarPoints,
-        												sPad_X,
-        												sPad_Y,
+        												mPad_X,
+        												mPad_Y,
         												-ARDataSource.getAzimuth(),
         												1);
         }else {
         	pointsContainer.set(radarPoints, 
-				        			sPad_X,
-									sPad_Y,
+				        			mPad_X,
+									mPad_Y,
 									-ARDataSource.getAzimuth(),
 									1);
         }
@@ -168,14 +170,14 @@ public class Radar {
         if (leftLineContainer == null) {
             leftRadarLine.set(0, -sRadarRadius);
             leftRadarLine.rotate(-CameraModel.DEFAULT_VIEW_ANGLE / 2);
-            leftRadarLine.add(sPad_X+sRadarRadius, sPad_Y+sRadarRadius);
+            leftRadarLine.add(mPad_X+sRadarRadius, mPad_Y+sRadarRadius);
 
-            float leftX = leftRadarLine.getX()-(sPad_X+sRadarRadius);
-            float leftY = leftRadarLine.getY()-(sPad_Y+sRadarRadius);
+            float leftX = leftRadarLine.getX()-(mPad_X+sRadarRadius);
+            float leftY = leftRadarLine.getY()-(mPad_Y+sRadarRadius);
             PaintableLine leftLine = new PaintableLine(LINE_COLOR, leftX, leftY);
             leftLineContainer = new PaintablePosition(  leftLine, 
-            		sPad_X+sRadarRadius, 
-            		sPad_Y+sRadarRadius, 
+            		mPad_X+sRadarRadius, 
+            		mPad_Y+sRadarRadius, 
                                                         0, 
                                                         1);
         }
@@ -184,14 +186,14 @@ public class Radar {
         if (rightLineContainer == null) {
             rightRadarLine.set(0, -sRadarRadius);
             rightRadarLine.rotate(CameraModel.DEFAULT_VIEW_ANGLE / 2);
-            rightRadarLine.add(sPad_X+sRadarRadius, sPad_Y+sRadarRadius);
+            rightRadarLine.add(mPad_X+sRadarRadius, mPad_Y+sRadarRadius);
             
-            float rightX = rightRadarLine.getX()-(sPad_X+sRadarRadius);
-            float rightY = rightRadarLine.getY()-(sPad_Y+sRadarRadius);
+            float rightX = rightRadarLine.getX()-(mPad_X+sRadarRadius);
+            float rightY = rightRadarLine.getY()-(mPad_Y+sRadarRadius);
             PaintableLine rightLine = new PaintableLine(LINE_COLOR, rightX, rightY);
             rightLineContainer = new PaintablePosition( rightLine, 
-            		sPad_X+sRadarRadius, 
-            		sPad_Y+sRadarRadius, 
+            		mPad_X+sRadarRadius, 
+            		mPad_Y+sRadarRadius, 
                                                         0, 
                                                         1);
         }
@@ -214,15 +216,15 @@ public class Radar {
         int bearing = (int) ARDataSource.getAzimuth(); 
         radarText(  canvas, 
                     ""+bearing+((char)176)+" "+dirTxt, 
-                    (sPad_X + sRadarRadius), 
-                    (sPad_Y - 5), 
+                    (mPad_X + sRadarRadius), 
+                    (mPad_Y - 5), 
                     true
                  );
         
         radarText(  canvas, 
                     formatDist(ARDataSource.getRadius() * 1000), 
-                    (sPad_X + sRadarRadius), 
-                    (sPad_Y + sRadarRadius*2 -10), 
+                    (mPad_X + sRadarRadius), 
+                    (mPad_Y + sRadarRadius*2 -10), 
                     false
                  );
     }
