@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="example_checkbox"
-        android:summary="@string/pref_description_social_recommendations"
-        android:title="@string/pref_title_social_recommendations" />
-
-<
-
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:key="preferencias_principal"
+    tools:context=".MainActivity" >
+    
+    <com.jmlb0003.prueba3.utilidades.SeekBarPreferencias
+        android:key="@string/pref_seekBar_distance_key"
+        android:id="@+id/mySeekBarPreference"
+        android:title="@string/pref_seekBar_distance_title"
+        android:summary="@string/pref_seekBar_distance_summary"        
+        android:max="100"
+        android:defaultValue="15"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"  />
+    
+    
 </PreferenceScreen>
