@@ -2,15 +2,15 @@ package com.jmlb0003.prueba3.vista;
 
 
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.view.View;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.view.View;
 
 import com.jmlb0003.prueba3.controlador.ARDataSource;
 import com.jmlb0003.prueba3.modelo.Marker;
@@ -42,8 +42,7 @@ public class AugmentedView extends View {
 		super(context);
 
 		sPixelDensity = context.getResources().getDisplayMetrics().density;
-		sRadar  = new Radar(sPixelDensity);
-        
+		sRadar  = new Radar(sPixelDensity);        
 	}// Fin del constructor
 	
 	
@@ -82,8 +81,7 @@ public class AugmentedView extends View {
 
 	        sRadar.draw(canvas);
 	        
-	        sDrawing.set(false);
-		
+	        sDrawing.set(false);		
         }
 	}// Fin de onDraw
 	

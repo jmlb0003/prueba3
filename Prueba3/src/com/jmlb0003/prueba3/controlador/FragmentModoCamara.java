@@ -34,10 +34,7 @@ import com.jmlb0003.prueba3.R;
 
 
 public class FragmentModoCamara extends Fragment implements SensorEventListener, OnTouchListener {
-	
-	private static final String CLASS_TAG = "FragmentModoCamara";
-
-	
+		
 	/***************CONSTANTES ORIENTACION*******************************************/
 	//Flag para controlar si los sensores se pueden leer o no
     private static final AtomicBoolean COMPUTING = new AtomicBoolean(false);
