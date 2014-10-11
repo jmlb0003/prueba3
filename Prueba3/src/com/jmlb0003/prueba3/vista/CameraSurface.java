@@ -44,6 +44,9 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
 		}
 	    
 		
+		/**
+		 * La vista con las imágenes de la cámara se crea por primera vez
+		 */
 		public void surfaceCreated(SurfaceHolder holder) {
 			Log.d(LOG_TAG, "LLamada a surfaceCreated");
 			try {
@@ -83,6 +86,10 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
 		}
 		
 		
+		/**
+		 * La vista de las imágenes de la cámara se destruye al salir de la vista en modo
+		 * cámara
+		 */
 		public void surfaceDestroyed(SurfaceHolder arg0) {
 			if (mCamera != null) {
 				mCamera.cancelAutoFocus();
@@ -93,6 +100,11 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
 		}
 		
 		
+		/**
+		 * Cada vez que se muestra la vista en modo cámara se llama a este método que calculan
+		 * el ancho y alto de la vista y distintos parámetros para obtener las imágenes con la 
+		 * mejor resolución posible
+		 */
 		@SuppressLint("InlinedApi")
 		public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 			// If your preview can change or rotate, take care of those events here.
@@ -174,9 +186,7 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
 				
 			} catch (Exception ex) {
 				ex.printStackTrace();
-			}
-			
-			
+			}			
 		}		
 		
 		
