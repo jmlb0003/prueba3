@@ -16,6 +16,14 @@ public class PaintableRadarPoints extends PaintableObject {
     private final float[] mLocationArray = new float[3];
 	private PaintablePoint mPaintablePoint = null;
 	private PaintablePosition mPointContainer = null;
+	private float mPixelDensity = 1;
+	
+	
+	public PaintableRadarPoints(float pixelsDensity) {
+		if (pixelsDensity != 0) {
+			mPixelDensity = pixelsDensity;
+		}
+	}
 
 	@Override
     public void paint(Canvas canvas) {
@@ -33,10 +41,10 @@ public class PaintableRadarPoints extends PaintableObject {
 		    
 		    if ((x*x+y*y) < (Radar.getRadius()*Radar.getRadius())) {
 		        if (mPaintablePoint == null) {
-		        	mPaintablePoint = new PaintablePoint(pm.getColor(),true);
+		        	mPaintablePoint = new PaintablePoint(pm.getColor(),true,mPixelDensity);
 		        	
 		        }else{
-		        	mPaintablePoint.set(pm.getColor(),true);
+		        	mPaintablePoint.set(pm.getColor(),true,mPixelDensity);
 		        }
 
 		        if (mPointContainer == null) {

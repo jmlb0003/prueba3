@@ -9,12 +9,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.jmlb0003.prueba3.R;
-
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.util.Log;
+
+import com.jmlb0003.prueba3.R;
 
 
 
@@ -24,6 +25,7 @@ import android.graphics.Color;
  *
  */
 public class WikipediaDataProvider extends NetworkDataProvider {
+	//TODO:El enlace de wikipedia está mal a caso hecho
 	private static final String BASE_URL = "http://api.geonames.org/findNearbyWikipediaJSON";
 
 	private static Bitmap mIcon = null;
@@ -56,6 +58,8 @@ public class WikipediaDataProvider extends NetworkDataProvider {
      */
 	@Override
 	public String createRequestURL(double lat, double lon, double alt, float radius, String locale, String mUsername) {
+		//La opción gratuita de esta API no permite consultas con radius mayor que 20
+		radius = (radius>20)?20.0f:radius;
 		
 		return BASE_URL+
 				"?lat=" + lat +
@@ -115,7 +119,7 @@ public class WikipediaDataProvider extends NetworkDataProvider {
         	try {
         		ma = new Marker(jo.getString("title"), jo.getDouble("lat"), jo.getDouble("lng"),
         							jo.getDouble("elevation"), Color.WHITE,	mIcon);
-        		
+        		Log.d("wikipediaDatasource","Creado un marker de wikipedia");
         	} catch (JSONException e) {
         		e.printStackTrace();
         	}

@@ -1,9 +1,6 @@
 package com.jmlb0003.prueba3.controlador;
 
 
-import android.location.Location;
-import android.util.Log;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,6 +11,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import android.location.Location;
 
 import com.jmlb0003.prueba3.modelo.Marker;
 import com.jmlb0003.prueba3.utilidades.Matrix;
@@ -36,6 +35,7 @@ public abstract class ARDataSource {
     
     //TODO: aqui hay que hacer algo...meter la ultima ubicacion, o por lo menos un mensaje de que no hay ubicaciones
     public static final Location HARD_FIX = new Location("ATL");  
+    
     static {
         //hardFix.setLatitude(0);
         //hardFix.setLongitude(0);
@@ -47,15 +47,13 @@ public abstract class ARDataSource {
     }
     
     
-    private static final Object RADIUS_LOCK = new Object();    
-//    private static final Object ZOOM_PROGRESS_LOCK = new Object();
+    private static final Object RADIUS_LOCK = new Object();
     
     private static final Object AZIMUTH_LOCK = new Object();    
     private static final Object PITCH_LOCK = new Object();    
     private static final Object ROLL_LOCK = new Object();
     
-    private static String sZoomLevel = new String();    
-//    private static int sZoomProgress = 0;
+    private static String sZoomLevel = new String();
     private static Location sCurrentLocation = HARD_FIX;
     private static Matrix sRotationMatrix = new Matrix();
     
@@ -65,10 +63,13 @@ public abstract class ARDataSource {
     
     private static float sRadius;
     
+    /**Variable donde se almacena el valor de densidad de píxel de la pantalla del dispositivo**/
+    public static float PixelsDensity;
+    
     
     /**
-     * Modifica el nivel de zoom actual
-     * @param zoomLevel Nuevo valor para el zoom
+     * Modifica el texto del radio de búsqueda del Radar
+     * @param zoomLevel Nuevo valor para el radio de búsqueda de PIs
      */
     public static void setZoomLevel(String zoomLevel) {
     	if (zoomLevel == null) {
@@ -80,21 +81,6 @@ public abstract class ARDataSource {
     	}
     }
     
-//    /**
-//     * Asigna un nuevo porcentaje de barra seleccionada de la barra de zoom
-//     * @param zoomProgress
-//     */
-//    public static void setZoomProgress(int zoomProgress) {
-//        synchronized (ARData.zoomProgressLock) {
-//            if (ARData.zoomProgress != zoomProgress) {
-//                ARData.zoomProgress = zoomProgress;
-//                if (dirty.compareAndSet(false, true)) {
-//                    Log.v(TAG, "Setting DIRTY flag!");
-//                    cache.clear();
-//                }
-//            }
-//        }
-//    }
     
     
     /**
@@ -154,15 +140,15 @@ public abstract class ARDataSource {
      * @return Lista inmodificable con los markers que hay en memoria
      */
     public static List<Marker> getMarkers() {
+    	//Si COMPUTING vale true, se le asigna false
         if (COMPUTING.compareAndSet(true, false)) {
-            Log.v("ARDataSource", "DIRTY flag found, resetting all marker heights to zero.");
             for(Marker ma : MARKER_LIST.values()) {
                 ma.getLocation().get(LOCATION_ARRAY);
                 LOCATION_ARRAY[1] = ma.getInitialY();
                 ma.getLocation().set(LOCATION_ARRAY);
             }
 
-            Log.v("ARDataSource", "Populating the cache.");
+
             List<Marker> copy = new ArrayList<Marker>();
             copy.addAll(MARKER_LIST.values());
             Collections.sort(copy,distanceComparator);
@@ -227,8 +213,7 @@ public abstract class ARDataSource {
     	if (markers.size() <= 0) {
     		return;
     	}
-    	
-    	Log.d("ARDataSource", "New markers, updating markers. new markers="+markers.toString());
+
     	for(Marker marker : markers) {
     	    if (!MARKER_LIST.containsKey(marker.getName())) {
     	        marker.calcRelativePosition(ARDataSource.getCurrentLocation());
@@ -237,7 +222,6 @@ public abstract class ARDataSource {
     	}
 
     	if (COMPUTING.compareAndSet(false, true)) {
-    	    Log.v("ARDataSource", "Setting DIRTY flag!");
     	    CACHE.clear();
     	}
     }
@@ -251,7 +235,6 @@ public abstract class ARDataSource {
         }
 
         if (COMPUTING.compareAndSet(false, true)) {
-            Log.v("ARDataSource", "Setting DIRTY flag!");
             CACHE.clear();
         }
     }
@@ -262,11 +245,8 @@ public abstract class ARDataSource {
      * @param newMaxDistance Distancia máxima a la que pueden estar los markers que se muestren en pantalla
      */
     public static void updateDataWithMaxDistance(float newMaxDistance) {
-		Log.d("ARDATA","se cambia la maxdistance a "+newMaxDistance);
-        //float zoomLevel = calcZoomLevel();
         ARDataSource.setRadius(newMaxDistance);
         ARDataSource.setZoomLevel(FORMAT.format(newMaxDistance));
-        //ARDataSource.setZoomProgress(myZoomBar.getProgress());
     }
 
 }

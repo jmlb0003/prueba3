@@ -1,21 +1,13 @@
 package com.jmlb0003.prueba3.modelo;
 
 
+import java.text.DecimalFormat;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
-
-
-
-
-
-
-
-
-
-import java.text.DecimalFormat;
 
 import com.jmlb0003.prueba3.controlador.ARDataSource;
 import com.jmlb0003.prueba3.utilidades.CameraModel;
@@ -50,11 +42,11 @@ public class Marker implements Comparable<Marker> {
     private volatile static CameraModel sCam = null;
     
     /**VARIABLES PARA PONER OPACAS ALGUNAS ZONAS DEL MARKER**/
-    private static boolean sDebugTouchZone = false;
+    private static boolean sDebugTouchZone = true;
     private static PaintableBox sTouchBox = null;
     private static PaintablePosition sTouchPosition = null;
 
-    private static boolean sDebugCollisionZone = false;
+    private static boolean sDebugCollisionZone = true;
     private static PaintableBox sCollisionBox = null;
     private static PaintablePosition sCollisionPosition = null;
     
@@ -90,7 +82,7 @@ public class Marker implements Comparable<Marker> {
     protected String name = null;
     /**Ubicación del marker en el mundo real **/
     protected volatile PhysicalLocationUtility markerPhysicalLocation = new PhysicalLocationUtility();
-    /**Distancia hasta el marker desde la posición del usuario **/
+    /**Distancia en metros hasta el marker desde la posición del usuario **/
     protected volatile double distance = 0.0;
     /** Indica si el marker debe aparecer en el radar o no**/
     protected volatile boolean isOnRadar = false;
@@ -134,12 +126,12 @@ public class Marker implements Comparable<Marker> {
 	
     /**
      * Constructor de la clase Marker con icono.
-     * @param name
-     * @param latitude
-     * @param longitude
-     * @param altitude
-     * @param color
-     * @param toBitmap
+     * @param name Nombre del Marker
+     * @param latitude	Latitud del Marker
+     * @param longitude Longitud del Marker
+     * @param altitude Altitud del Marker
+     * @param color Color que tendrá el marker en el radar y en las vistas de realidad aumentada y mapa
+     * @param toBitmap Icono que se aplicará al Marker
      */
 	public Marker(String name, double latitude, double longitude, double altitude, int color, 
 							Bitmap toBitmap) {
@@ -201,11 +193,12 @@ public class Marker implements Comparable<Marker> {
         float y = (symbolArray[1] + textArray[1])/2;
         float z = (symbolArray[2] + textArray[2])/2;
 
-        if (mTextBox!=null) {
+        if (mTextBox != null) {
         	y += (mTextBox.getHeight()/2);
         }
 
         mScreenPositionVector.set(x, y, z);
+        
         
         return mScreenPositionVector;
     }
@@ -219,7 +212,7 @@ public class Marker implements Comparable<Marker> {
         	return 0f;
         }
         
-        return symbolContainer.getHeight()+mTextContainer.getHeight();
+        return symbolContainer.getHeight() + mTextContainer.getHeight();
     }
     
     public synchronized float getWidth() {
@@ -261,8 +254,8 @@ public class Marker implements Comparable<Marker> {
 
     
     /**
-     * Método para actualizar las matrices de los objetos del marker (símbolo y texto) dada la 
-     * variación en X e Y.
+     * Método para actualizar las matrices de los objetos del marker (símbolo y texto). Además se
+     * añade la variación en X e Y.
      * @param casCamodelo de cámara
      * @param addX Variación en X
      * @param addY Variación en Y
@@ -598,11 +591,23 @@ public class Marker implements Comparable<Marker> {
     		throw new NullPointerException();
     	}
 
+    	float scaleDistance = 1.0f;
+    	if (distance > 2000)
+    		scaleDistance = 0.9f;
+    	else if (distance > 10000)
+    		scaleDistance = 0.6f;
+    	else if (distance > 50000)
+    		scaleDistance = 0.4f;
+    		   	
+    	
+
         if (gpsSymbol == null && mBitmap == null) {
-        	gpsSymbol = new PaintableGps(36, 36, true, getColor());
+        	gpsSymbol = 
+        			new PaintableGps((24*ARDataSource.PixelsDensity*scaleDistance), 
+        					(24*ARDataSource.PixelsDensity*scaleDistance), true, getColor());
         }else{
         	if (mBitmap != null) {
-        		gpsSymbol = new PaintableIcon(mBitmap,96,96);
+        		gpsSymbol = new PaintableIcon(mBitmap,scaleDistance);
         	}
         }
 
@@ -638,19 +643,20 @@ public class Marker implements Comparable<Marker> {
 	    textXyzRelativeToCameraView.get(textArray);
 	    symbolXyzRelativeToCameraView.get(symbolArray);
 
-	    float maxHeight = Math.round(canvas.getHeight() / 10f) + 1;
+	    
+	    float textSize = 16 * ARDataSource.PixelsDensity;
 	    
 	    if (mTextBox == null) {
-	    	mTextBox = new PaintableBoxedText(textStr, Math.round(maxHeight / 2f) + 1, 300);
+	    	mTextBox = new PaintableBoxedText(textStr, textSize, 300);
 	    }else{
-	    	mTextBox.set(textStr, Math.round(maxHeight / 2f) + 1, 300);
+	    	mTextBox.set(textStr, textSize, 300);
 	    }
 
 	    float currentAngle = Utilities.getAngle(symbolArray[0], symbolArray[1], textArray[0], textArray[1]);
         float angle = currentAngle + 90;
 
 	    float x = textArray[0] - (mTextBox.getWidth() / 2);
-	    float y = textArray[1] + maxHeight;
+	    float y = textArray[1] + (textSize * 2);
 
 	    if (mTextContainer == null) {
 	    	mTextContainer = new PaintablePosition(mTextBox, x, y, angle, 1);

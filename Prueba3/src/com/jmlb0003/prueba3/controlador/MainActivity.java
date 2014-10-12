@@ -22,7 +22,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,7 +46,7 @@ import com.jmlb0003.prueba3.modelo.WikipediaDataProvider;
  *
  */
 public class MainActivity extends ActionBarActivity implements ActionBar.OnNavigationListener,
-				LocationListener/*, OnSharedPreferenceChangeListener*/ {
+				LocationListener {
 	
 	/**
 	 * Nomenclatura de variables CODE GUIDELINES
@@ -94,9 +93,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     private Location mLocation = null;
     //Variable con el radio de búsqueda de PI del radar
     private float mRadarSearch;
-    
-    /***Variable con la densidad de píxeles por pulgada***/
-    private float mDp;
     
     
 	private FragmentModoCamara mFragmentModoCamara;
@@ -160,15 +156,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         ARDataSource.addMarkers(localData.getMarkers());
         //Se añaden recursos a la colección SOURCES para descargar PIs
         NetworkDataProvider wikipedia = new WikipediaDataProvider(this.getResources());
-        SOURCES.put("wiki",wikipedia);
-  
-        
-        //Obtenemos la densidad de píxeles de la pantalla para dibujar los componentes
-        //convirtiendo px en dp
-        DisplayMetrics dm = new DisplayMetrics();        
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-        mDp = dm.density;
-        
+        SOURCES.put("wiki",wikipedia);        
 		
 	}// Fin de onCreate()
 	
@@ -375,21 +363,21 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
 	@Override
 	public void onProviderDisabled(String arg0) {
-		//No se utiliza
+		//Función de onLocationListener - No se utiliza
 		
 	}
 
 
 	@Override
 	public void onProviderEnabled(String arg0) {
-		//No se utiliza
+		//Función de onLocationListener - No se utiliza
 		
 	}
 
 
 	@Override
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-		//No se utiliza		
+		//Función de onLocationListener - No se utiliza		
 	}
 
 
@@ -489,7 +477,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 		String url = null;
 		try {
-			url = source.createRequestURL(lat, lon, alt, ARDataSource.getRadius(), LOCALE, USERNAME);    	
+			url = source.createRequestURL(lat, lon, alt, ARDataSource.getRadius(), LOCALE, USERNAME);
+			Log.d("mainactivity","createrequestURL de:"+url);
 		} catch (NullPointerException e) {
 			return false;
 		}

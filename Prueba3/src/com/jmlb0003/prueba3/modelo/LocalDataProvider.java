@@ -35,7 +35,7 @@ public class LocalDataProvider {
         	throw new NullPointerException();
         }
         
-        icon = BitmapFactory.decodeResource(res, R.drawable.ic_launcher);
+        icon = BitmapFactory.decodeResource(res, R.drawable.icono_pi);
     }
     
     public List<Marker> getMarkers() {

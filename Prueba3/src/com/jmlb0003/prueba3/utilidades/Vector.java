@@ -46,16 +46,16 @@ public class Vector {
     
     /**
      * Devuelve los elementos del vector en un array.
-     * @param array Variable donde se almacenan los valores.
+     * @param outArray Variable donde se almacenan los valores.
      */
-    public synchronized void get(float[] array) {
-        if (array == null || array.length != 3) {
+    public synchronized void get(float[] outArray) {
+        if (outArray == null || outArray.length != 3) {
         	throw new IllegalArgumentException("get() array must be non-NULL and size of 3");
         }
         
-        array[0] = x;
-        array[1] = y;
-        array[2] = z;
+        outArray[0] = x;
+        outArray[1] = y;
+        outArray[2] = z;
     }
 
     

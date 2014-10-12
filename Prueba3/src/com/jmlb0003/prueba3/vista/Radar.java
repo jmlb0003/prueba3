@@ -154,7 +154,7 @@ public class Radar {
     	}
     	
         if (sRadarPoints == null) {
-        	sRadarPoints = new PaintableRadarPoints();
+        	sRadarPoints = new PaintableRadarPoints(sPixelsDensity);
         }
         
         if (sPointsContainer == null) {
@@ -249,9 +249,9 @@ public class Radar {
     	}
     	
         if (sPaintableText == null) {
-        	sPaintableText = new PaintableText(txt,TEXT_COLOR,TEXT_SIZE,bg);
+        	sPaintableText = new PaintableText(txt,TEXT_COLOR,Math.round(TEXT_SIZE*getPixelsDensity()),bg);
         }else {
-        	sPaintableText.set(txt,TEXT_COLOR,TEXT_SIZE,bg);
+        	sPaintableText.set(txt,TEXT_COLOR,Math.round(TEXT_SIZE*getPixelsDensity()),bg);
         }
         
         if (sPaintedContainer == null) {

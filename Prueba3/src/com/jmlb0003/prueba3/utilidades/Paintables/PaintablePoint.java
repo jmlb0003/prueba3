@@ -10,18 +10,29 @@ import android.graphics.Canvas;
  *
  */
 public class PaintablePoint extends PaintableObject {
-    private static int mWidth=3;
-    private static int mHeight=3;
+	/**Anchura del cuadrado que representa al punto**/
+    private static int mWidth=2;
+    /**Altura del cuadrado que representa al punto**/
+    private static int mHeight=2;
     private int mColor = 0;
     private boolean mFill = false;
     
-    public PaintablePoint(int color, boolean fill) {
-    	set(color, fill);
+    public PaintablePoint(int color, boolean fill, float scale) {
+    	set(color, fill, scale);
     }
 
-    public void set(int color, boolean fill) {
+    /**
+     * Por defecto el tamaño es 2dp pero se escala mediante el parámetro scale
+     * @param color Color del punto que se dibuja en el radar. Viene fijado desde la declaración
+     * del Marker
+     * @param fill
+     * @param scale Factor por el que se multiplica el tamaño por defecto del punto del radar
+     */
+    public void set(int color, boolean fill, float scale) {
         mColor = color;
         mFill = fill;
+        mWidth = Math.round(2*scale);
+        mHeight = mWidth;
     }
 
 	@Override

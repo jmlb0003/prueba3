@@ -42,7 +42,9 @@ public class AugmentedView extends View {
 		super(context);
 
 		sPixelDensity = context.getResources().getDisplayMetrics().density;
-		sRadar  = new Radar(sPixelDensity);        
+		ARDataSource.PixelsDensity = sPixelDensity;
+		
+		sRadar  = new Radar(sPixelDensity);
 	}// Fin del constructor
 	
 	
@@ -87,7 +89,7 @@ public class AugmentedView extends View {
 	
 	
 	/**
-	 * TODO:Este habría que cambiarlo...Pensar en métodos para evitar los solapamientos
+	 * TODO:Hay que cambiar la resolución de colisiones. Pensar en métodos para evitar los solapamientos
 	 * Método con el que se ajustan los marcadores para que no se superpongan los que se encuentran
 	 * muy cercanos en la pantalla.
 	 * @param canvas Canvas donde se va a dibujar
