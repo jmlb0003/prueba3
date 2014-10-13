@@ -6,5 +6,13 @@
     <string name="title_section_modoMapa">Modo Mapa</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Ajustes</string>
+    
+    
+    <!-- Ventana de diálogo de ubicación -->
+    <string name="alert_location_title">Ajustes de ubicación</string>
+    <string name="alert_location_message">No se puede ubicar su dispositivo. Por favor, active alguna opción de ubicación.</string>
+    <string name="alert_location_positive_button">Ir a Ajustes</string>
+    <string name="alert_location_negative_button">Cerrar</string>
+    <string name="alert_location_negative_message">Si quiere que la app funcione, tiene que activar alguna opción de ubicación en los ajustes.</string>
 
 </resources>

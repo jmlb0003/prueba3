@@ -10,7 +10,9 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -18,6 +20,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
@@ -26,6 +29,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.LocalDataProvider;
@@ -71,11 +75,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     
     
     /*******************CONSTANTES PARA LOCALIZACION**********************************/
-    //Tiempo mínimo en milisegundos entre lecturas de los sensores de posición
+    /**Tiempo mínimo en milisegundos entre lecturas de los sensores de posición (30 segundos)**/
     private static final int MIN_TIME = 30*1000;
-    //Variable para el descartar lecturas de ubicaciones en el método isBetterLocation
+    /**Variable para el descartar lecturas de ubicaciones en el método isBetterLocation**/
     private static final int TWO_MINUTES = 1000 * 60 * 2;
-    //Distancia mínima en metros entre lecturas de los sensores de posición
+    /**Distancia mínima en metros entre lecturas de los sensores de posición (50 metros)**/
     private static final int MIN_DISTANCE = 50;
     
     
@@ -83,6 +87,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     //Estas variables permiten descargar los recursos en tareas asíncronas sin bloquear la interfaz
     private static final BlockingQueue<Runnable> QUEUE = new ArrayBlockingQueue<Runnable>(1);
     private static final ThreadPoolExecutor DOWNLOADS_SERVICE = new ThreadPoolExecutor(1, 1, 20, TimeUnit.SECONDS, QUEUE);
+    /**Variable que almacena los proveedores online de Puntos de Interés**/
 	private static final Map<String,NetworkDataProvider> SOURCES = new ConcurrentHashMap<String,NetworkDataProvider>(); 
 	
 	
@@ -93,6 +98,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     private Location mLocation = null;
     //Variable con el radio de búsqueda de PI del radar
     private float mRadarSearch;
+    
+    
+    private boolean isDataSourcesInit = false;
     
     
 	private FragmentModoCamara mFragmentModoCamara;
@@ -151,13 +159,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 		aplicarValoresDeAjustes();
 		
-		//Ahora se cargan en memoria los PIs disponibles en el dispositivo
-		LocalDataProvider localData = new LocalDataProvider(this.getResources());
-        ARDataSource.addMarkers(localData.getMarkers());
-        //Se añaden recursos a la colección SOURCES para descargar PIs
-        NetworkDataProvider wikipedia = new WikipediaDataProvider(this.getResources());
-        SOURCES.put("wiki",wikipedia);        
-		
 	}// Fin de onCreate()
 	
 	
@@ -173,59 +174,19 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         
         aplicarValoresDeAjustes();
   
-        try {            
-            
-            sLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-            		MIN_TIME, MIN_DISTANCE, this);
-            sLocationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-            		MIN_TIME, MIN_DISTANCE, this);
-
-            try {
-            	
-            	Location gps = null;
-            	Location network = null;
-            	
-            	if (sLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            		gps = sLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            	}
-            	if (sLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            		network = sLocationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            	}
-            	
-            	
-            	if ( (gps != null) && (isBetterLocation(gps, network)) ) {
-            		mLocation = gps;
-            	}else {
-            		if (network != null) {
-            			mLocation = network;
-            		}else {
-            			//Si no hay localización ninguna, por defecto se pone la de la biblioteca de la UJA
-            			//TODO: aqui hay que hacer algo...meter la ultima ubicacion, o por lo menos un mensaje de que no hay ubicaciones
-            			mLocation.setLatitude(37.789);
-            			mLocation.setLongitude(-3.779);
-                		mLocation.setAltitude(700);
-                		
-            		}
-            	}
-            	
-            	onLocationChanged(mLocation);            	
-
-            	
-            	
-            } catch (Exception ex) {
-            	ex.printStackTrace();
-            }
-        } catch (Exception ex1) {
-            try {
-                if (sLocationMgr != null) {
-                	sLocationMgr.removeUpdates(this);
-                }
-            } catch (Exception ex2) {
-            	ex2.printStackTrace();
-            }
+        
+        getLocation();
+        
+        if (mLocation != null) {        	
+        	onLocationChanged(mLocation);
+        	
+        	cargarPIs();
         }
 
     }// Fin de onResume()
+	
+	
+	
 	
 	
 	/**
@@ -353,7 +314,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	        mFragmentModoCamara.calcularMagneticNorthCompensation();
 	        
 	        //Se actualizan/descargan los PIs según la posición obtenida
-	        updateData(newLocation.getLatitude(),newLocation.getLongitude(),newLocation.getAltitude());
+	        updateData(newLocation.getLatitude(),
+	        			newLocation.getLongitude(),
+	        			newLocation.getAltitude());
 		}else{
     		Log.d("SensorsActivity","la posicion anterior es mejor: La:"+ARDataSource.getCurrentLocation().getLatitude()+" lo:"+ARDataSource.getCurrentLocation().getLongitude()+" Precision:"+ARDataSource.getCurrentLocation().getAccuracy()+"\nLa nueva tenia precision: "+newLocation.getAccuracy());
     	}
@@ -451,22 +414,24 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     * @param alt Altitud de la última posición válida del dispositivo
     */
    private void updateData(final double lat, final double lon, final double alt) {
-       try {
-    	   DOWNLOADS_SERVICE.execute(
-    			   new Runnable() {
-    				   public void run() {
-    					   for (NetworkDataProvider source : SOURCES.values()) {
-    						   download(source, lat, lon, alt);
-    					   }
-    						   
-    				   }
-    			   }
-           );
-       } catch (RejectedExecutionException rej) {
-           Log.w("FragmentModoCamara", "Not running new download Runnable, queue is full.");
-       } catch (Exception e) {
-           Log.e("FragmentModoCamara", "Exception running download Runnable.",e);
-       }
+	   if (isDataSourcesInit) {
+	       try {
+	    	   DOWNLOADS_SERVICE.execute(
+	    			   new Runnable() {
+	    				   public void run() {
+	    					   for (NetworkDataProvider source : SOURCES.values()) {
+	    						   download(source, lat, lon, alt);
+	    					   }
+	    						   
+	    				   }
+	    			   }
+	           );
+	       } catch (RejectedExecutionException rej) {
+	           Log.w("FragmentModoCamara", "Not running new download Runnable, queue is full.");
+	       } catch (Exception e) {
+	           Log.e("FragmentModoCamara", "Exception running download Runnable.",e);
+	       }
+	   }
    }
    
    
@@ -523,6 +488,133 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
    }
    
    
+   
+   /**
+    * Método para gestionar el registro en los proveedores de localización y obtener una posición
+    * válida. Si no hay forma de obtener una posición, se fija la posición por defecto que es la 
+    * biblioteca de la UJA.
+    */
+   private void getLocation() {
+		boolean isGPSEnabled = false;
+		boolean isNetworkEnabled = false;
+		
+		
+		try {
+			Location gps = null;
+			Location network = null;
+       	
+			//Obtenemos la última posición almacenada de los proveedores y comprobamos
+			//si es válida
+			if (sLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+				isGPSEnabled = true;
+				gps = sLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+				sLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+    	           		MIN_TIME, MIN_DISTANCE, this);
+			}
+			if (sLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+				isNetworkEnabled = true;
+				network = sLocationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+				sLocationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+    	           		MIN_TIME, MIN_DISTANCE, this);
+			}
+    	   
+    	   
+			if (!isGPSEnabled && !isNetworkEnabled) {
+				mostrarSettingsAlert();
+			}
+    	   
+			//Si hay posición de los dos proveedores nos quedamos con la mejor
+			if ( (gps != null) && (network != null) ) {
+				if (isBetterLocation(gps, network)) {
+					Log.i("MainActivity","LastKnownLocation: mejor la del GPS");
+					mLocation = gps;
+				}else {
+					Log.i("MainActivity","LastKnownLocation: mejor la de network");
+					mLocation = network;
+				}
+    		   
+				//Si no, nos quedamos con la que haya
+			}else {
+				if (network != null) {	
+					Log.i("MainActivity","LastKnownLocation: solo hay de network");
+					mLocation = network;
+				}else {
+					if (gps != null) {
+						Log.i("MainActivity","LastKnownLocation: solo hay del GPS");
+						mLocation = gps;
+					}else {
+						//Si no hay localización ninguna, por defecto se pone la de la biblioteca de la UJA
+						Log.i("MainActivity","No hay ubicación, se pone la de la biblioteca");
+						mLocation.setLatitude(37.789);
+						mLocation.setLongitude(-3.779);
+						mLocation.setAltitude(700);
+					}
+				}
+			}
+    	   
+		} catch (Exception ex) {
+			if (sLocationMgr != null) {
+				sLocationMgr.removeUpdates(this);
+			}
+    	   
+			ex.printStackTrace();
+		}
+   }
+   
+   
+   
+   /**
+    * Método para avisar de que no se puede obtener ubicación en el dispositivo. Se mostrará
+    * un cuadro de diálogo que permite activar las funciones de localización.
+    */
+   private void mostrarSettingsAlert(){
+       AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);
+
+       ventanaAlerta.setTitle(getString(R.string.alert_location_title));
+       ventanaAlerta.setMessage(getString(R.string.alert_location_message));
+
+       //Si se pulsa el botón de ajustes, abrir los ajustes de localización
+       ventanaAlerta.setPositiveButton(getString(R.string.alert_location_positive_button),
+    		   											new DialogInterface.OnClickListener() {
+    	   public void onClick(DialogInterface dialog, int which) {
+               Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+               startActivity(intent);
+           }
+       });
+
+       //Si se pulsa el botón de cancelar, cerrar la ventana de diálogo
+       ventanaAlerta.setNegativeButton(getString(R.string.alert_location_negative_button), 
+    		   											new DialogInterface.OnClickListener() {
+           public void onClick(DialogInterface dialog, int which) {
+        	   Toast toast = Toast.makeText(getApplicationContext(), 
+        			   				getString(R.string.alert_location_negative_message), 
+        			   				Toast.LENGTH_LONG);
+        	   
+        	   dialog.cancel();
+        	   toast.show();
+           }
+       });
+
+       //Mostrar la ventana
+       ventanaAlerta.show();
+   }
+   
+   
+   /**
+	 * Método para cargar en memoria los Puntos de Interés desde los distintos proveedores 
+	 * de datos disponibles
+	 */
+	private void cargarPIs() {
+		//Ahora se cargan en memoria los PIs disponibles en el dispositivo
+		LocalDataProvider localData = new LocalDataProvider(getResources());
+		ARDataSource.addMarkers(localData.getMarkers());
+		
+		//Se añaden recursos a la colección SOURCES para descargar PIs
+		NetworkDataProvider wikipedia = new WikipediaDataProvider(getResources());
+		SOURCES.put("wiki",wikipedia);
+		
+		isDataSourcesInit = true;
+	}   
    
 
 

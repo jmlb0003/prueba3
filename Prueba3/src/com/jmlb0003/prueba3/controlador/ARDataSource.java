@@ -33,17 +33,18 @@ public abstract class ARDataSource {
     private static final float[] LOCATION_ARRAY = new float[3];
 	private static final DecimalFormat FORMAT = new DecimalFormat("#.##");
     
-    //TODO: aqui hay que hacer algo...meter la ultima ubicacion, o por lo menos un mensaje de que no hay ubicaciones
     public static final Location HARD_FIX = new Location("ATL");  
     
     static {
-        //hardFix.setLatitude(0);
-        //hardFix.setLongitude(0);
-        //hardFix.setAltitude(1);
+        //HARD_FIX.setLatitude(0);
+        //HARD_FIX.setLongitude(0);
+        //HARD_FIX.setAltitude(1);
         
-//        hardFix.setLatitude(37.789);
-//        hardFix.setLongitude(-3.779);
-//        hardFix.setAltitude(700);
+        HARD_FIX.setLatitude(37.789);
+        HARD_FIX.setLongitude(-3.779);
+        HARD_FIX.setAltitude(700);
+        
+        HARD_FIX.setAccuracy(0.0f);
     }
     
     
