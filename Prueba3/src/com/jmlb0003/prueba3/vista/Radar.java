@@ -47,6 +47,7 @@ public class Radar {
     private static float sPad_Y = 20;
     private static float sPixelsDensity = 0.0f;	//Esta es la densidad de píxeles de la pantalla
     private static float sRadarRadius = 40;
+    private static int sTextSize = TEXT_SIZE;
 
     
     /**
@@ -86,7 +87,8 @@ public class Radar {
         	
             sRadarRadius = 40 * sPixelsDensity;
             sPad_X = 10 * sPixelsDensity;
-            sPad_Y = 20 * sPixelsDensity;        	
+            sPad_Y = 20 * sPixelsDensity;
+            sTextSize = Math.round(TEXT_SIZE * sPixelsDensity);
         }
         
     }
@@ -231,14 +233,14 @@ public class Radar {
         radarText(  canvas, 
                     ""+bearing+((char)176)+" "+dirTxt, 
                     (sPad_X + sRadarRadius), 
-                    (sPad_Y - 5), 
+                    (sPad_Y - sTextSize), 
                     true
                  );
         
         radarText(  canvas, 
                     formatDist(ARDataSource.getRadius() * 1000), 
                     (sPad_X + sRadarRadius), 
-                    (sPad_Y + sRadarRadius*2 -10), 
+                    (sPad_Y + sRadarRadius*2 -sTextSize), 
                     false
                  );
     }
@@ -249,9 +251,9 @@ public class Radar {
     	}
     	
         if (sPaintableText == null) {
-        	sPaintableText = new PaintableText(txt,TEXT_COLOR,Math.round(TEXT_SIZE*getPixelsDensity()),bg);
+        	sPaintableText = new PaintableText(txt, TEXT_COLOR, sTextSize, bg);
         }else {
-        	sPaintableText.set(txt,TEXT_COLOR,Math.round(TEXT_SIZE*getPixelsDensity()),bg);
+        	sPaintableText.set(txt, TEXT_COLOR, sTextSize, bg);
         }
         
         if (sPaintedContainer == null) {

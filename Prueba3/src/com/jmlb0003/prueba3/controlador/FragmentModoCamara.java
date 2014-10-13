@@ -321,7 +321,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         // Listening for the down and up touch events
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-
                 return true;
                 
 
@@ -335,6 +334,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         	        }
         	    }
             	return false;
+            	
         }
         return false; // Return false for other touch events
 	}
