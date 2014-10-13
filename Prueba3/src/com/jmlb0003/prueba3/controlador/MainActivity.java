@@ -50,7 +50,7 @@ import com.jmlb0003.prueba3.modelo.WikipediaDataProvider;
  *
  */
 public class MainActivity extends ActionBarActivity implements ActionBar.OnNavigationListener,
-				LocationListener {
+				LocationListener, FragmentModoCamara.OnMarkerTouchedListener {
 	
 	/**
 	 * Nomenclatura de variables CODE GUIDELINES
@@ -99,8 +99,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     //Variable con el radio de búsqueda de PI del radar
     private float mRadarSearch;
     
+    /**Variable que almacena un marker pulsado**/
+    public static Marker sTouchedMarker = null;
     
+    /**Indica si se han inicializado los recursos de donde se obtienen los PIs**/
     private boolean isDataSourcesInit = false;
+    
     
     
 	private FragmentModoCamara mFragmentModoCamara;
@@ -614,8 +618,26 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		SOURCES.put("wiki",wikipedia);
 		
 		isDataSourcesInit = true;
+	}
+
+
+
+
+	@Override
+	public void onMarkerSelected(Marker markerTouched) {
+		sTouchedMarker = markerTouched;
+		
+		
+		//TODO: aquí deberia abrirse y cambiarse la vista de detalles básicos porque es para los dos modos
 	}   
    
+	@Override
+	public void onMarkerUnselected(Marker markerUnselected) {
+		sTouchedMarker = null;
+		
+		
+		//TODO: aquí deberia abrirse y cambiarse la vista de detalles básicos porque es para los dos modos
+	}
 
 
 }

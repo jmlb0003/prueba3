@@ -28,7 +28,8 @@ public class WikipediaDataProvider extends NetworkDataProvider {
 	//TODO:El enlace de wikipedia está mal a caso hecho
 	private static final String BASE_URL = "http://api.geonames.org/findNearbyWikipediaJSON";
 
-	private static Bitmap mIcon = null;
+	private static Bitmap sIcon = null;
+	private static Bitmap sSelectedIcon = null;
 	
 	
 	/**
@@ -49,7 +50,8 @@ public class WikipediaDataProvider extends NetworkDataProvider {
         }
         
         
-        mIcon = BitmapFactory.decodeResource(res, R.drawable.wikipedia);
+        sIcon = BitmapFactory.decodeResource(res, R.drawable.icono_pi);
+        sSelectedIcon = BitmapFactory.decodeResource(res, R.drawable.icono_pi_seleccionado);
     }
 
     
@@ -118,7 +120,7 @@ public class WikipediaDataProvider extends NetworkDataProvider {
         if ( jo.has("title") && jo.has("lat") && jo.has("lng") && jo.has("elevation") ) {
         	try {
         		ma = new Marker(jo.getString("title"), jo.getDouble("lat"), jo.getDouble("lng"),
-        							jo.getDouble("elevation"), Color.WHITE,	mIcon);
+        							jo.getDouble("elevation"), Color.WHITE,	sIcon, sSelectedIcon);
         		Log.d("wikipediaDatasource","Creado un marker de wikipedia");
         	} catch (JSONException e) {
         		e.printStackTrace();

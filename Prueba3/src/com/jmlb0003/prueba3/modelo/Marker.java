@@ -34,9 +34,13 @@ public class Marker implements Comparable<Marker> {
 	/****Constante para formatear el texto de la distancia hasta el marcador******/
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("@#");
     
-    /**Vectores para ubicar el símbolo y el texto de cada marker**/
+    /**Vectores para ubicar el icono de cada marker**/
     private static final Vector SYMBOL_VECTOR = new Vector(0, 0, 0);
+    /**Vectores para ubicar el texto de cada marker**/
     private static final Vector TEXT_VECTOR = new Vector(0, 1, 0);
+    
+    /**Valor en píxeles del radio que se utiliza como icono en los markers que no tienen un icono asignado**/
+    private static final int SYMBOL_RADIUS = 24;
     
     /**Modelo de cámara que permitirá proyectar el marker en pantalla**/
     private volatile static CameraModel sCam = null;
@@ -65,6 +69,10 @@ public class Marker implements Comparable<Marker> {
     
     /**Icono del marker**/
     private Bitmap mBitmap;
+    /**Icono del marker cuando está seleccionado**/
+    private Bitmap mSelectedBitmap;
+    /**Icono del marker que depende del estado actual (si está o no seleccionado)**/
+    private Bitmap mCurrentBitmap;
     
     /**Variables para dibujar algunos de los componentes visuales del marcador**/
     private volatile PaintableBoxedText mTextBox = null;
@@ -88,6 +96,8 @@ public class Marker implements Comparable<Marker> {
     protected volatile boolean isOnRadar = false;
     /**Indica si el marker está dentro del campo de visión o no**/
     protected volatile boolean isInView = false;
+    /**Indica si el marker ha sido pulsado**/
+    protected volatile boolean isSelected = false;
     
     /**VARIABLES PARA CONTROLAR LA POSICIÓN EN LA QUE SE DIBUJA EL MARKER EN PANTALLA
      * X define si está más arriba o más abajo
@@ -121,6 +131,8 @@ public class Marker implements Comparable<Marker> {
 	public Marker(String name, double latitude, double longitude, double altitude, int color) {
 		set(name, latitude, longitude, altitude, color);
 		mBitmap = null;
+		mSelectedBitmap = null;
+		mCurrentBitmap = mBitmap;
 	}
 	
 	
@@ -134,9 +146,11 @@ public class Marker implements Comparable<Marker> {
      * @param toBitmap Icono que se aplicará al Marker
      */
 	public Marker(String name, double latitude, double longitude, double altitude, int color, 
-							Bitmap toBitmap) {
+							Bitmap toBitmap, Bitmap toSelectedBitmap) {
 		set(name, latitude, longitude, altitude, color);
 		mBitmap = toBitmap;
+		mSelectedBitmap = toSelectedBitmap;
+		mCurrentBitmap = mBitmap;
 	}
 
 	public synchronized void set(String toName, double toLatitude, double toLongitude, 
@@ -180,6 +194,19 @@ public class Marker implements Comparable<Marker> {
         return isInView;
     }
 
+    
+    public synchronized void setTouched(boolean clicked) {
+    	isSelected = clicked;
+    	
+    	mCurrentBitmap = (isSelected)?mSelectedBitmap:mBitmap;
+
+    }
+    
+    public synchronized boolean isSelected() {
+    	return isSelected;
+    }
+    
+    
     /**
      * Calcula la posición del marker en la pantalla a partir de las coordenadas del texto 
      * y el símbolo relativas a la cámara
@@ -492,6 +519,7 @@ public class Marker implements Comparable<Marker> {
         	drawCollisionZone(canvas);
         }
         
+        
         drawIcon(canvas);
         drawText(canvas);
     }
@@ -522,10 +550,10 @@ public class Marker implements Comparable<Marker> {
         float x4 = x2;
         float y4 = y3;
 
-        Log.w("collisionBox", "ul (x="+x1+" y="+y1+")");
-        Log.w("collisionBox", "ur (x="+x2+" y="+y2+")");
-        Log.w("collisionBox", "ll (x="+x3+" y="+y3+")");
-        Log.w("collisionBox", "lr (x="+x4+" y="+y4+")");
+//        Log.w("collisionBox", "ul (x="+x1+" y="+y1+")");
+//        Log.w("collisionBox", "ur (x="+x2+" y="+y2+")");
+//        Log.w("collisionBox", "ll (x="+x3+" y="+y3+")");
+//        Log.w("collisionBox", "lr (x="+x4+" y="+y4+")");
         
         if (sCollisionBox == null) {
         	sCollisionBox = new PaintableBox(width,height,Color.WHITE,Color.RED);
@@ -566,10 +594,10 @@ public class Marker implements Comparable<Marker> {
         adjX -= (width/2);
         adjY -= (gpsSymbol.getHeight()/2);
         
-        Log.w("touchBox", "ul (x="+(adjX)+" y="+(adjY)+")");
-        Log.w("touchBox", "ur (x="+(adjX+width)+" y="+(adjY)+")");
-        Log.w("touchBox", "ll (x="+(adjX)+" y="+(adjY+height)+")");
-        Log.w("touchBox", "lr (x="+(adjX+width)+" y="+(adjY+height)+")");
+//        Log.w("touchBox", "ul (x="+(adjX)+" y="+(adjY)+")");
+//        Log.w("touchBox", "ur (x="+(adjX+width)+" y="+(adjY)+")");
+//        Log.w("touchBox", "ll (x="+(adjX)+" y="+(adjY+height)+")");
+//        Log.w("touchBox", "lr (x="+(adjX+width)+" y="+(adjY+height)+")");
         
         if (sTouchBox == null) {
         	sTouchBox = new PaintableBox(width,height,Color.WHITE,Color.GREEN);
@@ -601,13 +629,13 @@ public class Marker implements Comparable<Marker> {
     		   	
     	
 
-        if (gpsSymbol == null && mBitmap == null) {
+        if (gpsSymbol == null && mCurrentBitmap == null) {
         	gpsSymbol = 
-        			new PaintableGps((24*ARDataSource.PixelsDensity*scaleDistance), 
-        					(24*ARDataSource.PixelsDensity*scaleDistance), true, getColor());
+        			new PaintableGps((SYMBOL_RADIUS*ARDataSource.PixelsDensity*scaleDistance), 
+        					(SYMBOL_RADIUS*ARDataSource.PixelsDensity*scaleDistance), true, getColor());
         }else{
-        	if (mBitmap != null) {
-        		gpsSymbol = new PaintableIcon(mBitmap,scaleDistance);
+        	if (mCurrentBitmap != null) {
+        		gpsSymbol = new PaintableIcon(mCurrentBitmap,scaleDistance);
         	}
         }
 
@@ -683,4 +711,6 @@ public class Marker implements Comparable<Marker> {
         
         return name.equals(((Marker)marker).getName());
     }
+    
+    
 }

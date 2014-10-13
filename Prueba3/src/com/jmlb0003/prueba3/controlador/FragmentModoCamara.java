@@ -79,9 +79,35 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     private Activity mActivity;
     
 
-	
+	/*****************INTERFAZ PARA COMUNICARSE CON MAIN ACTIVITY***************/
+    OnMarkerTouchedListener mCallback;
+
+    // Container Activity must implement this interface
+    public interface OnMarkerTouchedListener {
+        public void onMarkerSelected(Marker markerTouched);
+        
+        public void onMarkerUnselected(Marker markerUnselected);
+    }
+    /***************************************************************************/
     
     /***************FUNCIONES*******************************************/
+    
+    /**
+     * Este es el primer evento del ciclo de vida del fragment
+     */
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            mCallback = (OnMarkerTouchedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnMarkerTouchedListener");
+        }
+    }
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -173,6 +199,8 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         
         //Con esto se mantiene la pantalla encendida mientras se esté usando el modo de Realidad Aumentada
         mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        
+        //TODO: Aqui se revisa si hay un marker seleccionado para dibujarlo como tal
         
 	}// Fin de onResume()
 	
@@ -333,6 +361,10 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         	            return true;
         	        }
         	    }
+            	
+            	//TODO:No se ha pulsado ninguno, si está abierta la vista de detalles básicos, se cierra y se deselecciona todo
+            	deseleccionarMarker(ARDataSource.SelectedMarker);
+            	
             	return false;
             	
         }
@@ -340,12 +372,60 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	}
 	
 	
+	/**
+	 * //TODO: Método de la pulsación sobre un marker, muy importante
+	 * Método con las acciones a realizar cuando se pulsa un marker
+	 * @param marker
+	 */
 	private void markerTouched(Marker marker) {
-		Log.w("FragmentModoCamara","markerTouched() not implemented.");
+		/**
+		 * Se ha pulsado marker.
+		 * 1º si hay ya uno pulsado:
+		 * 		1.1 Si es distinto, se cambia el seleccionado y se abre o se cambian los detalles básicos
+		 * 		1.2 Si es igual, se abre la ventana de detalles
+		 * 2º si no hay ninguno pulsado:
+		 * 		2.1 Se pone como seleccionado y se abre la vista de detalles básicos
+		 */
+		
+		if (ARDataSource.hasSelectededMarker()) {
+
+			if (ARDataSource.SelectedMarker != marker) {
+				//Se deselecciona el marker actual y se selecciona el nuevo
+				deseleccionarMarker(ARDataSource.SelectedMarker);
+				
+			} else {
+				//TODO: Aquí hay que abrir la ventana de detalles completos
+			}
+		}
+		
+		
+		seleccionarMarker(marker);
+		
 	}
 	
 	
+	/**
+	 * Método para marcar como seleccionado un marker de los que actualmente se encuentran en pantalla
+	 * @param m Marker que se va a marcar como seleccionado
+	 */
+	private void seleccionarMarker(Marker m) {
+		m.setTouched(true);
+		ARDataSource.SelectedMarker = m;
+		mCallback.onMarkerSelected(m);
+	}
 	
+	
+	/**
+	 * Método para desmarcar como seleccionado un marker previamente seleccionado
+	 * @param m Marker que se va a deseleccionar
+	 */
+	private void deseleccionarMarker(Marker m) {
+		if (m != null) {
+			m.setTouched(false);
+			mCallback.onMarkerUnselected(m);
+			ARDataSource.SelectedMarker = null;
+		}
+	}
 
 
 }

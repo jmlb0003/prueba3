@@ -33,7 +33,7 @@ public abstract class ARDataSource {
     private static final float[] LOCATION_ARRAY = new float[3];
 	private static final DecimalFormat FORMAT = new DecimalFormat("#.##");
     
-    public static final Location HARD_FIX = new Location("ATL");  
+    public static final Location HARD_FIX = new Location("ATL");
     
     static {
         //HARD_FIX.setLatitude(0);
@@ -64,9 +64,12 @@ public abstract class ARDataSource {
     
     private static float sRadius;
     
+    
     /**Variable donde se almacena el valor de densidad de píxel de la pantalla del dispositivo**/
     public static float PixelsDensity;
     
+    /**Variable donde se almacena la referencia del marker seleccionado en pantalla**/
+    public static Marker SelectedMarker = null;
     
     /**
      * Modifica el texto del radio de búsqueda del Radar
@@ -159,6 +162,26 @@ public abstract class ARDataSource {
         
         return Collections.unmodifiableList(CACHE);
     }
+    
+    
+    /**
+     * Método que comprueba si hay algún marker seleccionado
+     * @return
+     */
+    public static boolean hasSelectededMarker() {
+    	
+        for(Marker ma : MARKER_LIST.values()) {
+            if (ma.isSelected()) {
+            	SelectedMarker = ma;
+            	return true;
+            }
+        }
+        SelectedMarker = null;
+            	
+    	return false;
+    }
+    
+    
     
     
     public static void setAzimuth(float azimuth) {

@@ -14,5 +14,12 @@
     <string name="alert_location_positive_button">Ir a Ajustes</string>
     <string name="alert_location_negative_button">Cerrar</string>
     <string name="alert_location_negative_message">Si quiere que la app funcione, tiene que activar alguna opción de ubicación en los ajustes.</string>
+    
+    
+    <!-- Vista de detalles básicos de los PI -->
+    <string name="pi_name">Nombre del PI</string>
+    <string name="pi_distance">Distancia</string>
+    <string name="pi_description">Descripción</string>
+    <string name="pi_content_description">Fotografía del PI</string>
 
 </resources>
