@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="200dp"
+    android:padding="10dp" 
+    android:background="#AA000000">
+    
+    
+    <!-- 
+    xmlns:custom="http://schemas.android.com/apk/res/com.jmlb0003.prueba3"
+    
+    <com.jmlb0003.prueba3.vista.BasicDetailsView
+	        custom:showText="true"
+	        custom:labelPosition="left" />
+     -->
+    <LinearLayout
+	    android:id="@+id/basic_details_view_container"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical" >
+	    
+        <!-- Contiene la imagen, nombre y distancia del PI -->
+	    <LinearLayout 
+	        android:orientation="horizontal" >
+	        
+	        
+	        <ImageView 
+	            android:id="@+id/pi_image_container"
+	            android:contentDescription="@string/pi_content_description"
+	            android:clickable="true" />
+	        
+	        <LinearLayout
+		        android:id="@+id/pi_name_container"
+		        android:orientation="vertical"
+		        android:layout_height="wrap_content" >
+		        <TextView 
+		            android:text="@string/pi_name"/>
+		        <TextView 
+		            android:id="@+id/pi_name"/>
+		    </LinearLayout>
+		    
+	        <LinearLayout
+		        android:id="@+id/pi_distance_container"
+		        android:orientation="vertical"
+		        android:layout_width="60dp"
+		        android:layout_height="wrap_content" >
+		        <TextView 
+		            android:text="@string/pi_distance"/>
+		        <TextView 
+		            android:id="@+id/pi_distance"/>
+		    </LinearLayout>
+	    </LinearLayout>
+	    
+	        
+	    <!-- Contiene la descripción del PI -->
+	    <LinearLayout
+	        android:id="@+id/description_container"
+	        android:orientation="vertical"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content" >
+	        <TextView 
+	            android:id="@+id/title_description"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"/>
+	        <TextView 
+	            android:id="@+id/content_description"/>
+	    </LinearLayout>
+	        
+	</LinearLayout>
+	    
+	    
+</ScrollView>
