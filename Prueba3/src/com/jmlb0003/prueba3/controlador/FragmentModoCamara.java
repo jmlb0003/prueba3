@@ -22,14 +22,14 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
-import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
 
+import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.Marker;
 import com.jmlb0003.prueba3.utilidades.LowPassFilter;
 import com.jmlb0003.prueba3.utilidades.Matrix;
 import com.jmlb0003.prueba3.vista.AugmentedView;
-import com.jmlb0003.prueba3.vista.CameraSurface;
-import com.jmlb0003.prueba3.R;
+import com.jmlb0003.prueba3.vista.BasicDetailsView;
 
 
 
@@ -69,14 +69,12 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     private static Sensor sSensorGrav = null;
     //Sensor magnético del dispositivo
     private static Sensor sSensorMag = null;
-    
-
-    /***************VISTAS MODO RA**************************************/
-    protected static CameraSurface sCameraScreen = null;   
+      
     
     /***************VARIABLES PRIVADAS*******************************************/
     private AugmentedView mAugmentedView;
     private Activity mActivity;
+    private BasicDetailsView mBasicDetails;
     
 
 	/*****************INTERFAZ PARA COMUNICARSE CON MAIN ACTIVITY***************/
@@ -156,12 +154,10 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 		// 1- Obtener la vista principal del fragment
 		// 2- Obtener el layout donde se colocan las vistas de camara e información de aumento
 		View rootView = inflater.inflate(R.layout.fragment_modo_camara, container, false);
-		RelativeLayout preview = (RelativeLayout) rootView.findViewById(R.id.layoutParaCamara);
+		FrameLayout preview = (FrameLayout) rootView.findViewById(R.id.layoutParaCamara);
 		
 		mActivity = getActivity();
-		
-		//Se crea la view que muestra las imágenes de la cámara
-		sCameraScreen = new CameraSurface(mActivity);
+	
 		//Estas líneas venían en el programa original que no usaba fragments
 		//Se pone dicha vista para que sea la que se muestre en pantalla
 		//mActivity.setContentView(sCameraScreen);
@@ -173,12 +169,15 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         mAugmentedView = new AugmentedView(mActivity);        
         mAugmentedView.setOnTouchListener(this);
         
+        mBasicDetails = new BasicDetailsView(mActivity);
+        
         LayoutParams augmentedLayoutParams = 
         		new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
         //Se añaden al layout que obtuvimos al principio y se devuelve la vista del fragment
-        preview.addView(sCameraScreen);
+//preview.addView(sCameraScreen);
         preview.addView(mAugmentedView, augmentedLayoutParams);
+        preview.addView(mBasicDetails);
         
 
 	    return rootView;
@@ -385,8 +384,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 		 * 		1.2 Si es igual, se abre la ventana de detalles
 		 * 2º si no hay ninguno pulsado:
 		 * 		2.1 Se pone como seleccionado y se abre la vista de detalles básicos
-		 */
-		
+		 */		
 		if (ARDataSource.hasSelectededMarker()) {
 
 			if (ARDataSource.SelectedMarker != marker) {
@@ -400,7 +398,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 		
 		
 		seleccionarMarker(marker);
-		
 	}
 	
 	
@@ -412,6 +409,10 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 		m.setTouched(true);
 		ARDataSource.SelectedMarker = m;
 		mCallback.onMarkerSelected(m);
+		
+
+		mBasicDetails.setEnabled(true);		
+		mBasicDetails.initView(m);
 	}
 	
 	
@@ -425,6 +426,8 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 			mCallback.onMarkerUnselected(m);
 			ARDataSource.SelectedMarker = null;
 		}
+		
+		mBasicDetails.setEnabled(false);
 	}
 
 

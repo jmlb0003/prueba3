@@ -3,33 +3,58 @@ package com.jmlb0003.prueba3.vista;
 import java.util.Iterator;
 import java.util.List;
 
-
-
-import com.jmlb0003.prueba3.utilidades.Compatibility;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.os.Build;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.jmlb0003.prueba3.utilidades.Compatibility;
 
 
+/**
+ * Clase que gestiona la vista que muestra las imágenes capturadas por la cámara del dispositivo.
+ * 
+ * @author Jose
+ *
+ */
 public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 		private SurfaceHolder mHolder;
 	    private Camera mCamera;
 	    private static final String LOG_TAG = "CameraSurface";
 	    
 	    /**
-	     * Constructor del preview de la cámara.
+	     * Constructor del preview de la cámara para usarlo de forma dinámica.
 	     * @param context	Contexto de la actividad que alberga el objeto SurfaceView
 	     */
 		@SuppressWarnings("deprecation")
 		public CameraSurface(Context context) {
 			super(context);
+
+			try {
+				//Se añade un observador del surface para saber cuando se crea y
+				//se destruye
+				mHolder = getHolder();
+				mHolder.addCallback(this);
+				//Esta línea es requerida en versiones anteriores a la 3
+				mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+			} catch (Exception ex) {
+
+			}
+		}
+		
+		
+		/**
+	     * Constructor del preview de la cámara insertado en un layout XML.
+	     * @param context	Contexto de la actividad que alberga el objeto SurfaceView
+	     */
+		@SuppressWarnings("deprecation")
+		public CameraSurface(Context context, AttributeSet attrs) {
+			super(context, attrs);
 
 			try {
 				//Se añade un observador del surface para saber cuando se crea y

@@ -8,12 +8,18 @@
     <string name="action_settings">Ajustes</string>
     
     
-    <!-- Ventana de diálogo de ubicación -->
+    <!-- Ventana de diálogo de ajustes de ubicación -->
     <string name="alert_location_title">Ajustes de ubicación</string>
     <string name="alert_location_message">No se puede ubicar su dispositivo. Por favor, active alguna opción de ubicación.</string>
     <string name="alert_location_positive_button">Ir a Ajustes</string>
     <string name="alert_location_negative_button">Cerrar</string>
     <string name="alert_location_negative_message">Si quiere que la app funcione, tiene que activar alguna opción de ubicación en los ajustes.</string>
+    
+    <!-- Ventana de diálogo de ubicación -->
+    <string name="alert_location2_title">Buscando ubicación</string>
+    <string name="alert_location2_message">Afinando la ubicación&#8230;\nPaciencia. Al iniciar la app puede tardar un poco.</string>
+    <string name="alert_location2_negative_button">Cerrar</string>
+    <string name="alert_location2_negative_message">¡Ya queda menos!</string>
     
     
     <!-- Vista de detalles básicos de los PI -->

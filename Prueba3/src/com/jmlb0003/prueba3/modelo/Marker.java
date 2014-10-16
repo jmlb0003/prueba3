@@ -181,6 +181,10 @@ public class Marker implements Comparable<Marker> {
     public synchronized double getDistance() {
         return distance;
     }
+    
+    public synchronized Bitmap getImage() {
+        return mCurrentBitmap;
+    }
 
     public synchronized float getInitialY() {
         return mInitialY;

@@ -33,7 +33,6 @@
 	            android:clickable="true" />
 	        
 	        <LinearLayout
-		        android:id="@+id/pi_name_container"
 		        android:orientation="vertical"
 		        android:layout_height="wrap_content" >
 		        <TextView 
@@ -43,7 +42,6 @@
 		    </LinearLayout>
 		    
 	        <LinearLayout
-		        android:id="@+id/pi_distance_container"
 		        android:orientation="vertical"
 		        android:layout_width="60dp"
 		        android:layout_height="wrap_content" >
