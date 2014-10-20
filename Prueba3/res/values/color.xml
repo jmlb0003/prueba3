@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black_overlay">#66000000</color>
+    <color name="blue">#FF33B5E5</color>
+    <color name="purple">#FFAA66CC</color>
+    <color name="green">#FF99CC00</color>
+    <color name="orange">#FFFFBB33</color>
+    <color name="red">#FFFF4444</color>
+    <color name="darkblue">#FF0099CC</color>
+    <color name="darkpurple">#FF9933CC</color>
+    <color name="darkgreen">#FF669900</color>
+    <color name="darkorange">#FFFF8800</color>
+    <color name="darkred">#FFCC0000</color>
+    
+    <!-- indigo -->
+    <color name="md_indigo_50">#e8eaf6</color>
+    <color name="md_indigo_100">#c5cae9</color>
+    <color name="md_indigo_200">#9fa8da</color>
+    <color name="md_indigo_300">#7986cb</color>
+    <color name="md_indigo_400">#5c6bc0</color>
+    <color name="md_indigo_500">#3f51b5</color>
+    <color name="md_indigo_600">#3949ab</color>
+    <color name="md_indigo_700">#303f9f</color>
+    <color name="md_indigo_800">#283593</color>
+    <color name="md_indigo_900">#1a237e</color>
+    <color name="md_indigo_A100">#8c9eff</color>
+    <color name="md_indigo_A200">#536dfe</color>
+    <color name="md_indigo_A400">#3d5afe</color>
+    <color name="md_indigo_A700">#304ffe</color>
+ 
+    <!--blue-->
+    <color name="md_blue_50">#e7e9fd</color>
+    <color name="md_blue_100">#d0d9ff</color>
+    <color name="md_blue_200">#afbfff</color>
+    <color name="md_blue_300">#91a7ff</color>
+    <color name="md_blue_400">#738ffe</color>
+    <color name="md_blue_500">#5677fc</color>
+    <color name="md_blue_600">#4e6cef</color>
+    <color name="md_blue_700">#455ede</color>
+    <color name="md_blue_800">#3b50ce</color>
+    <color name="md_blue_900">#2a36b1</color>
+    <color name="md_blue_A100">#a6baff</color>
+    <color name="md_blue_A200">#6889ff</color>
+    <color name="md_blue_A400">#4d73ff</color>
+    <color name="md_blue_A700">#4d69ff</color>
+    
+    <color name="primary">@color/md_indigo_500</color>
+    <color name="primary_dark">@color/md_indigo_700</color>
+    <color name="accent">@color/md_blue_A200</color>
+    <color name="text_primary">#DEFFFFFF</color>
+    <color name="text_secondary">#DE000000</color>
+   
+    <color name="text_title">#DE3F51B5</color>
+</resources>

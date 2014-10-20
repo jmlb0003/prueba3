@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    -->
+    <style name="AppTheme" parent="android:Theme.Material.Light">
+	    <!--   your app branding color for the app bar -->
+	    <item name="android:colorPrimary">@color/primary</item>
+	    <!--   darker variant for the status bar and contextual app bars -->
+	    <item name="android:colorPrimaryDark">@color/primary_dark</item>
+	    <!--   theme UI controls like checkboxes and text fields -->
+	    <item name="android:colorAccent">@color/accent</item>
+	    
+	    <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        
+        <!--  Esto es de la página esta: http://antonioleiva.com/material-design-everywhere/ -->
+        <item name="android:windowContentTransitions">true</item>
+	    <item name="android:windowAllowEnterTransitionOverlap">true</item>
+	    <item name="android:windowAllowReturnTransitionOverlap">true</item>
+	    <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
+	    <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
+	</style>
+       
+</resources>
