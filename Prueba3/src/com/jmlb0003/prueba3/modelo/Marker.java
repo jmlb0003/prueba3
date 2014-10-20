@@ -11,7 +11,7 @@ import android.util.Log;
 
 import com.jmlb0003.prueba3.controlador.ARDataSource;
 import com.jmlb0003.prueba3.utilidades.CameraModel;
-import com.jmlb0003.prueba3.utilidades.PhysicalLocationUtility;
+import com.jmlb0003.prueba3.utilidades.PosicionPI;
 import com.jmlb0003.prueba3.utilidades.Utilities;
 import com.jmlb0003.prueba3.utilidades.Vector;
 import com.jmlb0003.prueba3.utilidades.Paintables.PaintableBox;
@@ -82,16 +82,12 @@ public class Marker implements Comparable<Marker> {
     protected final float[] textArray = new float[3];
     
     /**VARIABLES QUE ALMACENAN LOS COMPONENTES DIBUJABLES DEL MARKER**/
-    /**Símbolo del marker**/
+    /**Variable con la que se pinta el icono del marker**/
     protected volatile PaintableObject gpsSymbol = null;
-    /**Contenedor del Símbolo del marker**/
+    /**Contenedor del gpsSymbol del marker**/
     protected volatile PaintablePosition symbolContainer = null;
-    /**Nombre del marker**/
-    protected String name = null;
-    /**Ubicación del marker en el mundo real **/
-    protected volatile PhysicalLocationUtility markerPhysicalLocation = new PhysicalLocationUtility();
-    /**Distancia en metros hasta el marker desde la posición del usuario **/
-    protected volatile double distance = 0.0;
+
+
     /** Indica si el marker debe aparecer en el radar o no**/
     protected volatile boolean isOnRadar = false;
     /**Indica si el marker está dentro del campo de visión o no**/
@@ -114,11 +110,17 @@ public class Marker implements Comparable<Marker> {
      * marker */
     protected final Vector locationXyzRelativeToPhysicalLocation = new Vector();
     
-    /**Color por defecto del marker**/
-    protected int color = Color.WHITE;
+    /**DETALLES DEL PI**/
+    /**Nombre del PI**/
+    private String mName = null;
+    /**Ubicación del marker en el mundo real **/
+    private volatile PosicionPI mMarkerPhysicalLocation = new PosicionPI();
+    /**Distancia en metros hasta el marker desde la posición del usuario **/
+    private volatile double mDistance = 0.0;
 
-    
 
+    /**Variable que contiene otros atributos del PI**/    
+    private DetallesPI mDetails = new DetallesPI(null);
     
     /**
      * Constructor de la clase Marker sin icono.
@@ -126,10 +128,11 @@ public class Marker implements Comparable<Marker> {
      * @param latitude
      * @param longitude
      * @param altitude
-     * @param color
+     * @param otrosDetalles
      */
-	public Marker(String name, double latitude, double longitude, double altitude, int color) {
-		set(name, latitude, longitude, altitude, color);
+	public Marker(String name, double latitude, double longitude, double altitude, 
+																DetallesPI otrosDetalles) {
+		set(name, latitude, longitude, altitude, otrosDetalles);
 		mBitmap = null;
 		mSelectedBitmap = null;
 		mCurrentBitmap = mBitmap;
@@ -142,47 +145,94 @@ public class Marker implements Comparable<Marker> {
      * @param latitude	Latitud del Marker
      * @param longitude Longitud del Marker
      * @param altitude Altitud del Marker
-     * @param color Color que tendrá el marker en el radar y en las vistas de realidad aumentada y mapa
+     * @param otrosDetalles Contiene otros atributos del PI. Ver la clase DetallesPI.
      * @param toBitmap Icono que se aplicará al Marker
+     * @param toSelectedBitmap Icono que se aplicará al PI cuando sea seleccionado.
      */
-	public Marker(String name, double latitude, double longitude, double altitude, int color, 
-							Bitmap toBitmap, Bitmap toSelectedBitmap) {
-		set(name, latitude, longitude, altitude, color);
+	public Marker(String name, double latitude, double longitude, double altitude, 
+					DetallesPI otrosDetalles, Bitmap toBitmap, Bitmap toSelectedBitmap) {
+		set(name, latitude, longitude, altitude, otrosDetalles);
 		mBitmap = toBitmap;
 		mSelectedBitmap = toSelectedBitmap;
 		mCurrentBitmap = mBitmap;
 	}
 
+	
+	/**
+	 * Inicializa los atributos comunes de todos los PIs.
+	 * @param toName Nombre del PI
+	 * @param toLatitude Coordenada de latitud del PI en grados decimales
+	 * @param toLongitude Coordenada de longitud del PI en grados decimales
+	 * @param toAltitude Altitud del PI en metros
+	 * @param detalles Contiene otros atributos de los PI. Ver la clase DetallesPI.
+	 */
 	public synchronized void set(String toName, double toLatitude, double toLongitude, 
-																double toAltitude, int toColor) {
+													double toAltitude, DetallesPI detalles) {
 		if (toName == null) {
 			throw new NullPointerException();
 		}
 
-		name = toName;
-		markerPhysicalLocation.set(toLatitude,toLongitude,toAltitude);
-		color = toColor;
+		mName = toName;
+		mMarkerPhysicalLocation.set(toLatitude,toLongitude,toAltitude);		
 		isOnRadar = false;
 		isInView = false;
 		symbolXyzRelativeToCameraView.set(0, 0, 0);
 		textXyzRelativeToCameraView.set(0, 0, 0);
 		locationXyzRelativeToPhysicalLocation.set(0, 0, 0);
 		mInitialY = 0.0f;
+		
+		mDetails = detalles;
 	}
 
 	public synchronized String getName(){
-		return name;
+		return mName;
 	}
 
     public synchronized int getColor() {
-    	return color;
+    	return (int)mDetails.getDetalle("color");
     }
 
     public synchronized double getDistance() {
-        return distance;
+        return mDistance;
+    }
+    
+    public synchronized String getTextDistance() {
+        return (String) mDetails.getDetalle("distancia");
     }
     
     public synchronized Bitmap getImage() {
+        return (Bitmap)mDetails.getDetalle("imagen");
+    }
+    
+    public synchronized String getDescription() {
+        return (String)mDetails.getDetalle("descripcion");
+    }
+    
+    public synchronized String getWebSite() {
+        return (String)mDetails.getDetalle("sitio_web");
+    }
+    
+    public synchronized float getPrice() {
+        return (float)mDetails.getDetalle("precio");
+    }
+    
+    public synchronized String getOpenHours() {
+        return (String)mDetails.getDetalle("horario_apertura");
+    }
+    
+    public synchronized String getCloseHours() {
+        return (String)mDetails.getDetalle("horario_cierre");
+    }
+    
+    public synchronized int getMaxYears() {
+        return (int)mDetails.getDetalle("edad_maxima");
+    }
+    
+    public synchronized int getMinYears() {
+        return (int)mDetails.getDetalle("edad_minima");
+    }
+    
+    public synchronized Bitmap getIcon() {
         return mCurrentBitmap;
     }
 
@@ -366,12 +416,12 @@ public class Marker implements Comparable<Marker> {
 	    updateDistance(location);
 	    
 	    //Si el marker no tiene una altitud correcta se le asigna la actual del usuario
-		if (markerPhysicalLocation.getAltitude() == 0.0) {
-			markerPhysicalLocation.setAltitude(location.getAltitude());
+		if (mMarkerPhysicalLocation.getAltitude() == 0.0) {
+			mMarkerPhysicalLocation.setAltitude(location.getAltitude());
 		}
 		
 		//Se calcula la posición relativa del marker desde la posición del usuario
-		PhysicalLocationUtility.convLocationToVector(location, markerPhysicalLocation, 
+		PosicionPI.convLocationToVector(location, mMarkerPhysicalLocation, 
 											locationXyzRelativeToPhysicalLocation);
 		mInitialY = locationXyzRelativeToPhysicalLocation.getY();
 		
@@ -389,11 +439,11 @@ public class Marker implements Comparable<Marker> {
         	throw new NullPointerException();
         }
 
-        Location.distanceBetween(markerPhysicalLocation.getLatitude(), 
-        		markerPhysicalLocation.getLongitude(), location.getLatitude(), 
+        Location.distanceBetween(mMarkerPhysicalLocation.getLatitude(), 
+        		mMarkerPhysicalLocation.getLongitude(), location.getLatitude(), 
         		location.getLongitude(), mDistanceArray);
         
-        distance = mDistanceArray[0];
+        mDistance = mDistanceArray[0];
     }
 
     
@@ -554,10 +604,10 @@ public class Marker implements Comparable<Marker> {
         float x4 = x2;
         float y4 = y3;
 
-//        Log.w("collisionBox", "ul (x="+x1+" y="+y1+")");
-//        Log.w("collisionBox", "ur (x="+x2+" y="+y2+")");
-//        Log.w("collisionBox", "ll (x="+x3+" y="+y3+")");
-//        Log.w("collisionBox", "lr (x="+x4+" y="+y4+")");
+        Log.w("collisionBox", "ul (x="+x1+" y="+y1+")");
+        Log.w("collisionBox", "ur (x="+x2+" y="+y2+")");
+        Log.w("collisionBox", "ll (x="+x3+" y="+y3+")");
+        Log.w("collisionBox", "lr (x="+x4+" y="+y4+")");
         
         if (sCollisionBox == null) {
         	sCollisionBox = new PaintableBox(width,height,Color.WHITE,Color.RED);
@@ -598,10 +648,10 @@ public class Marker implements Comparable<Marker> {
         adjX -= (width/2);
         adjY -= (gpsSymbol.getHeight()/2);
         
-//        Log.w("touchBox", "ul (x="+(adjX)+" y="+(adjY)+")");
-//        Log.w("touchBox", "ur (x="+(adjX+width)+" y="+(adjY)+")");
-//        Log.w("touchBox", "ll (x="+(adjX)+" y="+(adjY+height)+")");
-//        Log.w("touchBox", "lr (x="+(adjX+width)+" y="+(adjY+height)+")");
+        Log.w("touchBox", "ul (x="+(adjX)+" y="+(adjY)+")");
+        Log.w("touchBox", "ur (x="+(adjX+width)+" y="+(adjY)+")");
+        Log.w("touchBox", "ll (x="+(adjX)+" y="+(adjY+height)+")");
+        Log.w("touchBox", "lr (x="+(adjX+width)+" y="+(adjY+height)+")");
         
         if (sTouchBox == null) {
         	sTouchBox = new PaintableBox(width,height,Color.WHITE,Color.GREEN);
@@ -624,11 +674,11 @@ public class Marker implements Comparable<Marker> {
     	}
 
     	float scaleDistance = 1.0f;
-    	if (distance > 2000)
-    		scaleDistance = 0.9f;
-    	else if (distance > 10000)
-    		scaleDistance = 0.6f;
-    	else if (distance > 50000)
+    	if (mDistance > 5000)
+    		scaleDistance = 0.7f;
+    	else if (mDistance > 10000)
+    		scaleDistance = 0.5f;
+    	else if (mDistance > 30000)
     		scaleDistance = 0.4f;
     		   	
     	
@@ -665,12 +715,15 @@ public class Marker implements Comparable<Marker> {
 		}
 		
 	    String textStr = null;
-	    if (distance < 1000.0) {
-	        textStr = name + " ("+ DECIMAL_FORMAT.format(distance) + "m)";          
+	    if (mDistance < 1000.0) {
+	        textStr = mName;// + " ("+ DECIMAL_FORMAT.format(mDistance) + "m)";
+	        mDetails.actualizaDistancia(DECIMAL_FORMAT.format(mDistance) + " m");
 	    } else {
-	        double d = distance/1000.0;
-	        textStr = name + " (" + DECIMAL_FORMAT.format(d) + "km)";
+	        double d = mDistance/1000.0;
+	        textStr = mName;// + " (" + DECIMAL_FORMAT.format(d) + "km)";
+	        mDetails.actualizaDistancia(DECIMAL_FORMAT.format(d) + " km");
 	    }
+
 
 	    textXyzRelativeToCameraView.get(textArray);
 	    symbolXyzRelativeToCameraView.get(symbolArray);
@@ -699,21 +752,24 @@ public class Marker implements Comparable<Marker> {
 	    mTextContainer.paint(canvas);
 	}
 
+    
+  //TODO: Revisar el compareTo de marker
     public synchronized int compareTo(Marker another) {
         if (another == null) {
         	throw new NullPointerException();
         }
-        
-        return name.compareTo(another.getName());
+
+        return mName.compareTo(another.getName());
     }
 
+    //TODO: Revisar el equals de marker
     @Override
     public synchronized boolean equals(Object marker) {
-        if(marker == null || name == null) {
+        if(marker == null || mName == null) {
         	throw new NullPointerException();
         }
-        
-        return name.equals(((Marker)marker).getName());
+
+        return mName.equals(((Marker)marker).getName());
     }
     
     

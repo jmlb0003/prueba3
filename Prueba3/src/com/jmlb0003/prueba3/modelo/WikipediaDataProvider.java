@@ -3,7 +3,9 @@ package com.jmlb0003.prueba3.modelo;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,10 +28,11 @@ import com.jmlb0003.prueba3.R;
  */
 public class WikipediaDataProvider extends NetworkDataProvider {
 	//TODO:El enlace de wikipedia está mal a caso hecho
-	private static final String BASE_URL = "http://api.geonames.org/findNearbyWikipediaJSON";
+	private static final String BASE_URL = "http://api.geonames.org/findNearbyWikipediacccccsJSON";
 
 	private static Bitmap sIcon = null;
 	private static Bitmap sSelectedIcon = null;
+	private static Bitmap sWikipediaIcon = null; 
 	
 	
 	/**
@@ -52,6 +55,7 @@ public class WikipediaDataProvider extends NetworkDataProvider {
         
         sIcon = BitmapFactory.decodeResource(res, R.drawable.icono_pi);
         sSelectedIcon = BitmapFactory.decodeResource(res, R.drawable.icono_pi_seleccionado);
+        sWikipediaIcon = BitmapFactory.decodeResource(res, R.drawable.wikipedia);
     }
 
     
@@ -116,11 +120,24 @@ public class WikipediaDataProvider extends NetworkDataProvider {
 		}
 		
         Marker ma = null;
+        Map<String, Object> datos;
         
         if ( jo.has("title") && jo.has("lat") && jo.has("lng") && jo.has("elevation") ) {
         	try {
+        		datos = new HashMap<String, Object>();
+        		datos.put("ID", -1);
+            	datos.put("color", Color.WHITE);
+            	datos.put("imagen", sWikipediaIcon);
+            	datos.put("descripcion", jo.get("summary"));
+            	datos.put("sitio_web", jo.get("wikipediaUrl"));
+            	datos.put("precio", 0);
+            	datos.put("horario_apertura", "00:00");
+            	datos.put("horario_cierre", "00:00");
+            	datos.put("edad_maxima", 0);
+            	datos.put("edad_minima", 0);
+            	
         		ma = new Marker(jo.getString("title"), jo.getDouble("lat"), jo.getDouble("lng"),
-        							jo.getDouble("elevation"), Color.WHITE,	sIcon, sSelectedIcon);
+        							jo.getDouble("elevation"), new DetallesPI(datos), sIcon, sSelectedIcon);
         		Log.d("wikipediaDatasource","Creado un marker de wikipedia");
         	} catch (JSONException e) {
         		e.printStackTrace();

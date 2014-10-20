@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.util.AttributeSet;
 import android.view.View;
 
 import com.jmlb0003.prueba3.controlador.ARDataSource;
@@ -45,7 +46,22 @@ public class AugmentedView extends View {
 		ARDataSource.PixelsDensity = sPixelDensity;
 		
 		sRadar  = new Radar(sPixelDensity);
-	}// Fin del constructor
+	}// Fin del constructor dinámico
+	
+	
+	/**
+	 * Constructor de la clase cuando se ha insertado en un layout XML
+	 * @param context
+	 * @param attrs
+	 */
+	public AugmentedView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+
+		sPixelDensity = context.getResources().getDisplayMetrics().density;
+		ARDataSource.PixelsDensity = sPixelDensity;
+		
+		sRadar  = new Radar(sPixelDensity);
+	}// Fin del constructor con XML
 	
 	
 	/**

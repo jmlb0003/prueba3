@@ -9,7 +9,7 @@ import android.location.Location;
  * @author Jose
  *
  */
-public class PhysicalLocationUtility {
+public class PosicionPI {
 	private static float[] sX = new float[1];
 	private static double sY = 0.0d;
 	private static float[] sZ = new float[1];
@@ -23,13 +23,13 @@ public class PhysicalLocationUtility {
 	/**
 	 * Constructor por defecto de la clase
 	 */
-	public PhysicalLocationUtility() { }
+	public PosicionPI() { }
 
 	/**
 	 * Constructor de la clase
 	 * @param pl Valores a asignar a la nueva instancia que se creará
 	 */
-	public PhysicalLocationUtility(PhysicalLocationUtility pl) {
+	public PosicionPI(PosicionPI pl) {
 		if (pl == null) {
 			throw new NullPointerException();
 		}
@@ -81,7 +81,7 @@ public class PhysicalLocationUtility {
 	 * @param gp Variable que contiene la posición del PI en coordenadas gps
 	 * @param v Vector donde se almacena el resultado
 	 */
-	public static synchronized void convLocationToVector(Location org, PhysicalLocationUtility gp, Vector v) {
+	public static synchronized void convLocationToVector(Location org, PosicionPI gp, Vector v) {
 		if (org == null || gp == null || v == null) {
 			throw new NullPointerException("Location, PhysicalLocationUtility, and Vector cannot be NULL.");
 		}

@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layoutParaCamara"
     android:layout_width="match_parent"
@@ -10,5 +10,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
     
-    
- </FrameLayout>
+    <com.jmlb0003.prueba3.vista.AugmentedView 
+        android:id="@+id/augmented_view_id"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+        
+    <com.jmlb0003.prueba3.vista.BasicDetailsView
+        android:id="@+id/basic_details_id"        
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible"
+        android:background="#88222222" />
+    <!-- 
+        android:layout_height="200dp" -->
+ </RelativeLayout>

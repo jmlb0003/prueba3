@@ -6,26 +6,25 @@
     <string name="title_section_modoMapa">Modo Mapa</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Ajustes</string>
-    
-    
+
     <!-- Ventana de diálogo de ajustes de ubicación -->
     <string name="alert_location_title">Ajustes de ubicación</string>
     <string name="alert_location_message">No se puede ubicar su dispositivo. Por favor, active alguna opción de ubicación.</string>
     <string name="alert_location_positive_button">Ir a Ajustes</string>
     <string name="alert_location_negative_button">Cerrar</string>
     <string name="alert_location_negative_message">Si quiere que la app funcione, tiene que activar alguna opción de ubicación en los ajustes.</string>
-    
+
     <!-- Ventana de diálogo de ubicación -->
     <string name="alert_location2_title">Buscando ubicación</string>
     <string name="alert_location2_message">Afinando la ubicación&#8230;\nPaciencia. Al iniciar la app puede tardar un poco.</string>
     <string name="alert_location2_negative_button">Cerrar</string>
     <string name="alert_location2_negative_message">¡Ya queda menos!</string>
-    
-    
+
     <!-- Vista de detalles básicos de los PI -->
     <string name="pi_name">Nombre del PI</string>
     <string name="pi_distance">Distancia</string>
     <string name="pi_description">Descripción</string>
     <string name="pi_content_description">Fotografía del PI</string>
+    <string name="title_activity_detalles_pi">DetallesPIActivity</string>
 
 </resources>

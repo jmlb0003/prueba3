@@ -51,7 +51,7 @@ import com.jmlb0003.prueba3.modelo.WikipediaDataProvider;
  *
  */
 public class MainActivity extends ActionBarActivity implements ActionBar.OnNavigationListener,
-				LocationListener, FragmentModoCamara.OnMarkerTouchedListener {
+				LocationListener,OnMarkerTouchedListener {
 	
 	/**
 	 * Nomenclatura de variables CODE GUIDELINES
@@ -83,7 +83,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     /**Distancia mínima en metros entre lecturas de los sensores de posición (50 metros)**/
     private static final int MIN_DISTANCE = 50;
     /**Constante con el tiempo en milisegundos para descartar una lectura de posición anterior**/
-    private static final int THIRTY_MINUTES = 30*60*1000;
+    //TODO:Esta modificado para que no incordie con las posiciones. Volver a dejarlo en 30 minutos
+    private static final int THIRTY_MINUTES = 30*60*1000    *2*24;
     
     
     /***************CONSTANTES DESCARGAS DE PIs DE LAS DISTINTAS APIs***********************/
@@ -105,7 +106,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     private float mRadarSearch;
     
     /**Variable que almacena un marker pulsado**/
-    public static Marker sTouchedMarker = null;
+    private Marker mTouchedMarker = null;
     
     /**Indica si se han inicializado los recursos de donde se obtienen los PIs**/
     private boolean isDataSourcesInit = false;
@@ -123,11 +124,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		//Se aplican los ajustes por defecto
-//		PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
-		//Registrar el observador para que se notifiquen los cambios en las preferencias
-		//PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+		Log.i("MainActivity","EV onCreate");
+		if (mTouchedMarker != null) {
+			Log.i("mainactivity","Y hay markerSelected");
+		}else{
+			Log.i("mainactivity","Y NO hay markerSelected");
+		}
 
 
 		//Se indica a MainActivity que la vista que tiene que usar para meter todo el contenido que
@@ -180,7 +182,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	@Override
     public void onResume() {
         super.onResume();        
-        
+        Log.i("MainActivity","EV onResume");
         aplicarValoresDeAjustes();
   
         
@@ -204,7 +206,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	 */
     public void onPause() {
         super.onPause();
-
+        Log.i("MainActivity","EV onPause");
         try {
         	sLocationMgr.removeUpdates(this);
         } catch (Exception ex) {
@@ -212,6 +214,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         }
     }// Fin de onPause
 
+    
     
     
 	@Override
@@ -538,7 +541,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						MIN_TIME, MIN_DISTANCE, this);
 				
 				//Si la localización es de hace más de 30 minutos se descarta
-				if ( (now.toMillis(true) - gps.getTime()) > THIRTY_MINUTES ) {
+				if ( gps != null && (now.toMillis(true) - gps.getTime()) > THIRTY_MINUTES ) {
 					gps = null;
 				}
 				
@@ -551,7 +554,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						MIN_TIME, MIN_DISTANCE, this);
 				
 				//Si la localización es de hace más de 30 minutos se descarta
-				if ( (now.toMillis(true) - network.getTime()) > THIRTY_MINUTES ) {
+				if ( network != null && (now.toMillis(true) - network.getTime()) > THIRTY_MINUTES ) {
 					network = null;
 				}
 			}
@@ -736,18 +739,24 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
 	@Override
 	public void onMarkerSelected(Marker markerTouched) {
-		sTouchedMarker = markerTouched;
+		//Si no hay un PI seleccionado, se pone seleccionado y fin
+		if (mTouchedMarker == null) {
+			mTouchedMarker = markerTouched;
+		}else{
+
+			if (mTouchedMarker.isSelected() && mTouchedMarker == markerTouched) {
+				startActivity(new Intent(this,DetallesPIActivity.class));
+			}else{
+				mTouchedMarker = markerTouched;
+			}
+			
+		}
 		
-		
-		//TODO: aquí deberia abrirse y cambiarse la vista de detalles básicos porque es para los dos modos
 	}   
    
 	@Override
 	public void onMarkerUnselected(Marker markerUnselected) {
-		sTouchedMarker = null;
-		
-		
-		//TODO: aquí deberia abrirse y cambiarse la vista de detalles básicos porque es para los dos modos
+		mTouchedMarker = null;
 	}
 
 

@@ -20,9 +20,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.Marker;
@@ -77,16 +76,8 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     private BasicDetailsView mBasicDetails;
     
 
-	/*****************INTERFAZ PARA COMUNICARSE CON MAIN ACTIVITY***************/
+	/**Interfaz para indicar a MainActivity que se ha pulsado un marker*********/
     OnMarkerTouchedListener mCallback;
-
-    // Container Activity must implement this interface
-    public interface OnMarkerTouchedListener {
-        public void onMarkerSelected(Marker markerTouched);
-        
-        public void onMarkerUnselected(Marker markerUnselected);
-    }
-    /***************************************************************************/
     
     /***************FUNCIONES*******************************************/
     
@@ -111,6 +102,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
 
+    	Log.i("FragmentCamara","EV onCreate");
 
     	List<Sensor> sensors;
 
@@ -149,35 +141,29 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		
+		Log.i("FragmentCamara","EV onCreateView");
 		//Para obtener el layout donde se construye la vista en modo Realidad Aumentada:
 		// 1- Obtener la vista principal del fragment
 		// 2- Obtener el layout donde se colocan las vistas de camara e información de aumento
 		View rootView = inflater.inflate(R.layout.fragment_modo_camara, container, false);
-		FrameLayout preview = (FrameLayout) rootView.findViewById(R.id.layoutParaCamara);
+		RelativeLayout preview = (RelativeLayout) rootView.findViewById(R.id.layoutParaCamara);
 		
 		mActivity = getActivity();
-	
-		//Estas líneas venían en el programa original que no usaba fragments
-		//Se pone dicha vista para que sea la que se muestre en pantalla
-		//mActivity.setContentView(sCameraScreen);
-		
-		//Esta línea venía en el programa original que no usaba fragments
-        //mActivity.addContentView(mAugmentedView,augmentedLayoutParams);
         
 		//Se crea el view con la información de aumento de realidad y sus parámetros de layout
-        mAugmentedView = new AugmentedView(mActivity);        
+		mAugmentedView = (AugmentedView) preview.findViewById(R.id.augmented_view_id);
         mAugmentedView.setOnTouchListener(this);
         
-        mBasicDetails = new BasicDetailsView(mActivity);
+        mBasicDetails = (BasicDetailsView) preview.findViewById(R.id.basic_details_id);
         
-        LayoutParams augmentedLayoutParams = 
-        		new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-
-        //Se añaden al layout que obtuvimos al principio y se devuelve la vista del fragment
-//preview.addView(sCameraScreen);
-        preview.addView(mAugmentedView, augmentedLayoutParams);
-        preview.addView(mBasicDetails);
+        
+        //Se establece que el alto conserve el ratio 1:1 (aproximado) para seguir las líneas de diseño
+        //https://www.google.com/design/spec/layout/metrics-and-keylines.html#metrics-and-keylines-ratio-keylines
+        float d = getResources().getDisplayMetrics().density;
+        int h = getResources().getDisplayMetrics().heightPixels;
+        int w = getResources().getDisplayMetrics().widthPixels;
+        Log.d("BasicDetails","Al final esta es la altura:"+Math.round((h-(80/d)) -w));
+        mBasicDetails.getLayoutParams().height = (Math.round(h-w-(80/d)));
         
 
 	    return rootView;
@@ -192,14 +178,12 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+		Log.i("FragmentCamara","EV onResume");
         sSensorMgr.registerListener(this, sSensorGrav, SensorManager.SENSOR_DELAY_NORMAL);
         sSensorMgr.registerListener(this, sSensorMag, SensorManager.SENSOR_DELAY_NORMAL);
         
         //Con esto se mantiene la pantalla encendida mientras se esté usando el modo de Realidad Aumentada
         mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        
-        //TODO: Aqui se revisa si hay un marker seleccionado para dibujarlo como tal
         
 	}// Fin de onResume()
 	
@@ -211,12 +195,20 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	 */
     public void onPause() {
         super.onPause();
-
+        Log.i("FragmentCamara","EV onpause");
         sSensorMgr.unregisterListener(this);
         mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }// Fin de onPause
 
 
+    @Override
+    public void onDestroy() {
+    	super.onDestroy();
+    	Log.i("FragmentCamara","EV onDestroy");
+    	if (ARDataSource.hasSelectededMarker()) {
+    		deseleccionarMarker(ARDataSource.SelectedMarker);
+    	}    	
+    }
 
     /**
 	 * Si hay algún cambio en la precisión de las lecturas de los sensores se llama a este
@@ -240,7 +232,11 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 
 
 	
-	// Se llama cada vez que se obtiene una nueva lectura de los sensores registrados
+	/**
+	 * Se llama cada vez que se obtiene una nueva lectura de los sensores registrados.
+	 * Aquí se calcula la matriz de rotación necesaria para calcular la posición en pantalla de 
+	 * los marker que serán mostrados.
+	 */
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		/**
@@ -339,10 +335,15 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	
 	
 	
+	/********************************************************************************/
+	/***********************OPERACIONES CON LOS MARKERS******************************/
+	/********************************************************************************/
+	
+	
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouch(View view, MotionEvent event) {
-		
+		Log.i("FragmentCamara","EV onTouc");
 		view.performClick();
 
         // Listening for the down and up touch events
@@ -361,7 +362,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         	        }
         	    }
             	
-            	//TODO:No se ha pulsado ninguno, si está abierta la vista de detalles básicos, se cierra y se deselecciona todo
             	deseleccionarMarker(ARDataSource.SelectedMarker);
             	
             	return false;
@@ -372,7 +372,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	
 	
 	/**
-	 * //TODO: Método de la pulsación sobre un marker, muy importante
 	 * Método con las acciones a realizar cuando se pulsa un marker
 	 * @param marker
 	 */
@@ -391,8 +390,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 				//Se deselecciona el marker actual y se selecciona el nuevo
 				deseleccionarMarker(ARDataSource.SelectedMarker);
 				
-			} else {
-				//TODO: Aquí hay que abrir la ventana de detalles completos
 			}
 		}
 		
@@ -410,8 +407,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 		ARDataSource.SelectedMarker = m;
 		mCallback.onMarkerSelected(m);
 		
-
-		mBasicDetails.setEnabled(true);		
+		mBasicDetails.setVisibility(View.VISIBLE);
 		mBasicDetails.initView(m);
 	}
 	
@@ -427,7 +423,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 			ARDataSource.SelectedMarker = null;
 		}
 		
-		mBasicDetails.setEnabled(false);
+		mBasicDetails.setVisibility(View.INVISIBLE);
 	}
 
 

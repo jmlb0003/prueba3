@@ -10,8 +10,8 @@
         android:id="@+id/mySeekBarPreference"
         android:title="@string/pref_seekBar_distance_title"
         android:summary="@string/pref_seekBar_distance_summary"        
-        android:max="100"
-        android:defaultValue="15"
+        android:max="50"
+        android:defaultValue="12"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"  />
     

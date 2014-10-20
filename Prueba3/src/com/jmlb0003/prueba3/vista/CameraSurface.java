@@ -29,7 +29,7 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
 	    
 	    /**
 	     * Constructor del preview de la cámara para usarlo de forma dinámica.
-	     * @param context	Contexto de la actividad que alberga el objeto SurfaceView
+	     * @param context
 	     */
 		@SuppressWarnings("deprecation")
 		public CameraSurface(Context context) {
@@ -50,7 +50,8 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
 		
 		/**
 	     * Constructor del preview de la cámara insertado en un layout XML.
-	     * @param context	Contexto de la actividad que alberga el objeto SurfaceView
+	     * @param context
+	     * @param attrs
 	     */
 		@SuppressWarnings("deprecation")
 		public CameraSurface(Context context, AttributeSet attrs) {

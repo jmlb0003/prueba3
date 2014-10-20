@@ -4,8 +4,8 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -15,59 +15,47 @@ import com.jmlb0003.prueba3.modelo.Marker;
 
 /**
  * Clase utilizada para mostrar los detalles básicos de un PI que ha sido pulsado.
- * En principio se usará tanto en modo cámara como en modo mapa
  * @author Jose
  * @see http://developer.android.com/training/custom-views/create-view.html
  */
 public class BasicDetailsView extends ScrollView {
 	
-	private FrameLayout mContainer;
+	private RelativeLayout mContainer = null;
 
 	public BasicDetailsView(Context context) {
 		super(context);
 		
-		//TODO: Esto no se puede hacer...hay que buscar una forma de crear la vista de detalles básicos...
-//		mContainer = (FrameLayout) context.getResources().getLayout(R.layout.activity_main);
+		LayoutInflater inflater = 
+				(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		
-		if (mContainer != null) {
-			LayoutInflater inflater = (LayoutInflater) context
-			        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			    inflater.inflate(R.layout.layout_detalles_basicos_pi, mContainer);
-		}
-		
-//		initView(context);
+		inflater.inflate(R.layout.layout_detalles_basicos_pi, this, true);		
+		    
+		mContainer = (RelativeLayout) getChildAt(0);
 	}
 	
 	public BasicDetailsView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
-//		TypedArray a = context.getTheme().obtainStyledAttributes(
-//				attrs,
-//		        R.styleable.BasicDetailsView,
-//		        0, 0);
-//
-//		try {
-//			mShowText = a.getBoolean(R.styleable.BasicDetailsView_showText, false);
-//			mTextPos = a.getInteger(R.styleable.BasicDetailsView_labelPosition, 0);
-//		} finally {
-//			a.recycle();
-//		}
 		
-//		initView(context);
+		LayoutInflater inflater = 
+				(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+		inflater.inflate(R.layout.layout_detalles_basicos_pi, this, true);
+		    
+		mContainer = (RelativeLayout) getChildAt(0);
+		
 	}
 
-	public BasicDetailsView(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		
-//		initView(context);
-	}
 	
 	
 	public void initView(Marker m) {
 		
 		if (mContainer != null) {
-//			setImage();
+			setImage(m);
 			setName(m);
+			setDistance(m);
+			setDescription(m);
+			
 		}else {
 			Log.d("BASICDETAILS","No hay container...");
 		}
@@ -93,6 +81,25 @@ public class BasicDetailsView extends ScrollView {
 			name.setText(m.getName());
 		}else{
 			Log.d("BASICDETAILS","No hay name container...");
+		}
+	}
+	
+	private void setDistance(Marker m) {
+		TextView distance = (TextView) mContainer.findViewById(R.id.pi_distance);
+		if (distance != null) {			
+			distance.setText(m.getTextDistance());
+		}else{
+			Log.d("BASICDETAILS","No hay distance container...");
+		}
+	}
+	
+	
+	private void setDescription(Marker m) {
+		TextView description = (TextView) mContainer.findViewById(R.id.pi_description);
+		if (description != null) {
+			description.setText(m.getDescription());
+		}else{
+			Log.d("BASICDETAILS","No hay description container...");
 		}
 	}
 	

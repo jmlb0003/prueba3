@@ -7,4 +7,6 @@
            <enum name="right" value="1"/>
        </attr>
    </declare-styleable>
+   
+   
 </resources>
