@@ -114,7 +114,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     
     
 	private FragmentModoCamara mFragmentModoCamara;
-//	private FragmentModoMapa mFragmentModoMapa;
+	private FragmentModoMapa mFragmentModoMapa;
 	private FragmentManager mFragmentManager;
 
 
@@ -142,7 +142,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         hayLocation = false;
 		
 		mFragmentModoCamara = new FragmentModoCamara();
-//		mFragmentModoMapa = new FragmentModoMapa();
+		mFragmentModoMapa = new FragmentModoMapa();
 		
 		// Set up the action bar to show a dropdown list.
 		final ActionBar actionBar = getSupportActionBar();
@@ -164,7 +164,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		Log.i(CLASS_TAG, "PantallaPrincipal:callbacks hechos y hola mundo");
 		mFragmentManager.beginTransaction().add(R.id.container, mFragmentModoCamara).commit();
 		Log.i(CLASS_TAG, "PantallaPrincipal:añadido el fragment de la camara");
-//		mFragmentManager.beginTransaction().add(R.id.container, mFragmentModoMapa).commit();
+		mFragmentManager.beginTransaction().add(R.id.container, mFragmentModoMapa).commit();
 		Log.i(CLASS_TAG, "PantallaPrincipal:Añadido el fragment del mapa_:FIN");
 		
 		
@@ -276,20 +276,39 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 		FragmentTransaction ft = mFragmentManager.beginTransaction();
 		
-		if (position == 0) {
+		switch (position) {
+			case 0:
+				ft.show(mFragmentModoCamara);
+				ft.replace(R.id.container, mFragmentModoCamara);
+				
+				ft.commit();
+				
+				break;
+			case 1:
+				ft.show(mFragmentModoMapa);
+				ft.replace(R.id.container, mFragmentModoMapa);
+				
+				ft.commit();
+				
+				break;
+	
+			default:
+				break;
+		}
+	/*	if (position == 0) {
 			ft.show(mFragmentModoCamara);
 			ft.replace(R.id.container, mFragmentModoCamara);
-			/**
-			 * Con esto se pone una especie de animacion al cambiar de fragment pero tambien
-			 * se ve un parpadeo con el color de la pantalla anterior...
-			 * */
+			
+//			  Con esto se pone una especie de animacion al cambiar de fragment pero tambien
+//			  se ve un parpadeo con el color de la pantalla anterior...
+			 
 			//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);	
 			//ft.addToBackStack(null);		//Quitar esto porque da fallos y no es necesario
 			
 		}else{
 			if (position ==1) {
-//				ft.show(mFragmentModoMapa);
-//				ft.replace(R.id.container, mFragmentModoMapa);
+				ft.show(mFragmentModoMapa);
+				ft.replace(R.id.container, mFragmentModoMapa);
 				//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 				//ft.addToBackStack(null);	//Quitar esto porque da fallos y no es necesario
 				
@@ -302,9 +321,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				}
 				
 			}
-		}
+		}*/
 		
-		ft.commit();
+		
 		
 		return true;
 	}
@@ -368,10 +387,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	}
 
 
-	
-
-
-	
 	
 	
 	/** 

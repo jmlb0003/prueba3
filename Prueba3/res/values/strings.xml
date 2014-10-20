@@ -26,5 +26,9 @@
     <string name="pi_description">Descripción</string>
     <string name="pi_content_description">Fotografía del PI</string>
     <string name="title_activity_detalles_pi">DetallesPIActivity</string>
+    
+    
+    <!-- Clave para usar Google Maps en la app -->
+    <string name="maps_key">AIzaSyAPWQlnZICVmAePBokkdXf4ic8ahjycq84</string>
 
 </resources>

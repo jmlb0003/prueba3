@@ -44,24 +44,25 @@
             </intent-filter>
         </activity>
 
-        <!--
-        <meta-data android:name="com.google.android.maps.v2.API_KEY"
-		    android:value="@string/maps_key"/>
-		<meta-data android:name="com.google.android.gms.version"
-                      android:value="@integer/google_play_services_version" />
-        -->
         <activity
             android:name=".controlador.SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
+        
         <activity
-            android:name="com.jmlb0003.prueba3.controlador.DetallesPIActivity"
+            android:name=".controlador.DetallesPIActivity"
             android:label="@string/title_activity_detalles_pi"
             android:parentActivityName=".controlador.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jmlb0003.prueba3.controlador.MainActivity" />
         </activity>
+        
+        
+        <meta-data android:name="com.google.android.maps.v2.API_KEY"
+		    android:value="@string/maps_key"/>
+		<meta-data android:name="com.google.android.gms.version"
+                      android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>
