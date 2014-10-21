@@ -24,7 +24,7 @@ public class PaintablePoint extends PaintableObject {
     /**
      * Por defecto el tamaño es 2dp pero se escala mediante el parámetro scale
      * @param color Color del punto que se dibuja en el radar. Viene fijado desde la declaración
-     * del Marker
+     * del Poi
      * @param fill
      * @param scale Factor por el que se multiplica el tamaño por defecto del punto del radar
      */

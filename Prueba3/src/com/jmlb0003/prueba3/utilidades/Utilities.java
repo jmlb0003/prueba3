@@ -2,7 +2,7 @@ package com.jmlb0003.prueba3.utilidades;
 
 /**
  * Clase abstracta que sirve para proporcionar el método getAngle que es necesario en otras 
- * clases (PitchAzimuthCalculator y Marker).
+ * clases (PitchAzimuthCalculator y Poi).
  * @author Jose
  *
  */

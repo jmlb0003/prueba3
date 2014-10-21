@@ -14,7 +14,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.jmlb0003.prueba3.controlador.ARDataSource;
-import com.jmlb0003.prueba3.modelo.Marker;
+import com.jmlb0003.prueba3.modelo.Poi;
 
 
 /**
@@ -26,10 +26,10 @@ import com.jmlb0003.prueba3.modelo.Marker;
 public class AugmentedView extends View {
 	
     private static final float[] LOCATION_ARRAY = new float[3];
-    private static final List<Marker> COLLECTION_CACHE = new ArrayList<Marker>();
+    private static final List<Poi> COLLECTION_CACHE = new ArrayList<Poi>();
     private static final int COLLISION_ADJUSTMENT = 100;
     
-    private static TreeSet<Marker> sUpdatedMarkers = new TreeSet<Marker>();
+    private static TreeSet<Poi> sUpdatedPois = new TreeSet<Poi>();
     private static AtomicBoolean sDrawing = new AtomicBoolean(false);
     private static float sPixelDensity;
     private static Radar sRadar;
@@ -77,10 +77,10 @@ public class AugmentedView extends View {
     	}
 
         if (sDrawing.compareAndSet(false, true)) { 
-	        List<Marker> collection = ARDataSource.getMarkers();
+	        List<Poi> collection = ARDataSource.getPois();
 
 	        COLLECTION_CACHE.clear();
-            for (Marker m : collection) {
+            for (Poi m : collection) {
                 m.update(canvas, 0, 0);
                 if (m.isOnRadar()) {
                 	COLLECTION_CACHE.add(m);
@@ -91,10 +91,10 @@ public class AugmentedView extends View {
 	        adjustForCollisions(canvas,collection);
 	        
 	        
-	        ListIterator<Marker> iter = collection.listIterator(collection.size());
+	        ListIterator<Poi> iter = collection.listIterator(collection.size());
 	        while (iter.hasPrevious()) {
-	            Marker marker = iter.previous();
-	            marker.draw(canvas);
+	            Poi poi = iter.previous();
+	            poi.draw(canvas);
 	        }
 
 	        sRadar.draw(canvas);
@@ -109,36 +109,36 @@ public class AugmentedView extends View {
 	 * Método con el que se ajustan los marcadores para que no se superpongan los que se encuentran
 	 * muy cercanos en la pantalla.
 	 * @param canvas Canvas donde se va a dibujar
-	 * @param collection Conjunto de Markers dentro del rango actual que se van a comprobar
+	 * @param collection Conjunto de PIs dentro del rango actual que se van a comprobar
 	 */
-	private static void adjustForCollisions(Canvas canvas, List<Marker> collection) {
+	private static void adjustForCollisions(Canvas canvas, List<Poi> collection) {
 		
-		sUpdatedMarkers.clear();
+		sUpdatedPois.clear();
 		
-        for (Marker marker1 : collection) {
-            if (sUpdatedMarkers.contains(marker1) || !marker1.isInView()) {
+        for (Poi poi1 : collection) {
+            if (sUpdatedPois.contains(poi1) || !poi1.isInView()) {
             	continue;
             }
 
             int collisions = 1;
-            for (Marker marker2 : collection) {
-                if (marker1.equals(marker2) || sUpdatedMarkers.contains(marker2) || !marker2.isInView()) {
+            for (Poi poi2 : collection) {
+                if (poi1.equals(poi2) || sUpdatedPois.contains(poi2) || !poi2.isInView()) {
                 	continue;
                 }
 
                 //Si los marcadores se solapan, se corrige la altura (en coordenadas de pantalla)
-                if (marker1.isMarkerOnMarker(marker2)) {
-                    marker2.getLocation().get(LOCATION_ARRAY);
+                if (poi1.isPoiOnPoi(poi2)) {
+                    poi2.getLocation().get(LOCATION_ARRAY);
                     float y = LOCATION_ARRAY[1];
                     float h = collisions*COLLISION_ADJUSTMENT;
                     LOCATION_ARRAY[1] = y+h;
-                    marker2.getLocation().set(LOCATION_ARRAY);
-                    marker2.update(canvas, 0, 0);
+                    poi2.getLocation().set(LOCATION_ARRAY);
+                    poi2.update(canvas, 0, 0);
                     collisions++;
-                    sUpdatedMarkers.add(marker2);
+                    sUpdatedPois.add(poi2);
                 }
             }
-            sUpdatedMarkers.add(marker1);
+            sUpdatedPois.add(poi1);
         }
 	}
 	

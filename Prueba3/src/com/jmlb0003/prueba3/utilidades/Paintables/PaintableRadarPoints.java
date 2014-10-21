@@ -2,7 +2,7 @@ package com.jmlb0003.prueba3.utilidades.Paintables;
 
 
 import com.jmlb0003.prueba3.controlador.ARDataSource;
-import com.jmlb0003.prueba3.modelo.Marker;
+import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.vista.Radar;
 
 import android.graphics.Canvas;
@@ -34,7 +34,7 @@ public class PaintableRadarPoints extends PaintableObject {
 		float range = ARDataSource.getRadius() * 1000;
 		float scale = range / Radar.getRadius();
 		
-		for (Marker pm : ARDataSource.getMarkers()) {
+		for (Poi pm : ARDataSource.getPois()) {
 		    pm.getLocation().get(mLocationArray);
 		    float x = mLocationArray[0] / scale;
 		    float y = mLocationArray[2] / scale;

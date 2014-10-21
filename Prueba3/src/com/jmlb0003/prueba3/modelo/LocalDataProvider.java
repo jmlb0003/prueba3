@@ -16,12 +16,12 @@ import com.jmlb0003.prueba3.R;
 
 
 /**
- * Clase encargada de proporcionar los markers que están almacenados en el dispositivo
+ * Clase encargada de proporcionar los PIs que están almacenados en el dispositivo
  * @author Jose
  *
  */
 public class LocalDataProvider {
-    private List<Marker> cachedMarkers = new ArrayList<Marker>();
+    private List<Poi> cachedPois = new ArrayList<Poi>();
     private static Bitmap sIcon = null;
     private static Bitmap sSelectedIcon = null;
     
@@ -43,7 +43,7 @@ public class LocalDataProvider {
         sSelectedIcon = BitmapFactory.decodeResource(res, R.drawable.icono_pi_seleccionado);
     }
     
-    public List<Marker> getMarkers() {
+    public List<Poi> getPois() {
     	Map<String, Object> datos = new HashMap<String, Object>();
     	datos.put("ID", 0);
     	datos.put("color", Color.DKGRAY);
@@ -56,8 +56,8 @@ public class LocalDataProvider {
     	datos.put("edad_maxima", 43);
     	datos.put("edad_minima", 3);
     	    	
-    	Marker atl = new Marker("ATL", 39.931269, -75.051261, 0, new DetallesPI(datos), sIcon, sSelectedIcon);
-        cachedMarkers.add(atl);
+    	Poi atl = new Poi("ATL", 39.931269, -75.051261, 0, new DetallesPI(datos), sIcon, sSelectedIcon);
+        cachedPois.add(atl);
         
         datos.put("ID", 1);
         Log.d("LocalDataProvider","Se vaa a dar el color:"+(Color.YELLOW));
@@ -73,8 +73,8 @@ public class LocalDataProvider {
     	datos.put("edad_maxima", 25);
     	datos.put("edad_minima", 1);
 
-        Marker home = new Marker("Casa", 37.6759861, -3.5661972, 763.0, new DetallesPI(datos));
-        cachedMarkers.add(home);
+        Poi home = new Poi("Casa", 37.6759861, -3.5661972, 763.0, new DetallesPI(datos));
+        cachedPois.add(home);
 
         
         datos = new HashMap<String, Object>();
@@ -89,8 +89,8 @@ public class LocalDataProvider {
     	datos.put("edad_maxima", 69);
     	datos.put("edad_minima", 1);
     	
-        Marker picoMagina = new Marker("Magina", 37.725048, -3.466663, 2132.0, new DetallesPI(datos), sIcon, sSelectedIcon);
-        cachedMarkers.add(picoMagina);
+        Poi picoMagina = new Poi("Magina", 37.725048, -3.466663, 2132.0, new DetallesPI(datos), sIcon, sSelectedIcon);
+        cachedPois.add(picoMagina);
         
         
         datos = new HashMap<String, Object>();
@@ -105,8 +105,8 @@ public class LocalDataProvider {
     	datos.put("edad_maxima", 69);
     	datos.put("edad_minima", 1);
     	
-        Marker cortijo = new Marker("cortijo", 37.692997,-3.565028, 912.0, new DetallesPI(datos), sIcon, sSelectedIcon);
-        cachedMarkers.add(cortijo);
+        Poi cortijo = new Poi("cortijo", 37.692997,-3.565028, 912.0, new DetallesPI(datos), sIcon, sSelectedIcon);
+        cachedPois.add(cortijo);
         
         datos = new HashMap<String, Object>();
         datos.put("ID", 4);
@@ -120,10 +120,10 @@ public class LocalDataProvider {
     	datos.put("edad_maxima", 34);
     	datos.put("edad_minima", 10);
     	
-        Marker carcheles = new Marker("carcheles", 37.644594, -3.638578, 825.0, new DetallesPI(datos), sIcon, sSelectedIcon);
-        cachedMarkers.add(carcheles);
+        Poi carcheles = new Poi("carcheles", 37.644594, -3.638578, 825.0, new DetallesPI(datos), sIcon, sSelectedIcon);
+        cachedPois.add(carcheles);
         
         
-        return cachedMarkers;
+        return cachedPois;
     }
 }

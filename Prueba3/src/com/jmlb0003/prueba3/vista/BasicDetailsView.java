@@ -10,7 +10,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.jmlb0003.prueba3.R;
-import com.jmlb0003.prueba3.modelo.Marker;
+import com.jmlb0003.prueba3.modelo.Poi;
 
 
 /**
@@ -48,7 +48,7 @@ public class BasicDetailsView extends ScrollView {
 
 	
 	
-	public void initView(Marker m) {
+	public void initView(Poi m) {
 		
 		if (mContainer != null) {
 			setImage(m);
@@ -64,7 +64,7 @@ public class BasicDetailsView extends ScrollView {
 	}
 	
 	
-	private void setImage(Marker m) {
+	private void setImage(Poi m) {
 		ImageView img = (ImageView) mContainer.findViewById(R.id.pi_image_container);
 		if (img != null) {
 			img.setImageBitmap(m.getImage());
@@ -75,7 +75,7 @@ public class BasicDetailsView extends ScrollView {
 	}
 	
 	
-	private void setName(Marker m) {
+	private void setName(Poi m) {
 		TextView name = (TextView) mContainer.findViewById(R.id.pi_name);
 		if (name != null) {
 			name.setText(m.getName());
@@ -84,7 +84,7 @@ public class BasicDetailsView extends ScrollView {
 		}
 	}
 	
-	private void setDistance(Marker m) {
+	private void setDistance(Poi m) {
 		TextView distance = (TextView) mContainer.findViewById(R.id.pi_distance);
 		if (distance != null) {			
 			distance.setText(m.getTextDistance());
@@ -94,7 +94,7 @@ public class BasicDetailsView extends ScrollView {
 	}
 	
 	
-	private void setDescription(Marker m) {
+	private void setDescription(Poi m) {
 		TextView description = (TextView) mContainer.findViewById(R.id.pi_description);
 		if (description != null) {
 			description.setText(m.getDescription());

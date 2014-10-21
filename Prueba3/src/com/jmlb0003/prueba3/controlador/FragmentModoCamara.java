@@ -24,7 +24,7 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
 import com.jmlb0003.prueba3.R;
-import com.jmlb0003.prueba3.modelo.Marker;
+import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.utilidades.LowPassFilter;
 import com.jmlb0003.prueba3.utilidades.Matrix;
 import com.jmlb0003.prueba3.vista.AugmentedView;
@@ -76,8 +76,8 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     private BasicDetailsView mBasicDetails;
     
 
-	/**Interfaz para indicar a MainActivity que se ha pulsado un marker*********/
-    OnMarkerTouchedListener mCallback;
+	/**Interfaz para indicar a MainActivity que se ha pulsado un PI*********/
+    OnPoiTouchedListener mCallback;
     
     /***************FUNCIONES*******************************************/
     
@@ -91,10 +91,10 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mCallback = (OnMarkerTouchedListener) activity;
+            mCallback = (OnPoiTouchedListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnMarkerTouchedListener");
+                    + " must implement OnPoiTouchedListener");
         }
     }
     
@@ -205,8 +205,8 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     public void onDestroy() {
     	super.onDestroy();
     	Log.i("FragmentCamara","EV onDestroy");
-    	if (ARDataSource.hasSelectededMarker()) {
-    		deseleccionarMarker(ARDataSource.SelectedMarker);
+    	if (ARDataSource.hasSelectededPoi()) {
+    		deseleccionarPoi(ARDataSource.SelectedPoi);
     	}    	
     }
 
@@ -235,7 +235,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	/**
 	 * Se llama cada vez que se obtiene una nueva lectura de los sensores registrados.
 	 * Aquí se calcula la matriz de rotación necesaria para calcular la posición en pantalla de 
-	 * los marker que serán mostrados.
+	 * los Poi que serán mostrados.
 	 */
 	@Override
 	public void onSensorChanged(SensorEvent event) {
@@ -336,7 +336,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	
 	
 	/********************************************************************************/
-	/***********************OPERACIONES CON LOS MARKERS******************************/
+	/***********************OPERACIONES CON LOS PoiS******************************/
 	/********************************************************************************/
 	
 	
@@ -354,15 +354,15 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 
             case MotionEvent.ACTION_UP:
             	
-            	for (Marker marker : ARDataSource.getMarkers()) {
-        	        if (marker.handleClick(event.getX(), event.getY())) {
-        	            markerTouched(marker);
+            	for (Poi poi : ARDataSource.getPois()) {
+        	        if (poi.handleClick(event.getX(), event.getY())) {
+        	            poiTouched(poi);
         	            
         	            return true;
         	        }
         	    }
             	
-            	deseleccionarMarker(ARDataSource.SelectedMarker);
+            	deseleccionarPoi(ARDataSource.SelectedPoi);
             	
             	return false;
             	
@@ -372,40 +372,40 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	
 	
 	/**
-	 * Método con las acciones a realizar cuando se pulsa un marker
-	 * @param marker
+	 * Método con las acciones a realizar cuando se pulsa un PI
+	 * @param poi
 	 */
-	private void markerTouched(Marker marker) {
+	private void poiTouched(Poi poi) {
 		/**
-		 * Se ha pulsado marker.
+		 * Se ha pulsado Poi.
 		 * 1º si hay ya uno pulsado:
 		 * 		1.1 Si es distinto, se cambia el seleccionado y se abre o se cambian los detalles básicos
 		 * 		1.2 Si es igual, se abre la ventana de detalles
 		 * 2º si no hay ninguno pulsado:
 		 * 		2.1 Se pone como seleccionado y se abre la vista de detalles básicos
 		 */		
-		if (ARDataSource.hasSelectededMarker()) {
+		if (ARDataSource.hasSelectededPoi()) {
 
-			if (ARDataSource.SelectedMarker != marker) {
-				//Se deselecciona el marker actual y se selecciona el nuevo
-				deseleccionarMarker(ARDataSource.SelectedMarker);
+			if (ARDataSource.SelectedPoi != poi) {
+				//Se deselecciona el Poi actual y se selecciona el nuevo
+				deseleccionarPoi(ARDataSource.SelectedPoi);
 				
 			}
 		}
 		
 		
-		seleccionarMarker(marker);
+		seleccionarPoi(poi);
 	}
 	
 	
 	/**
-	 * Método para marcar como seleccionado un marker de los que actualmente se encuentran en pantalla
-	 * @param m Marker que se va a marcar como seleccionado
+	 * Método para marcar como seleccionado un PI de los que actualmente se encuentran en pantalla
+	 * @param m Poi que se va a marcar como seleccionado
 	 */
-	private void seleccionarMarker(Marker m) {
+	private void seleccionarPoi(Poi m) {
 		m.setTouched(true);
-		ARDataSource.SelectedMarker = m;
-		mCallback.onMarkerSelected(m);
+		ARDataSource.SelectedPoi = m;
+		mCallback.onPoiSelected(m);
 		
 		mBasicDetails.setVisibility(View.VISIBLE);
 		mBasicDetails.initView(m);
@@ -413,14 +413,14 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	
 	
 	/**
-	 * Método para desmarcar como seleccionado un marker previamente seleccionado
-	 * @param m Marker que se va a deseleccionar
+	 * Método para desmarcar como seleccionado un PI previamente seleccionado
+	 * @param m Poi que se va a deseleccionar
 	 */
-	private void deseleccionarMarker(Marker m) {
+	private void deseleccionarPoi(Poi m) {
 		if (m != null) {
 			m.setTouched(false);
-			mCallback.onMarkerUnselected(m);
-			ARDataSource.SelectedMarker = null;
+			mCallback.onPoiUnselected(m);
+			ARDataSource.SelectedPoi = null;
 		}
 		
 		mBasicDetails.setVisibility(View.INVISIBLE);

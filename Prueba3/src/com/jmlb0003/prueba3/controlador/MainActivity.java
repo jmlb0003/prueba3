@@ -34,7 +34,7 @@ import android.widget.Toast;
 
 import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.LocalDataProvider;
-import com.jmlb0003.prueba3.modelo.Marker;
+import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.modelo.NetworkDataProvider;
 import com.jmlb0003.prueba3.modelo.WikipediaDataProvider;
 
@@ -51,7 +51,7 @@ import com.jmlb0003.prueba3.modelo.WikipediaDataProvider;
  *
  */
 public class MainActivity extends ActionBarActivity implements ActionBar.OnNavigationListener,
-				LocationListener,OnMarkerTouchedListener {
+				LocationListener,OnPoiTouchedListener {
 	
 	/**
 	 * Nomenclatura de variables CODE GUIDELINES
@@ -105,8 +105,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     //Variable con el radio de búsqueda de PI del radar
     private float mRadarSearch;
     
-    /**Variable que almacena un marker pulsado**/
-    private Marker mTouchedMarker = null;
+    /**Variable que almacena un Poi pulsado**/
+    private Poi mTouchedPoi = null;
     
     /**Indica si se han inicializado los recursos de donde se obtienen los PIs**/
     private boolean isDataSourcesInit = false;
@@ -125,10 +125,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i("MainActivity","EV onCreate");
-		if (mTouchedMarker != null) {
-			Log.i("mainactivity","Y hay markerSelected");
+		if (mTouchedPoi != null) {
+			Log.i("mainactivity","Y hay PoiSelected");
 		}else{
-			Log.i("mainactivity","Y NO hay markerSelected");
+			Log.i("mainactivity","Y NO hay PoiSelected");
 		}
 
 
@@ -487,14 +487,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			return false;
 		}
    	
-		List<Marker> markers = null;
+		List<Poi> pois = null;
 		try {
-			markers = source.parse(url);
+			pois = source.parse(url);
 		} catch (NullPointerException e) {
 			return false;
 		}
 		
-		ARDataSource.addMarkers(markers);
+		ARDataSource.addPois(pois);
 		
 		
 		return true;
@@ -740,7 +740,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	private void cargarPIs() {
 		//Ahora se cargan en memoria los PIs disponibles en el dispositivo
 		LocalDataProvider localData = new LocalDataProvider(getResources());
-		ARDataSource.addMarkers(localData.getMarkers());
+		ARDataSource.addPois(localData.getPois());
 		
 		//Se añaden recursos a la colección SOURCES para descargar PIs
 		NetworkDataProvider wikipedia = new WikipediaDataProvider(getResources());
@@ -753,16 +753,16 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
 
 	@Override
-	public void onMarkerSelected(Marker markerTouched) {
+	public void onPoiSelected(Poi poiTouched) {
 		//Si no hay un PI seleccionado, se pone seleccionado y fin
-		if (mTouchedMarker == null) {
-			mTouchedMarker = markerTouched;
+		if (mTouchedPoi == null) {
+			mTouchedPoi = poiTouched;
 		}else{
 
-			if (mTouchedMarker.isSelected() && mTouchedMarker == markerTouched) {
+			if (mTouchedPoi.isSelected() && mTouchedPoi == poiTouched) {
 				startActivity(new Intent(this,DetallesPIActivity.class));
 			}else{
-				mTouchedMarker = markerTouched;
+				mTouchedPoi = poiTouched;
 			}
 			
 		}
@@ -770,8 +770,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	}   
    
 	@Override
-	public void onMarkerUnselected(Marker markerUnselected) {
-		mTouchedMarker = null;
+	public void onPoiUnselected(Poi PoiUnselected) {
+		mTouchedPoi = null;
 	}
 
 

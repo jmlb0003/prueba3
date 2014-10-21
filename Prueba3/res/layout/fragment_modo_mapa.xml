@@ -6,10 +6,10 @@
     android:layout_height="match_parent" >
 
     <fragment
+        class="com.google.android.gms.maps.SupportMapFragment"
         android:id="@+id/mapa_container_id"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        class="com.google.android.gms.maps.SupportMapFragment" />
+        android:layout_height="match_parent" />
     
     
     <com.jmlb0003.prueba3.vista.BasicDetailsView

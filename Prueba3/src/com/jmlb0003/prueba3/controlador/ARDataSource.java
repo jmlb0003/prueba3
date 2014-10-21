@@ -14,21 +14,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.location.Location;
 
-import com.jmlb0003.prueba3.modelo.Marker;
+import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.utilidades.Matrix;
 
 
 
 /**
  * Clase que maneja la mayoría de los datos no persistentes necesarios para las demás clases de 
- * la aplicación como por ejemplo los markers, la posición actual, matrices de rotación, etc.
+ * la aplicación como por ejemplo los PIs, la posición actual, matrices de rotación, etc.
  * @author Jose
  *
  */
 public abstract class ARDataSource {
 	
-	private static final Map<String,Marker> MARKER_LIST = new ConcurrentHashMap<String,Marker>();
-    private static final List<Marker> CACHE = new CopyOnWriteArrayList<Marker>();
+	private static final Map<String,Poi> POI_LIST = new ConcurrentHashMap<String,Poi>();
+    private static final List<Poi> CACHE = new CopyOnWriteArrayList<Poi>();
     private static final AtomicBoolean COMPUTING = new AtomicBoolean(false);
     private static final float[] LOCATION_ARRAY = new float[3];
 	private static final DecimalFormat FORMAT = new DecimalFormat("#.##");
@@ -68,8 +68,8 @@ public abstract class ARDataSource {
     /**Variable donde se almacena el valor de densidad de píxel de la pantalla del dispositivo**/
     public static float PixelsDensity;
     
-    /**Variable donde se almacena la referencia del marker seleccionado en pantalla**/
-    public static Marker SelectedMarker = null;
+    /**Variable donde se almacena la referencia del PI seleccionado en pantalla**/
+    public static Poi SelectedPoi = null;
     
     /**
      * Modifica el texto del radio de búsqueda del Radar
@@ -140,21 +140,21 @@ public abstract class ARDataSource {
     }
     
     /**
-     * Método para obtener todos los markers que hay actualmente en memoria
-     * @return Lista inmodificable con los markers que hay en memoria
+     * Método para obtener todos los PIs que hay actualmente en memoria
+     * @return Lista inmodificable con los PIs que hay en memoria
      */
-    public static List<Marker> getMarkers() {
+    public static List<Poi> getPois() {
     	//Si COMPUTING vale true, se le asigna false
         if (COMPUTING.compareAndSet(true, false)) {
-            for(Marker ma : MARKER_LIST.values()) {
+            for(Poi ma : POI_LIST.values()) {
                 ma.getLocation().get(LOCATION_ARRAY);
                 LOCATION_ARRAY[1] = ma.getInitialY();
                 ma.getLocation().set(LOCATION_ARRAY);
             }
 
 
-            List<Marker> copy = new ArrayList<Marker>();
-            copy.addAll(MARKER_LIST.values());
+            List<Poi> copy = new ArrayList<Poi>();
+            copy.addAll(POI_LIST.values());
             Collections.sort(copy,distanceComparator);
             CACHE.clear();
             CACHE.addAll(copy);
@@ -165,18 +165,18 @@ public abstract class ARDataSource {
     
     
     /**
-     * Método que comprueba si hay algún marker seleccionado
+     * Método que comprueba si hay algún PI seleccionado
      * @return
      */
-    public static boolean hasSelectededMarker() {
+    public static boolean hasSelectededPoi() {
     	
-        for(Marker ma : MARKER_LIST.values()) {
+        for(Poi ma : POI_LIST.values()) {
             if (ma.isSelected()) {
-            	SelectedMarker = ma;
+            	SelectedPoi = ma;
             	return true;
             }
         }
-        SelectedMarker = null;
+        SelectedPoi = null;
             	
     	return false;
     }
@@ -222,26 +222,26 @@ public abstract class ARDataSource {
     }
     
     
-    private static final Comparator<Marker> distanceComparator = new Comparator<Marker>() {
-        public int compare(Marker m1, Marker m2) {
+    private static final Comparator<Poi> distanceComparator = new Comparator<Poi>() {
+        public int compare(Poi m1, Poi m2) {
             return Double.compare(m1.getDistance(),m2.getDistance());
         }
     };
 
     
-    public static void addMarkers(Collection<Marker> markers) {
-    	if (markers == null) {
+    public static void addPois(Collection<Poi> pois) {
+    	if (pois == null) {
     		throw new NullPointerException();
     	}
 
-    	if (markers.size() <= 0) {
+    	if (pois.size() <= 0) {
     		return;
     	}
 
-    	for(Marker marker : markers) {
-    	    if (!MARKER_LIST.containsKey(marker.getName())) {
-    	        marker.calcRelativePosition(ARDataSource.getCurrentLocation());
-    	        MARKER_LIST.put(marker.getName(),marker);
+    	for(Poi poi : pois) {
+    	    if (!POI_LIST.containsKey(poi.getName())) {
+    	        poi.calcRelativePosition(ARDataSource.getCurrentLocation());
+    	        POI_LIST.put(poi.getName(),poi);
     	    }
     	}
 
@@ -254,7 +254,7 @@ public abstract class ARDataSource {
     
     
     private static void onLocationChanged(Location location) {
-        for(Marker ma: MARKER_LIST.values()) {
+        for(Poi ma: POI_LIST.values()) {
             ma.calcRelativePosition(location);
         }
 
@@ -266,7 +266,7 @@ public abstract class ARDataSource {
     
     /**
      * Método para filtrar los datos que se muestran en pantalla según la distancia máxima
-     * @param newMaxDistance Distancia máxima a la que pueden estar los markers que se muestren en pantalla
+     * @param newMaxDistance Distancia máxima a la que pueden estar los PIs que se muestren en pantalla
      */
     public static void updateDataWithMaxDistance(float newMaxDistance) {
         ARDataSource.setRadius(newMaxDistance);

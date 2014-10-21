@@ -79,47 +79,47 @@ public class WikipediaDataProvider extends NetworkDataProvider {
 
 	
 	/**
-	 * Método para interpretar el JSON que se obtiene del proveedor wikipedia para convertirlo en una lista de markers
+	 * Método para interpretar el JSON que se obtiene del proveedor wikipedia para convertirlo en una lista de PIs
 	 */
 	@Override
-	public List<Marker> parse(JSONObject root) {
+	public List<Poi> parse(JSONObject root) {
 		if (root == null) {
 			return null;
 		}
 		
 		JSONObject jo = null;
 		JSONArray dataArray = null;
-    	List<Marker> markers = new ArrayList<Marker>();
+    	List<Poi> pois = new ArrayList<Poi>();
 		try {
 			if(root.has("geonames")) {
 				dataArray = root.getJSONArray("geonames");
 			}
 			
 			if (dataArray == null) 
-				return markers;
+				return pois;
 			
 			int top = Math.min(MAX_RESOURCES_NUMBER, dataArray.length());
 			for (int i = 0; i < top; i++) {		
 				jo = dataArray.getJSONObject(i);
-				Marker ma = processJSONObject(jo);
+				Poi ma = processJSONObject(jo);
 				if(ma!=null) {
-					markers.add(ma);
+					pois.add(ma);
 				}
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return markers;
+		return pois;
 	}
 	
 	
-	private Marker processJSONObject(JSONObject jo) {
+	private Poi processJSONObject(JSONObject jo) {
 
 		if (jo == null) {
 			return null;
 		}
 		
-        Marker ma = null;
+        Poi ma = null;
         Map<String, Object> datos;
         
         if ( jo.has("title") && jo.has("lat") && jo.has("lng") && jo.has("elevation") ) {
@@ -136,9 +136,9 @@ public class WikipediaDataProvider extends NetworkDataProvider {
             	datos.put("edad_maxima", 0);
             	datos.put("edad_minima", 0);
             	
-        		ma = new Marker(jo.getString("title"), jo.getDouble("lat"), jo.getDouble("lng"),
+        		ma = new Poi(jo.getString("title"), jo.getDouble("lat"), jo.getDouble("lng"),
         							jo.getDouble("elevation"), new DetallesPI(datos), sIcon, sSelectedIcon);
-        		Log.d("wikipediaDatasource","Creado un marker de wikipedia");
+        		Log.d("wikipediaDatasource","Creado un Poi de wikipedia");
         	} catch (JSONException e) {
         		e.printStackTrace();
         	}

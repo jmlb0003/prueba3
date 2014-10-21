@@ -29,8 +29,8 @@ public abstract class NetworkDataProvider {
     protected static final int READ_TIMEOUT = 10000;
     /**Tiempo máximo de conexión al proveedor de recursos**/
     protected static final int CONNECT_TIMEOUT = 10000;
-    /**Lista de markers descargados hasta el momento de este proveedor**/
-    protected List<Marker> markersCache = null;
+    /**Lista de PIs descargados hasta el momento de este proveedor**/
+    protected List<Poi> poisCache = null;
     
     /**
      * Método para crear la URL con la que se descargarán los recursos del proveedor
@@ -46,18 +46,18 @@ public abstract class NetworkDataProvider {
                                             float radius, String locale, String mUsername);
 
     /**
-     * Método para interpretar los datos descargados del proveedor y convertirlos en markers
+     * Método para interpretar los datos descargados del proveedor y convertirlos en PIs
      * @param root Objeto JSON que se va a interpretar
-     * @return Lista de markers creados a partir del JSON inicial
+     * @return Lista de PIs creados a partir del JSON inicial
      */
-    public abstract List<Marker> parse(JSONObject root);
+    public abstract List<Poi> parse(JSONObject root);
 
     
     /**
-     * Devuelve la lista actual de markers de este proveedor
+     * Devuelve la lista actual de PIs de este proveedor
      */
-    public List<Marker> getMarkers() {
-        return markersCache;
+    public List<Poi> getPois() {
+        return poisCache;
     }
     
     
@@ -143,12 +143,12 @@ public abstract class NetworkDataProvider {
 
     
     /**
-     * Método para convertir en markers los recursos descargados del proveedor a partir de la URL
+     * Método para convertir en PIs los recursos descargados del proveedor a partir de la URL
      * personalizada que se pasa como parámetro
      * @param url URL personalizada con la que se descargarán los datos del proveedor
-     * @return Lista de markers obtenidos del proveedor a partir de la URL personalizada
+     * @return Lista de PIs obtenidos del proveedor a partir de la URL personalizada
      */
-    public List<Marker> parse(String url) {
+    public List<Poi> parse(String url) {
         if (url == null) {
         	throw new NullPointerException();
         }
