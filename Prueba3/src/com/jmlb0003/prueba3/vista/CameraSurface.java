@@ -17,6 +17,8 @@ import com.jmlb0003.prueba3.utilidades.Compatibility;
 
 
 /**
+ * //TODO:Camera está deprecated...a cambiarla a camera2...
+ * https://android.googlesource.com/platform/frameworks/base/+/227b47625d7482b5b47ad0e4c70ce0a246236ade/tests/Camera2Tests/SmartCamera/SimpleCamera/src/androidx/media/filterfw/samples/simplecamera/Camera2Source.java
  * Clase que gestiona la vista que muestra las imágenes capturadas por la cámara del dispositivo.
  * 
  * @author Jose
@@ -136,6 +138,9 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
 			// If your preview can change or rotate, take care of those events here.
 	        // Make sure to stop the preview before resizing or reformatting it.
 			Log.d(LOG_TAG, "LLamada a surfaceChanged");
+			if (mCamera == null) {
+				return;
+			}
 			
 			try {
 				Camera.Parameters parameters = mCamera.getParameters();

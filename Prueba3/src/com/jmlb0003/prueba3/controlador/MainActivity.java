@@ -29,13 +29,14 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.LocalDataProvider;
-import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.modelo.NetworkDataProvider;
+import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.modelo.WikipediaDataProvider;
 
 /*
@@ -124,17 +125,22 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.i("MainActivity","EV onCreate");
+		Log.d("MainActivity","EV onCreate");
 		if (mTouchedPoi != null) {
-			Log.i("mainactivity","Y hay PoiSelected");
+			Log.d("mainactivity","Y hay PoiSelected");
 		}else{
-			Log.i("mainactivity","Y NO hay PoiSelected");
+			Log.d("mainactivity","Y NO hay PoiSelected");
 		}
 
 
 		//Se indica a MainActivity que la vista que tiene que usar para meter todo el contenido que
 		//sigue ahora es activity_main
 		setContentView(R.layout.activity_main);
+		
+//		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        if (toolbar != null) {
+//            setSupportActionBar(toolbar);
+//        }
 		
         
         //Se obtiene el servicio para controlar las actualizaciones de ubicación del dispositivo
@@ -144,7 +150,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		mFragmentModoCamara = new FragmentModoCamara();
 		mFragmentModoMapa = new FragmentModoMapa();
 		
-		// Set up the action bar to show a dropdown list.
+//		// Set up the action bar to show a dropdown list.
 		final ActionBar actionBar = getSupportActionBar();
 		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
@@ -157,16 +163,18 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						android.R.id.text1, new String[] {
 								getString(R.string.title_section_modoCamara),
 								getString(R.string.title_section_modoMapa) }), this);
-		
-		
+
 		
 		mFragmentManager = getSupportFragmentManager();
-		Log.i(CLASS_TAG, "PantallaPrincipal:callbacks hechos y hola mundo");
+
+
+		//No se pueden reemplazar los fragments añadidos por XML, por lo que hay que añadirlos 
+		//de forma dinámica. 
 		mFragmentManager.beginTransaction().add(R.id.container, mFragmentModoCamara).commit();
-		Log.i(CLASS_TAG, "PantallaPrincipal:añadido el fragment de la camara");
+		Log.d(CLASS_TAG, "PantallaPrincipal:añadido el fragment de la camara");
 		mFragmentManager.beginTransaction().add(R.id.container, mFragmentModoMapa).commit();
-		Log.i(CLASS_TAG, "PantallaPrincipal:Añadido el fragment del mapa_:FIN");
-		
+		Log.d(CLASS_TAG, "PantallaPrincipal:Añadido el fragment del mapa_:FIN");
+
 		
 		aplicarValoresDeAjustes();
 		
@@ -181,8 +189,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	 */
 	@Override
     public void onResume() {
-        super.onResume();        
-        Log.i("MainActivity","EV onResume");
+        super.onResume();
+        Log.d("MainActivity","EV onResume");
+        
+        //Con esto se mantiene la pantalla encendida mientras se use la app en esta activity
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        
         aplicarValoresDeAjustes();
   
         
@@ -192,6 +204,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         	onLocationChanged(mLocation);
         	
         	cargarPIs();
+        	
+        	//TODO: Esto es provisional...hay que poner en condiciones lo de descargar/almacenar los datos
+        	updateData(mLocation.getLatitude(),
+        			mLocation.getLongitude(),
+        			mLocation.getAltitude());
         }
 
     }// Fin de onResume()
@@ -206,7 +223,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	 */
     public void onPause() {
         super.onPause();
-        Log.i("MainActivity","EV onPause");
+        Log.d("MainActivity","EV onPause");
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         try {
         	sLocationMgr.removeUpdates(this);
         } catch (Exception ex) {
@@ -214,7 +232,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         }
     }// Fin de onPause
 
-    
     
     
 	@Override
@@ -261,7 +278,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	            return super.onOptionsItemSelected(item);*/
 	        case R.id.action_settings:
 	        	// Settings action
-	        	startActivity(new Intent(this,SettingsActivity.class));
+	        	startActivity( new Intent(this,SettingsActivity.class) );
 	            return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
@@ -280,6 +297,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			case 0:
 				ft.show(mFragmentModoCamara);
 				ft.replace(R.id.container, mFragmentModoCamara);
+//				  Con esto se pone una especie de animacion al cambiar de fragment pero tambien
+//				  se ve un parpadeo con el color de la pantalla anterior...
+				//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);	
+				//ft.addToBackStack(null);		//Quitar esto porque da fallos y no es necesario
 				
 				ft.commit();
 				
@@ -287,6 +308,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			case 1:
 				ft.show(mFragmentModoMapa);
 				ft.replace(R.id.container, mFragmentModoMapa);
+				//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+				//ft.addToBackStack(null);	//Quitar esto porque da fallos y no es necesario
 				
 				ft.commit();
 				
@@ -295,36 +318,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			default:
 				break;
 		}
-	/*	if (position == 0) {
-			ft.show(mFragmentModoCamara);
-			ft.replace(R.id.container, mFragmentModoCamara);
-			
-//			  Con esto se pone una especie de animacion al cambiar de fragment pero tambien
-//			  se ve un parpadeo con el color de la pantalla anterior...
-			 
-			//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);	
-			//ft.addToBackStack(null);		//Quitar esto porque da fallos y no es necesario
-			
-		}else{
-			if (position ==1) {
-				ft.show(mFragmentModoMapa);
-				ft.replace(R.id.container, mFragmentModoMapa);
-				//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-				//ft.addToBackStack(null);	//Quitar esto porque da fallos y no es necesario
-				
-			}else{
-//				if (mFragmentModoMapa.isVisible()){
-//					ft.hide(mFragmentModoMapa);
-//				}
-				if(mFragmentModoCamara.isVisible()) {
-					ft.hide(mFragmentModoCamara);
-				}
-				
-			}
-		}*/
-		
-		
-		
+	
 		return true;
 	}
 
@@ -350,7 +344,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		// Solo se tiene en cuenta la nueva ubicación si es mejor que la anterior 
 		// (más precisa y reciente)
 		if (isBetterLocation(newLocation, ARDataSource.getCurrentLocation())) {
-    		Log.i(CLASS_TAG,"la posicion nueva es mejor: La:"+newLocation.getLatitude()+" lo:"+newLocation.getLongitude()+" Precision:"+newLocation.getAccuracy()+"\nEl anterior tenia precision: "+ARDataSource.getCurrentLocation().getAccuracy());
+    		Log.d(CLASS_TAG,"la posicion nueva es mejor: La:"+newLocation.getLatitude()+" lo:"+newLocation.getLongitude()+" Precision:"+newLocation.getAccuracy()+"\nEl anterior tenia precision: "+ARDataSource.getCurrentLocation().getAccuracy());
     		ARDataSource.setCurrentLocation(newLocation);
 
 	        mFragmentModoCamara.calcularMagneticNorthCompensation();
@@ -370,6 +364,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	@Override
 	public void onProviderDisabled(String arg0) {
 		//Función de onLocationListener - No se utiliza
+		if (!sLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
+				!sLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+			
+			mostrarSettingsAlert();
+		}
 		
 	}
 
@@ -582,22 +581,22 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			//Si hay posición de los dos proveedores nos quedamos con la mejor
 			if ( (gps != null) && (network != null) ) {
 				if (isBetterLocation(gps, network)) {
-					Log.i("MainActivity","LastKnownLocation: mejor la del GPS");
+					Log.d("MainActivity","LastKnownLocation: mejor la del GPS");
 					mLocation = gps;
 					
 				}else {
-					Log.i("MainActivity","LastKnownLocation: mejor la de network");
+					Log.d("MainActivity","LastKnownLocation: mejor la de network");
 					mLocation = network;
 				}
     		   
 				//Si no, nos quedamos con la que haya
 			}else {
 				if (gps != null) {	
-					Log.i("MainActivity","LastKnownLocation: solo hay de network");
+					Log.d("MainActivity","LastKnownLocation: solo hay de network");
 					mLocation = gps;
 				}else {
 					if (network != null) {
-						Log.i("MainActivity","LastKnownLocation: solo hay del GPS");
+						Log.d("MainActivity","LastKnownLocation: solo hay del GPS");
 						mLocation = network;
 						
 					}else {
@@ -615,7 +614,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						mLocation.setLatitude(0);
 						mLocation.setLongitude(0);
 						mLocation.setAltitude(0);
-						mLocation.setAccuracy(1000);
+						mLocation.setAccuracy(0);
 					}
 				}
 			}
@@ -657,13 +656,16 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	   }
 	 
 	   if (sLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-			sLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+		   sLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 					toMinTime, MIN_DISTANCE, this);
-		}
-		if (sLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+		   Log.d("MAINACTIVITY","Se pone GPS con toMinTime:"+toMinTime);
+	   }
+	   
+	   if (sLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
 			sLocationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
 					toMinTime, MIN_DISTANCE, this);
-		}
+			Log.d("MAINACTIVITY","Se pone NETWORK con toMinTime:"+toMinTime);
+	   }
    }
    
    
@@ -734,8 +736,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
    }
    
    /**
-	 * Método para cargar en memoria los Puntos de Interés desde los distintos proveedores 
-	 * de datos disponibles
+	 * Método para cargar los distintos proveedores de datos disponibles. En este método no se
+	 * descargan datos, solamente se preparan los proveedores. 
 	 */
 	private void cargarPIs() {
 		//Ahora se cargan en memoria los PIs disponibles en el dispositivo

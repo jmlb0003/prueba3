@@ -2,7 +2,6 @@ package com.jmlb0003.prueba3.utilidades.Paintables;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.util.Log;
 
 
 /**

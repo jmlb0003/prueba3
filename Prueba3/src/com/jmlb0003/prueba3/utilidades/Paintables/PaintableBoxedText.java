@@ -64,7 +64,6 @@ public class PaintableBoxedText extends PaintableObject {
 	
 	
 	/**
-	 * //TODO: Esta funcion arregla el texto que se muestra debajo del marcador. Sería interesante modificarla al gusto...
 	 * @param txtInit
 	 * @param fontSizeInit
 	 * @param maxWidth

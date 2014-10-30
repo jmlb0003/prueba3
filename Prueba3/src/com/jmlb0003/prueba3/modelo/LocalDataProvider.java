@@ -60,10 +60,10 @@ public class LocalDataProvider {
         cachedPois.add(atl);
         
         datos.put("ID", 1);
-        Log.d("LocalDataProvider","Se vaa a dar el color:"+(Color.YELLOW));
+        Log.i("LocalDataProvider","Se vaa a dar el color:"+(Color.YELLOW));
     	datos.put("color", Color.YELLOW);
-    	Log.d("LocalDataProvider","1Se vaa a dar el color:"+(datos.get("color")));
-    	Log.d("LocalDataProvider","2Se vaa a dar el color:"+((int)datos.get("color")));
+    	Log.i("LocalDataProvider","1Se vaa a dar el color:"+(datos.get("color")));
+    	Log.i("LocalDataProvider","2Se vaa a dar el color:"+((int)datos.get("color")));
     	datos.put("imagen", sIcon);
     	datos.put("descripcion", "Este es mi casa. Vivo en Cambil...Y esta es la descripción más larga que voy a poner");
     	datos.put("sitio_web", "joselopez.hol.es");

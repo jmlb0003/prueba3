@@ -20,7 +20,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
 import com.jmlb0003.prueba3.R;
@@ -75,6 +74,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     private Activity mActivity;
     private BasicDetailsView mBasicDetails;
     
+    
 
 	/**Interfaz para indicar a MainActivity que se ha pulsado un PI*********/
     OnPoiTouchedListener mCallback;
@@ -102,7 +102,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
 
-    	Log.i("FragmentCamara","EV onCreate");
+    	Log.d("FragmentCamara","EV onCreate");
 
     	List<Sensor> sensors;
 
@@ -141,7 +141,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		Log.i("FragmentCamara","EV onCreateView");
+		Log.d("FragmentCamara","EV onCreateView");
 		//Para obtener el layout donde se construye la vista en modo Realidad Aumentada:
 		// 1- Obtener la vista principal del fragment
 		// 2- Obtener el layout donde se colocan las vistas de camara e información de aumento
@@ -178,12 +178,10 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	@Override
 	public void onResume() {
 		super.onResume();
-		Log.i("FragmentCamara","EV onResume");
+		Log.d("FragmentCamara","EV onResume");
+
         sSensorMgr.registerListener(this, sSensorGrav, SensorManager.SENSOR_DELAY_NORMAL);
         sSensorMgr.registerListener(this, sSensorMag, SensorManager.SENSOR_DELAY_NORMAL);
-        
-        //Con esto se mantiene la pantalla encendida mientras se esté usando el modo de Realidad Aumentada
-        mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         
 	}// Fin de onResume()
 	
@@ -195,16 +193,15 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	 */
     public void onPause() {
         super.onPause();
-        Log.i("FragmentCamara","EV onpause");
+        Log.d("FragmentCamara","EV onpause");
         sSensorMgr.unregisterListener(this);
-        mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }// Fin de onPause
 
 
     @Override
     public void onDestroy() {
     	super.onDestroy();
-    	Log.i("FragmentCamara","EV onDestroy");
+    	Log.d("FragmentCamara","EV onDestroy");
     	if (ARDataSource.hasSelectededPoi()) {
     		deseleccionarPoi(ARDataSource.SelectedPoi);
     	}    	
@@ -343,7 +340,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouch(View view, MotionEvent event) {
-		Log.i("FragmentCamara","EV onTouc");
+		Log.d("FragmentCamara","EV onTouc");
 		view.performClick();
 
         // Listening for the down and up touch events
@@ -351,6 +348,12 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
             case MotionEvent.ACTION_DOWN:
                 return true;
                 
+            
+            case MotionEvent.ACTION_MOVE:
+            	//TODO: Posible solucion a las colisiones...Los que colisionan, se meten en una lista y haciendo mover de izquierda a derecha y viceversa para cambiar de PI seleccionado
+            	//TODO: Marcial propone que los solapados, al pinchar en el grupo, se abra un abanico para seleccionar uno dentro del conjunto...(descartado por ahora)
+            	//TODO: En wikitude, agrupa los marcadores y al pinchar, muestra una lista en otra ventana.
+            	return true;
 
             case MotionEvent.ACTION_UP:
             	
@@ -362,7 +365,9 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         	        }
         	    }
             	
-            	deseleccionarPoi(ARDataSource.SelectedPoi);
+            	if (ARDataSource.hasSelectededPoi()) {
+            		deseleccionarPoi(ARDataSource.SelectedPoi);
+            	}
             	
             	return false;
             	
@@ -376,6 +381,9 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	 * @param poi
 	 */
 	private void poiTouched(Poi poi) {
+		if (poi == null) {
+			return;
+		}
 		/**
 		 * Se ha pulsado Poi.
 		 * 1º si hay ya uno pulsado:
@@ -403,6 +411,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	 * @param m Poi que se va a marcar como seleccionado
 	 */
 	private void seleccionarPoi(Poi m) {
+		Log.d("FragmentCamara","Seleccionar poi:"+m.getName());
 		m.setTouched(true);
 		ARDataSource.SelectedPoi = m;
 		mCallback.onPoiSelected(m);
@@ -411,12 +420,15 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 		mBasicDetails.initView(m);
 	}
 	
+
+	
 	
 	/**
 	 * Método para desmarcar como seleccionado un PI previamente seleccionado
 	 * @param m Poi que se va a deseleccionar
 	 */
 	private void deseleccionarPoi(Poi m) {
+		Log.d("FragmentCamara","Deseleccionar poi:"+m.getName());
 		if (m != null) {
 			m.setTouched(false);
 			mCallback.onPoiUnselected(m);

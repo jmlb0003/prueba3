@@ -169,6 +169,9 @@ public abstract class ARDataSource {
      * @return
      */
     public static boolean hasSelectededPoi() {
+    	if (POI_LIST == null) {
+    		return false;
+    	}
     	
         for(Poi ma : POI_LIST.values()) {
             if (ma.isSelected()) {
@@ -265,12 +268,26 @@ public abstract class ARDataSource {
     
     
     /**
+     *  //TODO: Aquí hay que hacer que se actualice menos. Si no,cada vez que cambia la posición se descarga todo.
+     *  1º solo se actualiza si la posición varía más de un margen (p.e. 100 metros)
+     *  2º Además de la opción 1º, guardar los PIs y crear una función que descargue aplicando como intersecciones... (tengo los PIs de la posición X y dame los de X+1 que no estén en X) 
      * Método para filtrar los datos que se muestran en pantalla según la distancia máxima
      * @param newMaxDistance Distancia máxima a la que pueden estar los PIs que se muestren en pantalla
      */
     public static void updateDataWithMaxDistance(float newMaxDistance) {
         ARDataSource.setRadius(newMaxDistance);
         ARDataSource.setZoomLevel(FORMAT.format(newMaxDistance));
+    }
+    
+    
+    /**
+     * Método para obtener un Poi de la lista de PIs cuyo nombre coincida con el que se pasa como
+     * parámetro en PoiName.
+     * @param PoiName Nombre del PI que se está buscando
+     * @return PoI de la lista cuyo nombre coincida con PoiName o null si no hay ninguno.
+     */
+    public static Poi getPoiByName(String PoiName) {
+    	return POI_LIST.get(PoiName);
     }
 
 }

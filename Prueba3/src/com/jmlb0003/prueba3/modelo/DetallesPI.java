@@ -12,7 +12,7 @@ import java.util.Map;
  * @author Jose
  *
  */
-public class DetallesPI {
+public class DetallesPI {//TODO: Para poner detallesPI como parcelable, revisar la mixarelib!!
 	
 	/* - Atributos --------------------------------------------------------- */
     

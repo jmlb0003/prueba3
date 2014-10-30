@@ -28,7 +28,7 @@ import com.jmlb0003.prueba3.R;
  */
 public class WikipediaDataProvider extends NetworkDataProvider {
 	//TODO:El enlace de wikipedia está mal a caso hecho
-	private static final String BASE_URL = "http://api.geonames.org/findNearbyWikipediacccccsJSON";
+	private static final String BASE_URL = "http://api.geonames.org/findNearbyWikipediaJSON";
 
 	private static Bitmap sIcon = null;
 	private static Bitmap sSelectedIcon = null;

@@ -46,11 +46,11 @@ public class Poi implements Comparable<Poi> {
     private volatile static CameraModel sCam = null;
     
     /**VARIABLES PARA PONER OPACAS ALGUNAS ZONAS DEL PI**/
-    private static boolean sDebugTouchZone = true;
+    private static boolean sDebugTouchZone = false;
     private static PaintableBox sTouchBox = null;
     private static PaintablePosition sTouchPosition = null;
 
-    private static boolean sDebugCollisionZone = true;
+    private static boolean sDebugCollisionZone = false;
     private static PaintableBox sCollisionBox = null;
     private static PaintablePosition sCollisionPosition = null;
     
@@ -94,6 +94,8 @@ public class Poi implements Comparable<Poi> {
     protected volatile boolean isInView = false;
     /**Indica si el PI ha sido pulsado**/
     protected volatile boolean isSelected = false;
+    /**Indica si el PI ha sido recolocado al estar en colisión con otro PI**/
+    protected volatile boolean isAdjusted = false;
     
     /**VARIABLES PARA CONTROLAR LA POSICIÓN EN LA QUE SE DIBUJA EL PI EN PANTALLA
      * X define si está más arriba o más abajo
@@ -187,6 +189,13 @@ public class Poi implements Comparable<Poi> {
 	public synchronized String getName(){
 		return mName;
 	}
+	
+	public synchronized int getID(){
+		if (mDetails.getDetalle("ID") != null) {
+			return (int)mDetails.getDetalle("ID");
+		}
+		return -1;
+	}
 
     public synchronized int getColor() {
     	return (int)mDetails.getDetalle("color");
@@ -262,8 +271,9 @@ public class Poi implements Comparable<Poi> {
     
     
     /**
-     * Calcula la posición del PI en la pantalla a partir de las coordenadas del texto 
-     * y el símbolo relativas a la cámara
+     * Calcula la posición central del PI (icono y texto) a partir de las coordenadas del texto 
+     * y el símbolo relativas a la cámara. Esta posición se traduce en unas coordenadas en píxeles
+     * donde se dibuja el PI en pantalla. 
      * @return Vector con las coordenadas donde se ubicará el PI.
      */
     public synchronized Vector getScreenPosition() {
@@ -472,6 +482,25 @@ public class Poi implements Comparable<Poi> {
     	
     	return isPointOnPoi(x,y,this);
     }
+    
+    
+    /**
+     * Método para cambiar el valor del flag que indica si se ha ajustado la posición del PI por 
+     * una colisión.
+     * @param v Parámetro para indicar si la posición en pantalla del PI se ha corregido para
+     * 		arreglar la colisión con otro PI
+     */
+    public void setAdjusted(boolean v) {
+    	isAdjusted = v;
+    }
+    
+    /**
+     * Método para saber si se ha ajustado la posición del PI por una colisión.
+     * @return Verdadero si se ajustó la posición del PI o falso en caso contrario.
+     */
+    public boolean isAdjusted() {
+    	return isAdjusted;
+    }
 
     
     /**
@@ -496,33 +525,41 @@ public class Poi implements Comparable<Poi> {
      */
     private synchronized boolean isPoiOnPoi(Poi otherPoi, boolean reflect) {
         otherPoi.getScreenPosition().get(mScreenPositionArray);
-        float x = mScreenPositionArray[0];
-        float y = mScreenPositionArray[1];        
-        boolean middleOfPoi = isPointOnPoi(x,y,this);
+        float mdlX = mScreenPositionArray[0];	//Coordenada central X del Poi
+        float mdlY = mScreenPositionArray[1];  //Coordenada central Y del Poi
+        Log.d("POI","POI: "+otherPoi.getName()+" mdlX:"+mdlX+"  mdlY:"+mdlY);
+        boolean middleOfPoi = isPointOnPoi(mdlX, mdlY, this);
         if (middleOfPoi) {
         	return true;
         }
 
-        float halfWidth = otherPoi.getWidth()/2;
-        float halfHeight = otherPoi.getHeight()/2;
-
-        float x1 = x - halfWidth;
-        float y1 = y - halfHeight;
+        float halfWidth = otherPoi.getWidth()/2;	//Anchura, antes era el punto central
+        float halfHeight = otherPoi.getHeight()/2;	//Altura, antes era el punto central
+        Log.d("POI","halfWidht: "+halfWidth+" halfHeight:"+halfHeight+"  Con getWi "+otherPoi.getWidth()+" y getHe:"+otherPoi.getHeight());
+        if (halfWidth == 0f || halfHeight == 0f) {
+        	Log.d("POI","halfWidht o el otro son false ");
+        	return false;
+        }
+        float x1 = mdlX - halfWidth;
+        float y1 = mdlY - halfHeight;
         boolean upperLeftOfPoi = isPointOnPoi(x1,y1,this);
+        Log.d("POI","Las coordenadas upperLeftPoi son X:"+x1+"  Y:"+y1);
         if (upperLeftOfPoi) {
         	return true;
         }
 
-        float x2 = x + halfWidth;
+        float x2 = mdlX + halfWidth;
         float y2 = y1;
         boolean upperRightOfPoi = isPointOnPoi(x2,y2,this);
+        Log.d("POI","Las coordenadas upperRightPoi son X:"+x2+"  Y:"+y2);
         if (upperRightOfPoi) {
         	return true;
         }
 
         float x3 = x1;
-        float y3 = y + halfHeight;
+        float y3 = mdlY + halfHeight;
         boolean lowerLeftOfPoi = isPointOnPoi(x3,y3,this);
+        Log.d("POI","Las coordenadas lowerleftPoi son X:"+x3+"  Y:"+y3);
         if (lowerLeftOfPoi) {
         	return true;
         }
@@ -530,6 +567,7 @@ public class Poi implements Comparable<Poi> {
         float x4 = x2;
         float y4 = y3;
         boolean lowerRightOfPoi = isPointOnPoi(x4,y4,this);
+        Log.d("POI","Las coordenadas lowerRightPoi son X:"+x4+"  Y:"+y4);
         if (lowerRightOfPoi) {
         	return true;
         }
@@ -686,7 +724,9 @@ public class Poi implements Comparable<Poi> {
     	}
 
     	float scaleDistance = 1.0f;
-    	if (mDistance > 5000)
+    	if (isSelected)
+    		scaleDistance = 1.4f;
+    	else if (mDistance > 5000)
     		scaleDistance = 0.7f;
     	else if (mDistance > 10000)
     		scaleDistance = 0.5f;
@@ -765,23 +805,37 @@ public class Poi implements Comparable<Poi> {
 	}
 
     
-  //TODO: Revisar el compareTo de PI
+    /**
+     * Compara el PI con otro PI teniendo en cuenta la distancia hasta el usuario.
+     * @param another PI con el que se compara esta instancia
+     * @returns Un entero negativo si este PI tiene una distancia menor que another; un entero
+     * 		positivo si este PI tiene una distancia mayor que another; 0 si están a la misma distancia.
+     */
     public synchronized int compareTo(Poi another) {
         if (another == null) {
         	throw new NullPointerException();
         }
 
-        return mName.compareTo(another.getName());
+        return (int)Math.round(mDistance-another.getDistance());
     }
 
-    //TODO: Revisar el equals de PI
+
+    
     @Override
     public synchronized boolean equals(Object poi) {
         if(poi == null || mName == null) {
         	throw new NullPointerException();
         }
 
-        return mName.equals(((Poi)poi).getName());
+        if ( ((Poi)poi).getID() != getID() ) {
+        	return false;
+        }
+        
+        if (!mName.equals(((Poi)poi).getName())) {
+        	return false;
+        }
+        
+        return true;
     }
     
     

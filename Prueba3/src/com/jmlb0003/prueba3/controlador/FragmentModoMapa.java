@@ -1,12 +1,15 @@
 package com.jmlb0003.prueba3.controlador;
 
 
+import java.util.List;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,12 +18,14 @@ import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -32,12 +37,11 @@ import com.jmlb0003.prueba3.vista.BasicDetailsView;
 
 
 
-public class FragmentModoMapa extends Fragment implements OnMarkerClickListener, 
+public class FragmentModoMapa extends Fragment implements OnMarkerClickListener, OnMapClickListener,
 				OnInfoWindowClickListener {
-	
-	private static final float MAP_ZOOM = 8;
+
+
 	private static GoogleMap mMap = null; // Might be null if Google Play services APK is not available.
-	private MapView mMapView;
 	private SupportMapFragment mMapFragment;
 	
 	private FragmentActivity mActivity;
@@ -45,7 +49,6 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 	
 	private OnPoiTouchedListener mCallback;
 	
-	private Marker mLastSelectedMarker;
 	
 	
 	/***************Clase representante de un cuadro con información del PI***********************/
@@ -136,7 +139,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        
+        Log.d("FragmentMAPA","EV onAttach");
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
@@ -153,19 +156,59 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
-		Log.i("FragmentModoMapa", "Creando el createView del mapa");
+		Log.d("FragmentMapa","EV oncreateView");
 		if (container == null) {
-			Log.i("FragmentModoMapa", "Createview mapa: el container es null");
+			Log.d("FragmentModoMapa", "Createview mapa: el container es null");
 			return null;
 		}
-        
+        /*********************************************************************************/
+		/**Esto es un fragment, y aqui se esta intentando meter otro fragment!!!!**/
+		//http://stackoverflow.com/a/15813151/3909894
+		/*********************************************************************************/
 		View rootView = inflater.inflate(R.layout.fragment_modo_mapa, container, false);
 		mBasicDetails = (BasicDetailsView) rootView.findViewById(R.id.basic_details2_id);
 		
-		
+		if (mBasicDetails == null) {
+			Log.d("FragmentMAPA","tampoco hay basicdetails");
+		}else{
+			Log.d("FragmentMAPA","Pues basicdetails SI hay");
+		}
 		mActivity = getActivity();
 		mMapFragment = (SupportMapFragment) mActivity.getSupportFragmentManager().findFragmentById(R.id.mapa_container_id);
 		
+		if (mMapFragment == null) {
+			Log.d("FragmentMAPA","El mmapfragment es NULL. No hay mapaContainer");
+			Log.d("FragmentMAPA","el id es: "+R.id.mapa_container_id);
+			
+			if (mActivity == null){
+				Log.d("FragmentMAPA","Es que no hay mActivity...");
+			}else{
+				Log.d("FragmentMAPA","Pero si hay mActivity");
+			}
+			FragmentManager fm = mActivity.getSupportFragmentManager();
+			if (fm == null){
+				Log.d("FragmentMAPA","Es que no hay fragmentManager...");
+			}else{
+				Log.d("FragmentMAPA","Pero si hay fragmentManager");
+				
+				List<Fragment> ls = fm.getFragments();
+				if (ls == null) {
+					Log.d("FragmentMAPA","Ls es null, no hay fragments");
+				}else{
+					if (ls.size() > 0) {
+						Log.d("FragmentMAPA","El tamaño del vector es:"+ls.size());
+					for (Fragment fg : ls) {
+						if (fg!= null) {
+						Log.d("FragmentMAPA","Un fragment con ID: "+fg.getId());
+						}
+					}
+					}
+				}
+			}
+			
+		}else{
+			Log.d("FragmentMAPA","Pues mmapfragment NO es NULL.");
+		}
 		
 		//Se establece que el alto conserve el ratio 1:1 (aproximado) para seguir las líneas de diseño
         //https://www.google.com/design/spec/layout/metrics-and-keylines.html#metrics-and-keylines-ratio-keylines
@@ -176,7 +219,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
         mBasicDetails.getLayoutParams().height = (Math.round(h-w-(80/d)));			
 		
 		
-		Log.i("FragmentModoMapa", "onCreateView terminado");
+		Log.d("FragmentModoMapa", "onCreateView terminado");
 		return rootView;
 		
 	}// Fin de onCreateView
@@ -186,8 +229,31 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
     @Override
 	public void onResume() {
         super.onResume();
+        Log.d("FragmentMapa","EV onResume");
+        
+        switch (GooglePlayServicesUtil.isGooglePlayServicesAvailable(mActivity)) {
+	        case 2: //out date
+	            try {
+	                GooglePlayServicesUtil.getErrorDialog(2, mActivity, 0).show();
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	            }	            
+	            
+	            break;
+        }
         
         setUpMapIfNeeded();
+    }
+    
+    
+    
+    @Override
+    public void onDestroy() {
+    	super.onDestroy();
+    	Log.d("FragmentCamara","EV onDestroy");
+    	if (ARDataSource.hasSelectededPoi()) {
+    		deseleccionarPoi(ARDataSource.SelectedPoi);
+    	}    	
     }
     
 
@@ -208,12 +274,12 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
      */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
-    	Log.i("INICIO", "SetupIfNeeded:Entra");
-        if (mMap == null) {
-        	Log.i("INICIO", "Setup:mMap=null");
+    	Log.d("FragmentMapa", "SetupIfNeeded:Entra");
+        if (mMap == null && mMapFragment != null) {
+        	Log.d("FragmentMapa", "Setup:mMap=null");
             // Try to obtain the map from the SupportMapFragment.
         	mMap = mMapFragment.getMap();
-        	Log.i("INICIO", "Setup:mMap=iniciado");
+        	Log.d("FragmentMapa", "Setup:mMap=iniciado");
 
 
             // Check if we were successful in obtaining the map.
@@ -221,7 +287,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
                 setUpMap();
             }
         }
-        Log.i("INICIO", "Setup:termina");
+        Log.d("FragmentMapa", "Setup:termina");
     }
 		    
     
@@ -235,7 +301,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
      */
     @Override
     public void onDestroyView() {
-    	Log.i("FragmentModoMapa", "ondestroyview:entra");
+    	Log.d("FragmentModoMapa", "EV ondestroyview:entra");
         super.onDestroyView();
         
         if (mMap != null) {
@@ -248,42 +314,40 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
     	    }
             mMap = null;
         }
-        Log.i("FragmentModoMapa", "ondestroyview: sale");
+        Log.d("FragmentModoMapa", "ondestroyview: sale");
     }
 
     /**
-     * //TODO:Función para añadir los Pois al mapa
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
+     * Método donde se añaden al mapa los markers, listeners, etc. 
      * <p>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
+     * Solo debe ser llamado una vez que se asegure que {@link #mMap} no es null.
      */
     private void setUpMap() {
+    	Log.d("FragmentMapa","Setup Map: Añadiendo marcadores, etc...");
     	// Hide the zoom controls as the button panel will cover it.
         mMap.getUiSettings().setZoomControlsEnabled(false);
         
-        // Add lots of markers to the map.
-        addMarkersToMap();
-        
-        
-//        // Setting an info window adapter allows us to change the both the contents and look of the
-//        // info window.
-//        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
-        
-        // Set listeners for marker events.  See the bottom of this class for their behavior.
-        mMap.setOnMarkerClickListener(this);
-        mMap.setOnInfoWindowClickListener(this);
-        
-        
-        //TODO: Esto hay que arreglarlo para que el zoom se haga de forma que quepan todos los markers
-        
-        LatLng currentPosition = new LatLng(ARDataSource.getCurrentLocation().getLatitude(),
-        								ARDataSource.getCurrentLocation().getLongitude());
-        
-        
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 
-        	calculateZoomLevel(getResources().getDisplayMetrics().widthPixels, 
-        													ARDataSource.getRadius()*1000)));
+        if (isVisible()) {
+	        // Add lots of markers to the map.
+	        addMarkersToMap();
+	        
+	        
+	//        // Setting an info window adapter allows us to change the both the contents and look of the
+	//        // info window.
+	//        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
+	        
+	        // Set listeners for marker events.  See the bottom of this class for their behavior.
+	        mMap.setOnMarkerClickListener(this);
+	        mMap.setOnMapClickListener(this);
+	        mMap.setOnInfoWindowClickListener(this);
+	        
+	        LatLng currentPosition = new LatLng(ARDataSource.getCurrentLocation().getLatitude(),
+	        								ARDataSource.getCurrentLocation().getLongitude());
+	        
+	        
+	        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 
+	        								calculateMapZoomLevel(ARDataSource.getRadius()*1000)));
+        }
     } 
 		    
    
@@ -292,43 +356,35 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
      * Método para añadir al mapa los PIs que se encuentran dentro del rango de búsqueda actual
      */
     private void addMarkersToMap() {
+
+    	Log.d("FragmentMapa","añandiendo Poi al mapa");
     	
     	for (Poi poi : ARDataSource.getPois()) {
-    		    		
-    		mMap.addMarker(new MarkerOptions()
-    					.position( new LatLng(poi.getLatitude(), poi.getLongitude()) )
-    					.title( poi.getName() )
-    					/*.icon( BitmapDescriptorFactory.fromBitmap(poi.getIcon()) )*/  );
-    	}
+    		if (poi.getIcon() != null) {
+   
+    			mMap.addMarker(new MarkerOptions()
+	    					.position( new LatLng(poi.getLatitude(), poi.getLongitude()) )
+	    					.title( poi.getName() )
+	    					.icon(BitmapDescriptorFactory.fromBitmap(poi.getIcon()) )  );
+	    			
+    		}else{
+    			mMap.addMarker(new MarkerOptions()
+							.position( new LatLng(poi.getLatitude(), poi.getLongitude()) )
+							.title( poi.getName() )
+							.icon( BitmapDescriptorFactory.fromResource(R.drawable.icono_pi) )  );
+    		}
+	    		
+	    }
+    	
+    	
+    	/////////////////////////////////////////
+    	mMap.addMarker(new MarkerOptions().position(new LatLng(ARDataSource.getCurrentLocation().getLatitude(),ARDataSource.getCurrentLocation().getLongitude()))
+    			.title("Estás aquí")
+    			.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))  );
+    	
     }
     
-    /**
-	 * Método para marcar como seleccionado un Poi de los que actualmente se encuentran en pantalla
-	 * @param m Poi que se va a marcar como seleccionado
-	 */
-	private void seleccionarPoi(Poi m) {
-		m.setTouched(true);
-		ARDataSource.SelectedPoi = m;
-		mCallback.onPoiSelected(m);
-		
-		mBasicDetails.setVisibility(View.VISIBLE);
-		mBasicDetails.initView(m);
-	}
-	
-	
-	/**
-	 * Método para desmarcar como seleccionado un Poi previamente seleccionado
-	 * @param m Poi que se va a deseleccionar
-	 */
-	private void deseleccionarPoi(Poi m) {
-		if (m != null) {
-			m.setTouched(false);
-			mCallback.onPoiUnselected(m);
-			ARDataSource.SelectedPoi = null;
-		}
-		
-		mBasicDetails.setVisibility(View.INVISIBLE);
-	}
+    
 
 
 
@@ -337,15 +393,25 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 		Toast.makeText(mActivity, "Click Info Window", Toast.LENGTH_SHORT).show();
 	}
 
-
+	
+	
+	@Override
+	public void onMapClick(LatLng point) {
+		Log.d("FragmentMapa","EV onMapClick");
+		
+		if (ARDataSource.hasSelectededPoi()) {
+			deseleccionarPoi(ARDataSource.SelectedPoi);
+		}
+		
+	}
+	
 
 	@Override
 	public boolean onMarkerClick(final Marker marker) {
 		if (marker != null) {
-            // This causes the marker at Perth to bounce into position when it is clicked.
             final Handler handler = new Handler();
             final long start = SystemClock.uptimeMillis();
-            final long duration = 1500;
+            final long duration = 1000;
 
             final Interpolator interpolator = new BounceInterpolator();
 
@@ -363,11 +429,12 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
                     }
                 }
             });
+            
+            poiTouched(ARDataSource.getPoiByName(marker.getTitle()));
+            
         }
-
-
-
-        mLastSelectedMarker = marker;
+        
+        
         // We return false to indicate that we have not consumed the event and that we wish
         // for the default behavior to occur (which is for the camera to move such that the
         // marker is centered and for the marker's info window to open, if it has one).
@@ -375,22 +442,94 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 	}
 	
 	
-	//TODO: Método confuso que no llega a funcionar...sobra un nivel más o menos (dos si zoomlevel se inicializa con 1)
-	private int calculateZoomLevel(int screenWidth, float maxDistance) {
-		double equatorLength = 40075004; // in meters
-		double metersPerPixel = equatorLength / 256;
-		int zoomLevel = 1;
+	/**
+	 * Método con las acciones a realizar cuando se pulsa un PI
+	 * @param poi
+	 */
+	private void poiTouched(Poi poi) {		
+		if (poi == null) {
+			return;			
+		}
 		
-		Log.i("ADNAN", "Con radius:"+maxDistance+" y width:"+screenWidth);
-		while ((metersPerPixel * 2 * screenWidth) > (maxDistance * 2)) {
-			Log.i("ADNAN", "zoom level = "+zoomLevel+ "  y metersPixels:"+metersPerPixel+" = "+metersPerPixel *2  * screenWidth);
-		    metersPerPixel /= 2;
-		    ++zoomLevel;
+		/**
+		 * Se ha pulsado Poi.
+		 * 1º si hay ya uno pulsado:
+		 * 		1.1 Si es distinto, se cambia el seleccionado y se abre o se cambian los detalles básicos
+		 * 		1.2 Si es igual, se abre la ventana de detalles
+		 * 2º si no hay ninguno pulsado:
+		 * 		2.1 Se pone como seleccionado y se abre la vista de detalles básicos
+		 */		
+		if (ARDataSource.hasSelectededPoi()) {
+
+			if (ARDataSource.SelectedPoi != poi) {
+				//Se deselecciona el Poi actual y se selecciona el nuevo
+				deseleccionarPoi(ARDataSource.SelectedPoi);
+				
+			}
 		}
 		
 		
-		return zoomLevel;
+		seleccionarPoi(poi);
 	}
+	
+	
+	/**
+	 * Método que calcula el nivel de zoom necesario para que los markers que se van a mostrar 
+	 * quepan en la pantalla. Se utiliza el alcance actual del radar como distancia a mostrar en
+	 * pantalla.
+	 * @param maxDistance Distancia que se va a mostrar en pantalla
+	 * @return Valor entero del zoom que se aplica a Google Maps para que quepan los markers en
+	 * pantalla.
+	 */
+	private int calculateMapZoomLevel(float maxDistance) {
+        //@see: http://stackoverflow.com/questions/5939983/how-does-this-google-maps-zoom-level-calculation-work
+        return (int) (16 - Math.log(maxDistance/500) / Math.log(2));
+	}
+
+	
+	
+	/**
+	 * Método para marcar como seleccionado un Poi de los que actualmente se encuentran en pantalla
+	 * @param poi PI que se va a marcar como seleccionado
+	 */
+	private void seleccionarPoi(Poi poi) {
+		if (poi == null) {
+			return;			
+		}
+		
+		Log.d("FragmentMapa","Seleccionar poi:"+poi.getName());
+		poi.setTouched(true);
+		ARDataSource.SelectedPoi = poi;
+		mCallback.onPoiSelected(poi);
+		
+		mBasicDetails.setVisibility(View.VISIBLE);
+		mBasicDetails.initView(poi);
+	}
+	
+
+
+	
+	
+	/**
+	 * Método para desmarcar como seleccionado un Poi previamente seleccionado
+	 * @param poi Marker que se va a deseleccionar
+	 */
+	private void deseleccionarPoi(Poi poi) {
+		if (poi == null) {
+			return;			
+		}
+		
+		Log.d("FragmentMapa","Deseleccionar poi:"+poi.getName());
+		if (poi != null) {
+			poi.setTouched(false);
+			mCallback.onPoiUnselected(poi);
+			ARDataSource.SelectedPoi = null;
+		}
+		
+		mBasicDetails.setVisibility(View.INVISIBLE);
+	}
+
+
 
 }
 
