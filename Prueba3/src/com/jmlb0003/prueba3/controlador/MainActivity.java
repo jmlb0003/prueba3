@@ -172,7 +172,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		//de forma dinámica. 
 		mFragmentManager.beginTransaction().add(R.id.container, mFragmentModoCamara).commit();
 		Log.d(CLASS_TAG, "PantallaPrincipal:añadido el fragment de la camara");
-		mFragmentManager.beginTransaction().add(R.id.container, mFragmentModoMapa).commit();
+		mFragmentManager.beginTransaction().add(R.id.container, mFragmentModoMapa,"tagMapa").commit();
 		Log.d(CLASS_TAG, "PantallaPrincipal:Añadido el fragment del mapa_:FIN");
 
 		
@@ -307,7 +307,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				break;
 			case 1:
 				ft.show(mFragmentModoMapa);
-				ft.replace(R.id.container, mFragmentModoMapa);
+				ft.replace(R.id.container, mFragmentModoMapa,"tagMapa");
 				//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 				//ft.addToBackStack(null);	//Quitar esto porque da fallos y no es necesario
 				

@@ -174,9 +174,19 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 			Log.d("FragmentMAPA","Pues basicdetails SI hay");
 		}
 		mActivity = getActivity();
-		mMapFragment = (SupportMapFragment) mActivity.getSupportFragmentManager().findFragmentById(R.id.mapa_container_id);
+		Fragment f = mActivity.getSupportFragmentManager().findFragmentByTag("tagMapa");
 		
-		if (mMapFragment == null) {
+		
+		if (mActivity.getSupportFragmentManager().findFragmentByTag("tagMapa") == null) {
+			Log.d("FragmentMAPA","El f es NULL.");
+		}
+		
+		
+		
+		mMapFragment = (SupportMapFragment) f.getChildFragmentManager().findFragmentById(R.id.mapa_container_id);
+		
+		
+		if (f.getChildFragmentManager().findFragmentById(R.id.mapa_container_id) == null) {
 			Log.d("FragmentMAPA","El mmapfragment es NULL. No hay mapaContainer");
 			Log.d("FragmentMAPA","el id es: "+R.id.mapa_container_id);
 			
