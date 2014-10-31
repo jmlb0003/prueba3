@@ -172,8 +172,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		//de forma dinámica. 
 		mFragmentManager.beginTransaction().add(R.id.container, mFragmentModoCamara).commit();
 		Log.d(CLASS_TAG, "PantallaPrincipal:añadido el fragment de la camara");
-		mFragmentManager.beginTransaction().add(R.id.container, mFragmentModoMapa,"tagMapa").commit();
-		Log.d(CLASS_TAG, "PantallaPrincipal:Añadido el fragment del mapa_:FIN");
+//		mFragmentManager.beginTransaction().add(R.id.container, mFragmentModoMapa,"tagMapa").commit();
+//		Log.d(CLASS_TAG, "PantallaPrincipal:Añadido el fragment del mapa_:FIN");
 
 		
 		aplicarValoresDeAjustes();
@@ -295,7 +295,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 		switch (position) {
 			case 0:
-				ft.show(mFragmentModoCamara);
 				ft.replace(R.id.container, mFragmentModoCamara);
 //				  Con esto se pone una especie de animacion al cambiar de fragment pero tambien
 //				  se ve un parpadeo con el color de la pantalla anterior...
@@ -306,7 +305,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				
 				break;
 			case 1:
-				ft.show(mFragmentModoMapa);
 				ft.replace(R.id.container, mFragmentModoMapa,"tagMapa");
 				//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 				//ft.addToBackStack(null);	//Quitar esto porque da fallos y no es necesario
