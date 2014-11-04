@@ -1,15 +1,12 @@
 package com.jmlb0003.prueba3.controlador;
 
 
-import java.util.List;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -345,7 +342,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
     	
     	/////////////////////////////////////////
     	mMap.addMarker(new MarkerOptions().position(new LatLng(ARDataSource.getCurrentLocation().getLatitude(),ARDataSource.getCurrentLocation().getLongitude()))
-    			.title("Estás aquí")
+    			.title(getString(R.string.you_are_here))
     			.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))  );
     	
     }
@@ -396,7 +393,9 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
                 }
             });
             
-            poiTouched(ARDataSource.getPoiByName(marker.getTitle()));
+            if ( !marker.getTitle().equals(getString(R.string.you_are_here)) ) {
+            	poiTouched(ARDataSource.getPoiByName(marker.getTitle()));
+            }
             
         }
         

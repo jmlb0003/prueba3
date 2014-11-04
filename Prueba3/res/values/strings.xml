@@ -6,6 +6,8 @@
     <string name="title_section_modoMapa">Modo Mapa</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Ajustes</string>
+    <!-- Content Provider -->
+    <string name="content_authority">"com.jmlb0003.prueba3"</string>
 
     <!-- Ventana de diálogo de ajustes de ubicación -->
     <string name="alert_location_title">Ajustes de ubicación</string>
@@ -27,7 +29,8 @@
     <string name="pi_content_description">Fotografía del PI</string>
     <string name="title_activity_detalles_pi">DetallesPIActivity</string>
     
-    
+    <!-- Cadena "estás aquí" para el marcador del modo mapa -->
+    <string name="you_are_here">Estás aquí</string>
     <!-- Clave para usar Google Maps en la app -->
     <string name="maps_key">AIzaSyAPWQlnZICVmAePBokkdXf4ic8ahjycq84</string>
 

@@ -122,6 +122,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
 	
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -172,8 +173,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		//de forma dinámica. 
 		mFragmentManager.beginTransaction().add(R.id.container, mFragmentModoCamara).commit();
 		Log.d(CLASS_TAG, "PantallaPrincipal:añadido el fragment de la camara");
-//		mFragmentManager.beginTransaction().add(R.id.container, mFragmentModoMapa,"tagMapa").commit();
-//		Log.d(CLASS_TAG, "PantallaPrincipal:Añadido el fragment del mapa_:FIN");
 
 		
 		aplicarValoresDeAjustes();
@@ -206,9 +205,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         	cargarPIs();
         	
         	//TODO: Esto es provisional...hay que poner en condiciones lo de descargar/almacenar los datos
-        	updateData(mLocation.getLatitude(),
-        			mLocation.getLongitude(),
-        			mLocation.getAltitude());
+        	if (hayLocation) {
+        		updateData(mLocation.getLatitude(),
+        					mLocation.getLongitude(),
+        					mLocation.getAltitude());
+        	}
         }
 
     }// Fin de onResume()
@@ -234,6 +235,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
     
     
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		// Restore the previously serialized current dropdown position.
@@ -245,6 +247,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	
 	
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		// Serialize the current dropdown position.
@@ -296,9 +299,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		switch (position) {
 			case 0:
 				ft.replace(R.id.container, mFragmentModoCamara);
-//				  Con esto se pone una especie de animacion al cambiar de fragment pero tambien
-//				  se ve un parpadeo con el color de la pantalla anterior...
-				//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);	
 				//ft.addToBackStack(null);		//Quitar esto porque da fallos y no es necesario
 				
 				ft.commit();
@@ -306,7 +306,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				break;
 			case 1:
 				ft.replace(R.id.container, mFragmentModoMapa,"tagMapa");
-				//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 				//ft.addToBackStack(null);	//Quitar esto porque da fallos y no es necesario
 				
 				ft.commit();
@@ -342,15 +341,22 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		// Solo se tiene en cuenta la nueva ubicación si es mejor que la anterior 
 		// (más precisa y reciente)
 		if (isBetterLocation(newLocation, ARDataSource.getCurrentLocation())) {
-    		Log.d(CLASS_TAG,"la posicion nueva es mejor: La:"+newLocation.getLatitude()+" lo:"+newLocation.getLongitude()+" Precision:"+newLocation.getAccuracy()+"\nEl anterior tenia precision: "+ARDataSource.getCurrentLocation().getAccuracy());
+    		Log.d(CLASS_TAG,"la posicion nueva es mejor: La:"+newLocation.getLatitude()+" lo:"+newLocation.getLongitude()+" Precision:"+newLocation.getAccuracy()+"\nEl anterior tenia precision: "+ARDataSource.getCurrentLocation().getAccuracy());    		
+    		float locationsDistance = newLocation.distanceTo(ARDataSource.getCurrentLocation());
     		ARDataSource.setCurrentLocation(newLocation);
 
-	        mFragmentModoCamara.calcularMagneticNorthCompensation();
-	        
-	        //Se actualizan/descargan los PIs según la posición obtenida
-	        updateData(newLocation.getLatitude(),
-	        			newLocation.getLongitude(),
-	        			newLocation.getAltitude());
+	        mFragmentModoCamara.calculateMagneticNorthCompensation();
+	        Log.d(CLASS_TAG,"UPDATEDATA: locationsDistance vale:"+locationsDistance);
+	        //TODO: Si varia la posicion mas de 50 metros...
+	        if ( (locationsDistance > MIN_DISTANCE) && (hayLocation) ) {
+	        	Log.d(CLASS_TAG,"UPDATEDATA: Hay que llamar a updateData");
+		        //Se actualizan/descargan los PIs según la posición obtenida
+		        updateData(newLocation.getLatitude(),
+		        			newLocation.getLongitude(),
+		        			newLocation.getAltitude());
+	        }else{
+	        	Log.d(CLASS_TAG,"UPDATEDATA: No hace falta llamar a updateData");
+	        }
 		}else{
     		Log.d(CLASS_TAG,"la posicion anterior es mejor: La:"+ARDataSource.getCurrentLocation().getLatitude()+" lo:"+ARDataSource.getCurrentLocation().getLongitude()+" Precision:"+ARDataSource.getCurrentLocation().getAccuracy()+"\nLa nueva tenia precision: "+newLocation.getAccuracy());
     	}
@@ -455,6 +461,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	    	   DOWNLOADS_SERVICE.execute(
 	    			   new Runnable() {
 	    				   public void run() {
+	    					   //TODO: Si la distancia no ha variado mucho, no descargar (se hace en onLocationChanged)
 	    					   for (NetworkDataProvider source : SOURCES.values()) {
 	    						   download(source, lat, lon, alt);
 	    					   }
@@ -760,6 +767,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		}else{
 
 			if (mTouchedPoi.isSelected() && mTouchedPoi == poiTouched) {
+				//TODO: Está quitado del manifest lo de parentActivity...
 				startActivity(new Intent(this,DetallesPIActivity.class));
 			}else{
 				mTouchedPoi = poiTouched;

@@ -303,7 +303,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	/**
 	 * Método para calcular la matriz de compensación entre los polos norte magnético y geográfico
 	 */
-	public void calcularMagneticNorthCompensation() {
+	public void calculateMagneticNorthCompensation() {
 		double angleY;
 	   
 	   

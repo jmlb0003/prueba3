@@ -527,7 +527,7 @@ public class Poi implements Comparable<Poi> {
         otherPoi.getScreenPosition().get(mScreenPositionArray);
         float mdlX = mScreenPositionArray[0];	//Coordenada central X del Poi
         float mdlY = mScreenPositionArray[1];  //Coordenada central Y del Poi
-        Log.d("POI","POI: "+otherPoi.getName()+" mdlX:"+mdlX+"  mdlY:"+mdlY);
+//        Log.d("POI","POI: "+otherPoi.getName()+" mdlX:"+mdlX+"  mdlY:"+mdlY);
         boolean middleOfPoi = isPointOnPoi(mdlX, mdlY, this);
         if (middleOfPoi) {
         	return true;
@@ -535,15 +535,15 @@ public class Poi implements Comparable<Poi> {
 
         float halfWidth = otherPoi.getWidth()/2;	//Anchura, antes era el punto central
         float halfHeight = otherPoi.getHeight()/2;	//Altura, antes era el punto central
-        Log.d("POI","halfWidht: "+halfWidth+" halfHeight:"+halfHeight+"  Con getWi "+otherPoi.getWidth()+" y getHe:"+otherPoi.getHeight());
+//        Log.d("POI","halfWidht: "+halfWidth+" halfHeight:"+halfHeight+"  Con getWi "+otherPoi.getWidth()+" y getHe:"+otherPoi.getHeight());
         if (halfWidth == 0f || halfHeight == 0f) {
-        	Log.d("POI","halfWidht o el otro son false ");
+//        	Log.d("POI","halfWidht o el otro son false ");
         	return false;
         }
         float x1 = mdlX - halfWidth;
         float y1 = mdlY - halfHeight;
         boolean upperLeftOfPoi = isPointOnPoi(x1,y1,this);
-        Log.d("POI","Las coordenadas upperLeftPoi son X:"+x1+"  Y:"+y1);
+//        Log.d("POI","Las coordenadas upperLeftPoi son X:"+x1+"  Y:"+y1);
         if (upperLeftOfPoi) {
         	return true;
         }
@@ -551,7 +551,7 @@ public class Poi implements Comparable<Poi> {
         float x2 = mdlX + halfWidth;
         float y2 = y1;
         boolean upperRightOfPoi = isPointOnPoi(x2,y2,this);
-        Log.d("POI","Las coordenadas upperRightPoi son X:"+x2+"  Y:"+y2);
+//        Log.d("POI","Las coordenadas upperRightPoi son X:"+x2+"  Y:"+y2);
         if (upperRightOfPoi) {
         	return true;
         }
@@ -559,7 +559,7 @@ public class Poi implements Comparable<Poi> {
         float x3 = x1;
         float y3 = mdlY + halfHeight;
         boolean lowerLeftOfPoi = isPointOnPoi(x3,y3,this);
-        Log.d("POI","Las coordenadas lowerleftPoi son X:"+x3+"  Y:"+y3);
+//        Log.d("POI","Las coordenadas lowerleftPoi son X:"+x3+"  Y:"+y3);
         if (lowerLeftOfPoi) {
         	return true;
         }
@@ -567,7 +567,7 @@ public class Poi implements Comparable<Poi> {
         float x4 = x2;
         float y4 = y3;
         boolean lowerRightOfPoi = isPointOnPoi(x4,y4,this);
-        Log.d("POI","Las coordenadas lowerRightPoi son X:"+x4+"  Y:"+y4);
+//        Log.d("POI","Las coordenadas lowerRightPoi son X:"+x4+"  Y:"+y4);
         if (lowerRightOfPoi) {
         	return true;
         }
