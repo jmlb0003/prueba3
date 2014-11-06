@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -23,6 +24,9 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.format.Time;
@@ -35,9 +39,11 @@ import android.widget.Toast;
 
 import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.LocalDataProvider;
-import com.jmlb0003.prueba3.modelo.NetworkDataProvider;
+import com.jmlb0003.prueba3.modelo.NetworkDataProvider2;
 import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.modelo.WikipediaDataProvider;
+import com.jmlb0003.prueba3.modelo.WikipediaDataProvider2;
+import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
 
 /*
  * TODO Orden de los imports CODE GUIDELINES
@@ -52,7 +58,7 @@ import com.jmlb0003.prueba3.modelo.WikipediaDataProvider;
  *
  */
 public class MainActivity extends ActionBarActivity implements ActionBar.OnNavigationListener,
-				LocationListener,OnPoiTouchedListener {
+				LocationListener,OnPoiTouchedListener, LoaderCallbacks<Cursor> {
 	
 	/**
 	 * Nomenclatura de variables CODE GUIDELINES
@@ -93,7 +99,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     private static final BlockingQueue<Runnable> QUEUE = new ArrayBlockingQueue<Runnable>(1);
     private static final ThreadPoolExecutor DOWNLOADS_SERVICE = new ThreadPoolExecutor(1, 1, 20, TimeUnit.SECONDS, QUEUE);
     /**Variable que almacena los proveedores online de Puntos de Interés**/
-	private static final Map<String,NetworkDataProvider> SOURCES = new ConcurrentHashMap<String,NetworkDataProvider>(); 
+	private static final Map<String,NetworkDataProvider2> SOURCES = new ConcurrentHashMap<String,NetworkDataProvider2>(); 
 	
 	
     /**********************VARIABLES LOCALIZACION********************************/
@@ -111,6 +117,29 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     
     /**Indica si se han inicializado los recursos de donde se obtienen los PIs**/
     private boolean isDataSourcesInit = false;
+    
+    
+    /************* Constantes para el Loader ******************/
+    /** Identificador del Loader. Actualmente solo hay uno **/
+    private static final int POI_LOADER = 0;
+
+    /** Datos necesarios del PI de entre los disponibles en la BD **/
+    private static final String[] POI_COLUMNS = {
+            PoiEntry.TABLE_NAME + "." + PoiEntry._ID,
+            PoiEntry.COLUMN_POI_NAME,
+            PoiEntry.COLUMN_POI_COLOR,
+            PoiEntry.COLUMN_POI_IMAGE,
+            PoiEntry.COLUMN_POI_DESCRIPTION,
+            PoiEntry.COLUMN_POI_WEBSITE,
+            PoiEntry.COLUMN_POI_PRICE,
+            PoiEntry.COLUMN_POI_OPEN_HOURS,
+            PoiEntry.COLUMN_POI_CLOSE_HOURS,
+            PoiEntry.COLUMN_POI_MAX_AGE,
+            PoiEntry.COLUMN_POI_MIN_AGE,
+            PoiEntry.COLUMN_POI_LATITUDE,
+            PoiEntry.COLUMN_POI_LONGITUDE,
+            PoiEntry.COLUMN_POI_ALTITUDE
+    };
     
     
     
@@ -177,6 +206,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 		aplicarValoresDeAjustes();
 		
+		
+		/**********************************************************************************/
+//		getSupportLoaderManager().initLoader(POI_LOADER, null, this);
+		
 	}// Fin de onCreate()
 	
 	
@@ -211,6 +244,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         					mLocation.getAltitude());
         	}
         }
+        
+        /******************************************************************************************************/
+//        if (mLocation != null) {
+//            getSupportLoaderManager().restartLoader(POI_LOADER, null, this);
+//        }
 
     }// Fin de onResume()
 	
@@ -462,7 +500,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	    			   new Runnable() {
 	    				   public void run() {
 	    					   //TODO: Si la distancia no ha variado mucho, no descargar (se hace en onLocationChanged)
-	    					   for (NetworkDataProvider source : SOURCES.values()) {
+	    					   for (NetworkDataProvider2 source : SOURCES.values()) {
 	    						   download(source, lat, lon, alt);
 	    					   }
 	    						   
@@ -478,7 +516,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
    }
    
    
-   private static boolean download(NetworkDataProvider source, double lat, double lon, double alt) {
+   private static boolean download(NetworkDataProvider2 source, double lat, double lon, double alt) {
 		if (source == null) {
 			return false;
 		}
@@ -750,7 +788,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		ARDataSource.addPois(localData.getPois());
 		
 		//Se añaden recursos a la colección SOURCES para descargar PIs
-		NetworkDataProvider wikipedia = new WikipediaDataProvider(getResources());
+		NetworkDataProvider2 wikipedia = new WikipediaDataProvider2(getResources());
 		SOURCES.put("wiki",wikipedia);
 		
 		isDataSourcesInit = true;
@@ -780,6 +818,70 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	@Override
 	public void onPoiUnselected(Poi PoiUnselected) {
 		mTouchedPoi = null;
+	}
+
+
+
+
+	/**
+	 * El Loader se usa para obtener los datos del Content Provider, que a su vez hace de 
+	 * intermediario entre el Loader y la Base de Datos. A continuación se implementan los 
+	 * métodos necesarios para manejarlo y poder obtener los PIs.
+	 */
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		// TODO Auto-generated method stub
+//		// This is called when a new Loader needs to be created.  This
+//        // fragment only uses one loader, so we don't care about checking the id.
+//
+//
+//        // Sort order:  Resultados ordenados por distancia (formato ORDER BY de SQL).
+//        //TODO: Aquí fórmula de la distancia....
+////        String sortOrder = PoiEntry.COLUMN_DISTANCE + " ASC";
+//
+//
+//        // Now create and return a CursorLoader that will take care of
+//        // creating a Cursor for the data being displayed.
+//        return new CursorLoader(
+//        		this,	//Context
+//                PoiEntry.CONTENT_URI,	//URI
+//                POI_COLUMNS,	//Proyección (SELECT)
+//                null,	//Selección (WHERE)
+//                null,	//Argumentos de la selección (Parámetros ? del WHERE)
+////                sortOrder	//(SORTED BY)
+//                null
+//        );
+		return null;
+	}
+
+
+
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+//		Log.d(CLASS_TAG,"onLoadFinished:1");
+//		if (data.getCount() == 0) {
+//			Log.d(CLASS_TAG,"onLoadFinished:2");
+//			NetworkDataProvider nd = new WikipediaDataProvider(this, true);
+//			Log.d(CLASS_TAG,"onLoadFinished:2.1");
+//            nd.syncImmediately(this);
+//            Log.d(CLASS_TAG,"onLoadFinished:2.2");
+//        }
+//		Log.d(CLASS_TAG,"onLoadFinished:3 con Count:"+data.getCount());
+//
+//
+//		for (int i=0; i<data.getColumnCount(); i++) {
+//			Log.d(CLASS_TAG,"onLoadFinished:4 columna "+i+" "+data.getColumnName(i));
+//		}
+	}
+
+
+
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

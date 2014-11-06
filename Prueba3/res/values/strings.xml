@@ -7,6 +7,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Ajustes</string>
     <!-- Content Provider -->
+    <string name="sync_account_type">prueba3.jmlb0003.com</string>
     <string name="content_authority">"com.jmlb0003.prueba3"</string>
 
     <!-- Ventana de diálogo de ajustes de ubicación -->
