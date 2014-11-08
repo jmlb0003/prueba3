@@ -7,6 +7,7 @@ import java.util.Date;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 
 
@@ -30,12 +31,14 @@ public class PoiContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
 
-    /**
-     * Posibles rutas dentro del provider, que llevan a las tablas que contiene.
-     */
+
+    //Posibles rutas dentro del provider, que llevan a las tablas que contiene. 
     public static final String PATH_POIS = "poi";
     public static final String PATH_LOCATION = "location";
     public static final String PATH_LOCATION_POI = "location_poi";
+    
+    public static final String POIS_BY_NAME = "by-name";
+    public static final String POIS_BY_COORDS = "by-coords";
 
 
     /**
@@ -106,10 +109,40 @@ public class PoiContract {
 
         
 
+        /**
+         * Método que genera la URI de consulta de la tabla Location del Content Provider por ID.
+         * @param id Id de la posición que se quiere consultar
+         * @return URI para consultar una fila de Location en el Content Provider dada su ID.
+         */
         public static Uri buildLocationUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-    }
+
+        
+        /**
+         * Método para extraer la coordenada de latitud en una URI de una entrada para
+         * la tabla Location
+         * @param uri URI de la que se extrae la latitud
+         * @return String con la latitud (Debe convertirse a double después si es necesario)
+         */
+        public static String getLocationLatitudeFromUri(Uri uri) {
+            return uri.getQueryParameter(COLUMN_LOCATION_LATITUDE);
+        }
+        
+        
+        /**
+         * Método para extraer la coordenada de longitud en una URI de una entrada para
+         * la tabla Location
+         * @param uri URI de la que se extrae la longitud
+         * @return String con la longitud (Debe convertirse a double después si es necesario)
+         */
+        public static String getLocationLongitudeFromUri(Uri uri) {
+        	Log.d("PoiProvider","En poicontract: "+uri.getPath());
+            return uri.getQueryParameter(COLUMN_LOCATION_LONGITUDE);
+        }
+        
+        
+    }// Fin de LocationEntry
     
     
     /**
@@ -136,11 +169,16 @@ public class PoiContract {
         public static final String COLUMN_ID_POI = "id_poi";
 
         
-
+        /**
+         * Método que genera la URI de consulta en la tabla Location_Poi del Content Provider 
+         * por ID.
+         * @param id Id de la fila que se quiere consultar
+         * @return URI para consultar una fila de Location_Poi en el Content Provider dada su ID.
+         */
         public static Uri buildLocationPoiUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-    }
+    }// Fin de LocationPoiEntry
     
     
     
@@ -199,28 +237,46 @@ public class PoiContract {
           
         
 
-
+        /**
+         * Método que genera la URI de consulta del Content Provider por ID.
+         * @param id Id del PI que se quiere consultar
+         * @return URI para consultar en el Content Provider un PI dada su ID.
+         */
         public static Uri buildPoiUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-//
-//        public static Uri buildPoiLocation(String locationSetting) {
-//            return CONTENT_URI.buildUpon().appendPath(locationSetting).build();
-//        }
+        
+        
+        /**
+         * Método que genera la URI de consulta de PIs del Content Provider dadas las 
+         * coordenadas GPS. Será de la forma: 
+         * <pre>content://< paquete >/poi/by-coords?latitud=lat&longitud=lon</pre>
+         * @param lat Coordenada de latitud
+         * @param lon Coordenada de longitud
+         * @return URI para consultar en el Content Provider los PIs que coinciden con
+         * la posición dada.
+         */
+        public static Uri buildLocationUriWithCoords(String lat, String lon) {
+        	
+        	return CONTENT_URI.buildUpon()
+        			.appendPath(POIS_BY_COORDS)
+                    .appendQueryParameter(LocationEntry.COLUMN_LOCATION_LATITUDE, lat)
+                    .appendQueryParameter(LocationEntry.COLUMN_LOCATION_LONGITUDE, lon)
+                    .build();
+        }
+        
+        
 //
 //        public static Uri buildPoiLocationWithDate(String locationSetting, String date) {
 //            return CONTENT_URI.buildUpon().appendPath(locationSetting).appendPath(date).build();
 //        }
 //
-//        public static String getLocationSettingFromUri(Uri uri) {
-//            return uri.getPathSegments().get(1);
-//        }
+        
 //
 //        public static String getDateFromUri(Uri uri) {
 //            return uri.getPathSegments().get(2);
 //        }
 
     }// Fin de PoiEntry
-    /*************************************/
 
 }
