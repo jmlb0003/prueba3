@@ -1,6 +1,8 @@
 package com.jmlb0003.prueba3.modelo.data;
 
 
+import java.util.Locale;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -25,6 +27,19 @@ public class PoiDbHelper extends SQLiteOpenHelper {
     public PoiDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
+    
+    
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        
+        if (!db.isReadOnly()) {
+            // Enable foreign key constraints
+            db.execSQL("PRAGMA foreign_keys=ON;");
+            db.setLocale(Locale.getDefault());
+        }
+    }
+    
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
@@ -43,10 +58,10 @@ public class PoiDbHelper extends SQLiteOpenHelper {
                 LocationEntry.COLUMN_RADIUS + " INTEGER NOT NULL, " +
                 LocationEntry.COLUMN_DATETEXT + " TEXT NOT NULL, " +
                 
-                //Solo habrá una entrada por posición (y se controlará en el código que las 
-                // posiciones estén a más de 50 metros de distancia entre ellas)
+                //No habrá dos posiciones con las mismas coordenadas (y se controlará en el 
+                //código que las posiciones estén a más de 50 metros de distancia entre ellas)
                 " UNIQUE (" + LocationEntry.COLUMN_LOCATION_LATITUDE + ", " +
-                LocationEntry.COLUMN_LOCATION_LONGITUDE + ") ON CONFLICT IGNORE" +
+                LocationEntry.COLUMN_LOCATION_LONGITUDE + ") ON CONFLICT ROLLBACK" +
                 ");";
         
 
@@ -77,12 +92,12 @@ public class PoiDbHelper extends SQLiteOpenHelper {
 				PoiEntry.COLUMN_POI_CLOSE_HOURS + " REAL DEFAULT 0, " +
 				
 				PoiEntry.COLUMN_POI_MAX_AGE + " INTEGER DEFAULT 0, " +
-				PoiEntry.COLUMN_POI_MIN_AGE + " INTEGER DEFAULT 0 " +
+				PoiEntry.COLUMN_POI_MIN_AGE + " INTEGER DEFAULT 0, " +
 
-
-//
-//                // To assure the application have just one weather entry per day
-//                // per location, it's created a UNIQUE constraint with REPLACE strategy
+				//No habrá dos PIs con un mismo nombre y una misma posición
+				" UNIQUE (" + PoiEntry.COLUMN_POI_NAME + ", " +
+				PoiEntry.COLUMN_POI_LATITUDE + ", " +
+				PoiEntry.COLUMN_POI_LONGITUDE + ") ON CONFLICT ROLLBACK" +
 
 	
 				" );";	
@@ -94,26 +109,28 @@ public class PoiDbHelper extends SQLiteOpenHelper {
     	 * posiciones.
     	 */
         final String SQL_CREATE_LOCATION_POI_TABLE = "CREATE TABLE " + LocationPoiEntry.TABLE_NAME + " (" +
-//        		LocationPoiEntry._ID + " INTEGER PRIMARY KEY," +
+        		//Columna con el ID de cada entrada de la tabla. 
+        		//(Aunque las otras dos columnas formaban el ID (restricción PRIMARY KEY más abajo) )
+        		LocationPoiEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 
 				LocationPoiEntry.COLUMN_ID_LOCATION + " INTEGER NOT NULL, " +
 				LocationPoiEntry.COLUMN_ID_POI + " INTEGER NOT NULL, " +
 				
-				// Set up the table primary key with two foreign keys 
-			    " PRIMARY KEY (" + LocationPoiEntry.COLUMN_ID_LOCATION + "," +
-			    	LocationPoiEntry.COLUMN_ID_POI + "), " +  
+//				// Set up the table primary key with two foreign keys 
+//			    " PRIMARY KEY (" + LocationPoiEntry.COLUMN_ID_LOCATION + "," +
+//			    	LocationPoiEntry.COLUMN_ID_POI + "), " +  
 				
 			    // Set up the location column as a foreign key to location table.
 			    " FOREIGN KEY (" + LocationPoiEntry.COLUMN_ID_LOCATION + ") REFERENCES " +
-			    	LocationEntry.TABLE_NAME + " (" + LocationEntry._ID + "), " +
+			    	LocationEntry.TABLE_NAME + " (" + LocationEntry._ID + ") ON DELETE CASCADE, " +
 			    
 				//Set up the poi column as a foreign key to poi table.
 				" FOREIGN KEY (" + LocationPoiEntry.COLUMN_ID_POI + ") REFERENCES " +
-					PoiEntry.TABLE_NAME + " (" + PoiEntry._ID + "), " +
+					PoiEntry.TABLE_NAME + " (" + PoiEntry._ID + ") ON DELETE CASCADE, " +
 				
 				//Solo hay una fila para cada par Posicion/PI
 				" UNIQUE (" + LocationPoiEntry.COLUMN_ID_LOCATION + ", " +
-				LocationPoiEntry.COLUMN_ID_POI + ") ON CONFLICT IGNORE" + 
+				LocationPoiEntry.COLUMN_ID_POI + ") ON CONFLICT ROLLBACK" + 
                 
                 " );";
 
