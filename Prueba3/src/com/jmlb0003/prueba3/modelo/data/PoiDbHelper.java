@@ -116,10 +116,6 @@ public class PoiDbHelper extends SQLiteOpenHelper {
 				LocationPoiEntry.COLUMN_ID_LOCATION + " INTEGER NOT NULL, " +
 				LocationPoiEntry.COLUMN_ID_POI + " INTEGER NOT NULL, " +
 				
-//				// Set up the table primary key with two foreign keys 
-//			    " PRIMARY KEY (" + LocationPoiEntry.COLUMN_ID_LOCATION + "," +
-//			    	LocationPoiEntry.COLUMN_ID_POI + "), " +  
-				
 			    // Set up the location column as a foreign key to location table.
 			    " FOREIGN KEY (" + LocationPoiEntry.COLUMN_ID_LOCATION + ") REFERENCES " +
 			    	LocationEntry.TABLE_NAME + " (" + LocationEntry._ID + ") ON DELETE CASCADE, " +

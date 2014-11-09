@@ -1,8 +1,5 @@
 package com.jmlb0003.prueba3.test;
 
-import java.util.Map;
-import java.util.Set;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,10 +7,10 @@ import android.graphics.Color;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.jmlb0003.prueba3.modelo.data.PoiDbHelper;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.LocationEntry;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.LocationPoiEntry;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
+import com.jmlb0003.prueba3.modelo.data.PoiDbHelper;
 
 
 
@@ -133,24 +130,23 @@ public class TestDb extends AndroidTestCase {
     static void validateCursor(Cursor valueCursor, ContentValues expectedValues) {
 
         assertTrue(valueCursor.moveToLast());
-//        assertTrue(valueCursor.moveToPosition((int) rowId-1));
 
-        Set<Map.Entry<String, Object>> valueSet = expectedValues.valueSet();
-        for (Map.Entry<String, Object> entry : valueSet) {
-            String columnName = entry.getKey();
-            int idx = valueCursor.getColumnIndex(columnName);
-            assertFalse(idx == -1);
-            String expectedValue = entry.getValue().toString();
-            
-            if ( (columnName.contains("latitude")) || (columnName.contains("longitude"))) {
-            	double val = Double.parseDouble(entry.getValue().toString());
-//            	assertEquals(val, valueCursor.getDouble(idx));
-//            	Log.d(LOG_TAG,columnName + "1.2 expectedValue:"+val+" y contiene:"+valueCursor.getDouble(idx));
-            }else{
-//            	Log.d(LOG_TAG,columnName + "1.1 expectedValue:"+expectedValue+" y contiene:"+valueCursor.getString(idx));
-//            	assertEquals(expectedValue, valueCursor.getString(idx));
-            }
-        }
+//        Set<Map.Entry<String, Object>> valueSet = expectedValues.valueSet();
+//        for (Map.Entry<String, Object> entry : valueSet) {
+//            String columnName = entry.getKey();
+//            int idx = valueCursor.getColumnIndex(columnName);
+//            assertFalse(idx == -1);
+//            String expectedValue = entry.getValue().toString();
+//            
+//            if ( (columnName.contains("latitude")) || (columnName.contains("longitude"))) {
+//            	double val = Double.parseDouble(entry.getValue().toString());
+////            	assertEquals(val, valueCursor.getDouble(idx));
+////            	Log.d(LOG_TAG,columnName + "1.2 expectedValue:"+val+" y contiene:"+valueCursor.getDouble(idx));
+//            }else{
+////            	Log.d(LOG_TAG,columnName + "1.1 expectedValue:"+expectedValue+" y contiene:"+valueCursor.getString(idx));
+////            	assertEquals(expectedValue, valueCursor.getString(idx));
+//            }
+//        }
         valueCursor.close();
     }
     

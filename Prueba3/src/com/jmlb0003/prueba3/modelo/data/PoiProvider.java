@@ -1,7 +1,5 @@
 package com.jmlb0003.prueba3.modelo.data;
 
-import java.util.List;
-
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -44,38 +42,8 @@ public class PoiProvider extends ContentProvider {
     
     private static final int LOCATION_POI = 300;
     private static final int LOCATION_POI_BY_ID = 301;
-//    private static final int WEATHER_WITH_LOCATION_AND_DATE = 102;
     
-
-    /** 
-     * Maneja las consultas a las tablas de la base de datos mediante una operación JOIN definida.
-     * Equivale (más o menos) a la cláusula FROM de la consulta. 
-     */
-    private static final SQLiteQueryBuilder sPoisByLocationQueryBuilder;
-
-    static{
-    	sPoisByLocationQueryBuilder = new SQLiteQueryBuilder();
-    	sPoisByLocationQueryBuilder.setTables(
-                PoiContract.PoiEntry.TABLE_NAME + " INNER JOIN " + 
-    			PoiContract.LocationPoiEntry.TABLE_NAME + " ON " +
-        		
-        		PoiContract.PoiEntry.TABLE_NAME + "." + 
-        		PoiContract.PoiEntry._ID + 
-        		" = " +                			
-                PoiContract.LocationPoiEntry.TABLE_NAME + "." + 
-        		PoiContract.LocationPoiEntry.COLUMN_ID_POI + 
-                
-                	" INNER JOIN " + 
-                PoiContract.LocationEntry.TABLE_NAME + " ON " +
-                	
-                PoiContract.LocationPoiEntry.TABLE_NAME + 
-                "." + PoiContract.LocationEntry._ID +                        	
-                " = " + 
-                PoiContract.LocationPoiEntry.TABLE_NAME +
-                "." + PoiContract.LocationPoiEntry.COLUMN_ID_LOCATION
-    	);
-    }
-
+    
     /*************** CONSTANTES PARA DEFINIR LAS SELECCIONES (WHERE) PERMITIDAS *****************/
     /** 
      * Constante para añadir a las consultas variables de latitud y longitud.
@@ -116,46 +84,92 @@ public class PoiProvider extends ContentProvider {
     private static final String sIdLocationPoiSearchSelection =
 			PoiContract.LocationPoiEntry.COLUMN_ID_LOCATION + " = ? AND " +
 			PoiContract.LocationPoiEntry.COLUMN_ID_POI + " = ?";
+
+ 
     
-//
-//    private static final String sLocationSettingAndDaySelection =
-//            WeatherContract.LocationEntry.TABLE_NAME +
-//                    "." + WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " +
-//                    WeatherContract.WeatherEntry.COLUMN_DATETEXT + " = ? ";
+    /**************** CONSTANTES PARA DEFINIR CONSULTAS **********************/
+
+    /** 
+     * Maneja las consultas a las tablas de la base de datos mediante una operación JOIN definida.
+     * Equivale (más o menos) a la cláusula FROM de la consulta. 
+     */
+    private static final SQLiteQueryBuilder sPoisByLocationQueryBuilder;
+
+
+    static{
+    	sPoisByLocationQueryBuilder = new SQLiteQueryBuilder();
+    	sPoisByLocationQueryBuilder.setTables(
+                PoiContract.PoiEntry.TABLE_NAME + " INNER JOIN " + 
+    			PoiContract.LocationPoiEntry.TABLE_NAME + " ON " +
+        		
+        		PoiContract.PoiEntry.TABLE_NAME + "." + 
+        		PoiContract.PoiEntry._ID + 
+        		" = " +                			
+                PoiContract.LocationPoiEntry.TABLE_NAME + "." + 
+        		PoiContract.LocationPoiEntry.COLUMN_ID_POI + 
+                
+                	" INNER JOIN " + 
+                PoiContract.LocationEntry.TABLE_NAME + " ON " +
+                	
+                PoiContract.LocationPoiEntry.TABLE_NAME + 
+                "." + PoiContract.LocationEntry._ID +                        	
+                " = " + 
+                PoiContract.LocationPoiEntry.TABLE_NAME +
+                "." + PoiContract.LocationPoiEntry.COLUMN_ID_LOCATION
+    	);
+    }
+
     
     
     /************* FUNCIONES DONDE SE CREAN LAS QUERYS CONTRA EL CONTENT PROVIDER *****************/
-  
     /**
-     * Método para obtener un cursor de datos del content provider a partir de una URI que apunta
-     * al content. Concretamente, con esta función se intenta obtener todos los PIs disponibles.
-     * @param uri URI donde están los datos que se quieren obtener y donde se va a realizar la 
-     * 				consulta.
-     * @param projection Lista de columnas que se incluirán en el cursor. Si vale null, se 
-     * 				incluyen todas las columnas.
-     * @param sortOrder Criterio para ordenar las columnas. Si es null, el provider las ordena 
-     * 				según su propio criterio.
-     * @return Cursor con el resultado de la consulta o null si algo falla.
+     * Método que crea una consulta sobre la Base de Datos para obtener los IDs de las posiciones
+     * cercanas a unas coordendas dadas como parámetros en una URI. Se considerarán cercanas las 
+     * posiciones a una distancia menor de 50 metros.
+     * @return String con la consulta generada sin ';' al final con ?s para asignar los valores
+     * de las coordenadas como selectionArgs en una consulta
      */
-    private Cursor getAllPois(Uri uri, String[] projection, String sortOrder) {
-        /**
-         * Valores de los parámetros ? de selection. Serán reemplazados según el orden de aparición. 
-         */
-        String[] selectionArgs = null;
-        /**
-         * Comprende la cláusula WHERE de la consulta (excluyendo el WHERE). Si vale null, se 
-         * devuelven todas las columnas.
-         */
-        String selection = null;
+    private String getLocationsNearCoordsQuery() {
 
-        return sPoisByLocationQueryBuilder.query(mOpenHelper.getReadableDatabase(),
-                projection,	//Contenido del SELECT
-                selection,	//Contenido del WHERE (puede incluir parámetros con ?)
-                selectionArgs,	//Valores de parámetros ? de selection
-                null,	//Contenido del GROUP BY
-                null,	//Contenido del HAVING
-                sortOrder	//Contenido del ORDER BY
-        );
+    	//TODO: Aquí hay que cambiar la consulta para que obtenga los cercanos... (Formula de Haversine o la que sea...)
+    	String[] columns = {PoiContract.LocationEntry._ID};
+
+        
+        return SQLiteQueryBuilder.buildQueryString(
+                true, // include distinct
+                PoiContract.LocationEntry.TABLE_NAME,
+                columns,
+                sLocationSelection,
+                null, // group by
+                null, // having
+                null, // order by
+                null);	// limit
+    }
+    
+    
+    
+    /**
+     * Método que lanza una consulta sobre la Base de Datos para obtener los IDs de los PIs
+     * asociados a una posición.
+     * @param locationId ID de la posición
+     * @return Cursor con los PIs asociados a la posición identificada por locationId
+     */
+    private String getPoisByLocationIdQuery(String locationSubquery) {
+    	String[] columns = {PoiContract.LocationPoiEntry.COLUMN_ID_POI};
+    	
+    	String where = PoiContract.LocationPoiEntry.COLUMN_ID_LOCATION + " IN (" + 
+    			locationSubquery + ")";
+    	
+    	
+    	return SQLiteQueryBuilder.buildQueryString(
+        		true, 
+        		PoiContract.LocationPoiEntry.TABLE_NAME,
+        		columns, 
+        		where, 
+                null, // group by
+                null, // having
+                null, // order by
+                null);	// limit
     }
     
     
@@ -173,40 +187,30 @@ public class PoiProvider extends ContentProvider {
      * @return Cursor con el resultado de la consulta o null si algo falla.
      */
     private Cursor getAllPoisByLocation(Uri uri, String[] projection, String sortOrder) { 
-        //Valores de los parámetros ? de selection. Serán reemplazados según el orden de aparición.
-        String[] selectionArgs = {
-        		PoiContract.LocationEntry.getLocationLatitudeFromUri(uri),
-        		PoiContract.LocationEntry.getLocationLongitudeFromUri(uri)
-        		};
-        Log.d(LOG_TAG,"LatitudeFromUri:"+PoiContract.LocationEntry.getLocationLatitudeFromUri(uri));
-        Log.d(LOG_TAG,"LongitudeFromUri:"+PoiContract.LocationEntry.getLocationLongitudeFromUri(uri));
-        Log.d(LOG_TAG,"Selection:"+sLocationSelection);
-        
-        /*******************************************/
-        /*******************************************/
-        /*******************************************/
-        /*****************************************
-         * 
-         * 
-         * //TODO: Revisar la consulta para que de las dos filas que hay...solo da la primera
-         * 
-         * 
-         * 
-         * 
-         * 
-         * */
-        
 
-        return sPoisByLocationQueryBuilder.query(mOpenHelper.getReadableDatabase(),
-                projection,	//Contenido del SELECT
-                sLocationSelection,	//Contenido del WHERE (puede incluir parámetros con ?)
-                selectionArgs,	//Valores de parámetros ? de selection
-                null,	//Contenido del GROUP BY
-                null,	//Contenido del HAVING
-                sortOrder	//Contenido del ORDER BY
-        );
+        //1 - Query para IDs de location cercanos a las coordenadas dadas en la URI
+        String locationSubquery = getLocationsNearCoordsQuery();        
+        //2 - Query para IDs de los pois que pertenecen a los location de la 1
+        String idPoisSubquery = getPoisByLocationIdQuery(locationSubquery);   
+        
+        
+        //3 - Query para datos de los pois cuyos IDs son los de 2
+        String poisByLocationQuery = SQLiteQueryBuilder.buildQueryString(
+        		true, 
+        		PoiContract.PoiEntry.TABLE_NAME,
+        		projection, 
+        		PoiContract.PoiEntry._ID + " IN (" + idPoisSubquery + ")", 
+                null, // group by
+                null, // having
+                sortOrder, // order by
+                null);	// limit
+        
+        String[] selectionArgs = {PoiContract.LocationEntry.getLocationLatitudeFromUri(uri), 
+        		PoiContract.LocationEntry.getLocationLongitudeFromUri(uri)};
+        
+        
+         return mOpenHelper.getReadableDatabase().rawQuery(poisByLocationQuery, selectionArgs);
     }
-    
     
     
     
@@ -246,9 +250,6 @@ public class PoiProvider extends ContentProvider {
         // Location por ID --> content://com.jmlb0003.prueba3/location_poi/123
         matcher.addURI(authority, PoiContract.PATH_LOCATION_POI + "/#", LOCATION_POI_BY_ID);
         
-        
-//      matcher.addURI(authority, PoiContract.PATH_WEATHER + "/*/*", WEATHER_WITH_LOCATION_AND_DATE);
-//      matcher.addURI(authority, PoiContract.PATH_LOCATION + "/#", LOCATION_ID);
         
         return matcher;
     }
@@ -467,14 +468,14 @@ public class PoiProvider extends ContentProvider {
             			null,
             			null
             	);
-            	Log.d(LOG_TAG,"Repetido el PI, con columns:"+columns[0]+". SdIDasda:"+sIdPoiSearchSelection+". Y selectionArgs:"+selectionArgs[0]+selectionArgs[1]+selectionArgs[2]);
+            	
             	if (c.moveToFirst()) {
             		//Si se ha encontrado el PI que se intentaba insertar, obtenemos el ID
             		_id = c.getLong(c.getColumnIndex(PoiContract.PoiEntry._ID));
-            		Log.d(LOG_TAG,"El id obtenido es:"+_id);
             	}else{
             		_id = db.insert(PoiContract.PoiEntry.TABLE_NAME, null, values);
             	}
+            	c.close();
             	
                 if ( _id < 0 ) {
                 	throw new android.database.SQLException("Failed to insert row into " + uri);
@@ -482,7 +483,7 @@ public class PoiProvider extends ContentProvider {
                 
                 //Finalmente, construimos la URI con el ID del PI en la tabla
                 returnUri = PoiContract.PoiEntry.buildPoiUri(_id);
-                Log.d(LOG_TAG,"La URI del PI queda:"+returnUri);
+
                 break;
             }
             
@@ -509,22 +510,22 @@ public class PoiProvider extends ContentProvider {
             			null,
             			null
             	);
-            	Log.d(LOG_TAG,"Repetido el Location, con columns:"+columns+". SdIDasda:"+sIdLocationSearchSelection+". Y selectionArgs:"+selectionArgs);
+
             	if (c.moveToFirst()) {
             		//Si se ha encontrado la posición que se intentaba insertar, obtenemos el ID
             		_id = c.getLong(c.getColumnIndex(PoiContract.LocationEntry._ID));
-            		Log.d(LOG_TAG,"El id obtenido es:"+_id);
             	}else{
             		_id = db.insert(PoiContract.LocationEntry.TABLE_NAME, null, values);
             	}
+            	c.close();
             	
                 if ( _id < 0 ) {
                 	throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
                 
                 //Finalmente, construimos la URI con el ID de la posición en la tabla
-                returnUri = PoiContract.LocationEntry.buildLocationUri(_id);                
-                Log.d(LOG_TAG,"La URI de la location queda:"+returnUri);
+                returnUri = PoiContract.LocationEntry.buildLocationUri(_id);
+
                 break;
             }
             
@@ -551,22 +552,22 @@ public class PoiProvider extends ContentProvider {
             			null,
             			null
             	);
-            	Log.d(LOG_TAG,"Repetido el Location, con columns:"+columns+". SdIDasda:"+sIdLocationPoiSearchSelection+". Y selectionArgs:"+selectionArgs);
+            	
             	if (c.moveToFirst()) {
             		//Si se ha encontrado la posición que se intentaba insertar, obtenemos el ID
             		_id = c.getLong(c.getColumnIndex(PoiContract.LocationPoiEntry._ID));
-            		Log.d(LOG_TAG,"El id obtenido es:"+_id);
             	}else{
             		_id = db.insert(PoiContract.LocationPoiEntry.TABLE_NAME, null, values);
             	}
+            	c.close();
             	
                 if ( _id < 0 ) {
                 	throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
                 
                 //Finalmente, construimos la URI con el ID del PI en la tabla
-                returnUri = PoiContract.LocationPoiEntry.buildLocationPoiUri(_id);                
-                Log.d(LOG_TAG,"La URI del location_poi queda:"+returnUri);
+                returnUri = PoiContract.LocationPoiEntry.buildLocationPoiUri(_id);
+                
                 break;
             }
             

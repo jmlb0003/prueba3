@@ -214,7 +214,7 @@ public class TestProvider extends AndroidTestCase {
 
 
         String[] projection = {
-        		PoiEntry._ID,
+        		PoiEntry.TABLE_NAME + "." + PoiEntry._ID,
         		PoiEntry.COLUMN_POI_NAME,
         		PoiEntry.COLUMN_POI_LATITUDE,
         		PoiEntry.COLUMN_POI_LONGITUDE
@@ -240,19 +240,6 @@ public class TestProvider extends AndroidTestCase {
     	Log.d(LOG_TAG,"fin del recorrido");
         
         poiCursor.close();
-        
-        
-//        TestDb.validateCursor(poiCursor, poiTestValues);
-//
-//        // Get the joined Weather data for a specific date
-//        poiCursor = mContext.getContentResolver().query(
-//                WeatherEntry.buildWeatherLocationWithDate(TestDb.TEST_LOCATION, TestDb.TEST_DATE),
-//                null,
-//                null,
-//                null,
-//                null
-//        );
-//        TestDb.validateCursor(poiCursor, poiTestValues);
     }
     
     
