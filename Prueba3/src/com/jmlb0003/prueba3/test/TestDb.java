@@ -147,6 +147,7 @@ public class TestDb extends AndroidTestCase {
 ////            	assertEquals(expectedValue, valueCursor.getString(idx));
 //            }
 //        }
+
         valueCursor.close();
     }
     
