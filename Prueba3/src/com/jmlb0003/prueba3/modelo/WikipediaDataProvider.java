@@ -2,35 +2,20 @@ package com.jmlb0003.prueba3.modelo;
 
 
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.content.ContentProviderClient;
-import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.SyncInfo;
-import android.content.SyncResult;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.jmlb0003.prueba3.R;
-import com.jmlb0003.prueba3.controlador.ARDataSource;
 import com.jmlb0003.prueba3.controlador.NetworkDataProvider;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
 
@@ -47,38 +32,35 @@ public class WikipediaDataProvider extends NetworkDataProvider {
 	private static Bitmap sIcon = null;
 	private static Bitmap sSelectedIcon = null;
 	private static Bitmap sWikipediaIcon = null;
-	
-	private final Context mContext;
+
+
 	
 	
 	/**
 	 * Constructor de la clase para poder descargar recursos geolocalizados de Wikipedia
 	 * @param res
 	 */
-	public WikipediaDataProvider(Context context, boolean autoInitialize) {
-		super(context, autoInitialize);
-		
-		mContext = context;
-
-		createIcon();
+	public WikipediaDataProvider(Resources res) {
+		if (res == null) {
+	    	throw new NullPointerException();
+	    }
+        
+        createIcon(res);
 	}
 
-    private void createIcon() {
-        sIcon = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.icono_pi);
-        sSelectedIcon = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.icono_pi_seleccionado);
-        sWikipediaIcon = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.wikipedia);
+    private void createIcon(Resources res) {
+        sIcon = BitmapFactory.decodeResource(res, R.drawable.icono_pi);
+        sSelectedIcon = BitmapFactory.decodeResource(res, R.drawable.icono_pi_seleccionado);
+        sWikipediaIcon = BitmapFactory.decodeResource(res, R.drawable.wikipedia);
     }
 
     
     /**
      * Método que crea la URL personalizada para el proveedor Wikipedia
      */
-	public String createRequestURL() {
-		double lat = ARDataSource.getCurrentLocation().getLatitude();
-		double lon = ARDataSource.getCurrentLocation().getLongitude();
-		float radius = (ARDataSource.getRadius() > 20)?20.0f:ARDataSource.getRadius();
-		String locale = "es";
-		String username = "jmlb0003";
+    @Override
+	protected String createRequestURL(double lat, double lon, double alt, float radius, 
+				String locale, String username) {
 		
 		return BASE_URL+
 				"?lat=" + lat +
@@ -92,14 +74,16 @@ public class WikipediaDataProvider extends NetworkDataProvider {
 	}
 
 	
+	
 	/**
 	 * Método para interpretar el JSON que se obtiene del proveedor wikipedia para convertirlo en 
 	 * una lista de PIs. Si hay algún fallo en el proceso, se devolverá null.
-	 * @param wikipediaPoisStrg Cadena que contiene el objeto en formato JSON
+	 * @param poisInJson Cadena que contiene el objeto en formato JSON
 	 * @return Lista de objetos ContentValues con los pares clave-valor que contienen todos los 
 	 * 		atributos los PIs obtenidos del proveedor
 	 */
-	private List<ContentValues> processJSONObject(String wikipediaPoisStrg) {
+	@Override
+	protected ArrayList<ContentValues> getDataFromJSON(JSONObject poisInJson) {
 
 		// Now we have a String representing the complete forecast in JSON Format.
         // Fortunately parsing is easy:  constructor takes the JSON string and converts it
@@ -116,7 +100,6 @@ public class WikipediaDataProvider extends NetworkDataProvider {
         
 
         try {
-            JSONObject poisInJson = new JSONObject(wikipediaPoisStrg);
             if (!poisInJson.has(WIKI_ROOT)) {
             	return null;
             }
@@ -127,7 +110,7 @@ public class WikipediaDataProvider extends NetworkDataProvider {
             }
             
             // Insert the new weather information into the database
-            Vector<ContentValues> cVVector = new Vector<ContentValues>(poisArray.length());
+            ArrayList<ContentValues> cVVector = new ArrayList<ContentValues>(poisArray.length());
 
             int top = Math.min(MAX_RESOURCES_NUMBER, poisArray.length());
 			for (int i = 0; i < top; i++) {
@@ -199,154 +182,8 @@ public class WikipediaDataProvider extends NetworkDataProvider {
         }
 		return null;
 	}
-	
-	
-
-	@Override
-	public void onPerformSync(Account account, Bundle extras, String authority,
-			ContentProviderClient provider, SyncResult syncResult) {
-		Log.d(LOG_TAG, "Starting sync");
-
-		
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-
-        // Contendrá todos los PIs en formato JSON para la URL que solicitemos
-        String wikipediaPoisStrg = null;
-
-
-        try {          
-
-            URL url = new URL(createRequestURL());
-
-            // Create the request to OpenWeatherMap, and open the connection
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            // Read the input stream into a String
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                // Nothing to do.
-                return;
-            }
-
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                // But it does make debugging a *lot* easier if you print out the completed
-                // buffer for debugging.
-                buffer.append(line + "\n");
-            }
-
-            if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                return;
-            }
-            wikipediaPoisStrg = buffer.toString();
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error ", e);
-            // If the code didn't successfully get the weather data, there's no point in attemping
-            // to parse it.
-            return;
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
-                }
-            }
-        }
-
-        List<ContentValues> processedPois = processJSONObject(wikipediaPoisStrg);
-        
-        if ( processedPois != null && processedPois.size() > 0 ) {
-            ContentValues[] cvArray = new ContentValues[processedPois.size()];
-            processedPois.toArray(cvArray);
-            mContext.getContentResolver().bulkInsert(PoiEntry.CONTENT_URI, cvArray);
-        }
-        Log.d(LOG_TAG, "FetchWeatherTask Complete. " + processedPois.size() + " Inserted");
-        
-        return;		
-	}
-	
-	
-	
-	/**
-     * Método para inicializar el provider
-     * @param context
-     */
-	@Override
-	protected void initialize(Context context) {
-        getSyncAccount(context);
-    }
-    
-
-	
-	/**
-     * Método para lanzar la consulta al proveedor.
-     * @param context An app context
-     */
-	@Override
-    public void syncImmediately(Context context) {
-        Bundle bundle = new Bundle();
-
-        //La petición se coloca al principio de la cola de peticiones de sincronización
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        //Se fuerza a que se realice la sincronización
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        //Inicia la operación de sincronización
-        ContentResolver.requestSync(getSyncAccount(context),
-                context.getString(R.string.content_authority), bundle);
-    }
     
     
-    
-    /**
-     * Método para obtener una cuenta provisional para el SyncAdapter si existe o crear una nueva
-     * si aún no existe.
-     * @param context Contexto en el que se utiliza la cuenta
-     * @return Devuelve una cuenta provisional con la que se realiza la sincronización
-     */
-     private Account getSyncAccount(Context context) {
-
-         AccountManager accountManager =
-                 (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
-
-         //Crear el tipo de cuenta y una cuenta por defecto
-         Account newAccount = new Account(context.getString(R.string.app_name), 
-        		 context.getString(R.string.sync_account_type));
-
-             // Si no hay contraseña, es porque la cuenta no existe y por tanto, se crea una nueva
-             if (null == accountManager.getPassword(newAccount)) {
-                 // Añadir la cuenta y el tipo de cuenta sin contraseña ni datos de usuario
-                 if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
-                     return null;
-                 }
-
-                 onAccountCreated(newAccount, context);
-             }
-         return newAccount;
-     }
-     
-     
-     /**
-      * Método con las instrucciones a ejecutar cuando se crea por primera vez una cuenta para
-      * la descarga de los recursos.
-      * @param newAccount
-      * @param context
-      */
-     private void onAccountCreated(Account newAccount, Context context) {
-         //Realizar una primera sincronización al crear la cuenta
-         
-    	 syncImmediately(context);
-     }
    
     
 }

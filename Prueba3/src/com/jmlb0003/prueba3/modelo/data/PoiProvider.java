@@ -489,6 +489,7 @@ public class PoiProvider extends ContentProvider {
             
             
             case LOCATIONS: {
+                //TODO: Aquí hay que aplicar lo de la distancia también
             	//Comprobamos si la posición ya estaba insertada consultando por las columnas que
                 //indican la unicidad de cada entrada de la tabla location (además del ID):
             	// LATITUD y LONGITUD
@@ -503,7 +504,7 @@ public class PoiProvider extends ContentProvider {
             	//Consulta
             	Cursor c = db.query(
             			PoiContract.LocationEntry.TABLE_NAME,
-            			columns, 
+            			columns,
             			sIdLocationSearchSelection,
             			selectionArgs,
             			null,
@@ -661,16 +662,17 @@ public class PoiProvider extends ContentProvider {
     public int bulkInsert(Uri uri, ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
+        int rowCount;
         
         switch (match) {
             case POIS:
                 db.beginTransaction();
-                int returnCount = 0;
+                rowCount = 0;
                 try {
                     for (ContentValues value : values) {
                         long _id = db.insert(PoiContract.PoiEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
-                            returnCount++;
+                        	rowCount++;
                         }
                     }
                     db.setTransactionSuccessful();
@@ -678,7 +680,25 @@ public class PoiProvider extends ContentProvider {
                     db.endTransaction();
                 }
                 getContext().getContentResolver().notifyChange(uri, null);
-                return returnCount;
+                return rowCount;
+                
+                
+            case LOCATION_POI:
+            	db.beginTransaction();
+            	rowCount = 0;
+            	try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(PoiContract.LocationPoiEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                        	rowCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return rowCount;
                 
             default:
                 return super.bulkInsert(uri, values);

@@ -99,7 +99,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     private static final BlockingQueue<Runnable> QUEUE = new ArrayBlockingQueue<Runnable>(1);
     private static final ThreadPoolExecutor DOWNLOADS_SERVICE = new ThreadPoolExecutor(1, 1, 20, TimeUnit.SECONDS, QUEUE);
     /**Variable que almacena los proveedores online de Puntos de Interés**/
-	private static final Map<String,NetworkDataProvider2> SOURCES = new ConcurrentHashMap<String,NetworkDataProvider2>(); 
+	private static final Map<String,NetworkDataProvider2> SOURCES = new ConcurrentHashMap<String,NetworkDataProvider2>();
 	
 	
     /**********************VARIABLES LOCALIZACION********************************/
