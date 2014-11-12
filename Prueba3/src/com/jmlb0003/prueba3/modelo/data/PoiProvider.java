@@ -1,5 +1,8 @@
 package com.jmlb0003.prueba3.modelo.data;
 
+import java.util.ArrayList;
+
+
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -32,6 +35,9 @@ public class PoiProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private PoiDbHelper mOpenHelper;
 
+    /** Distancia en metros que representa la máxima distancia para considerar cercanos dos puntos **/
+    private static final float MAX_DISTANCE = 0.025f;// un poco menos de 2000m // 2000;
+    
     private static final int POIS = 100;
     private static final int POI_BY_ID = 101;
     private static final int POIS_BY_NAME = 102;
@@ -55,6 +61,25 @@ public class PoiProvider extends ContentProvider {
 		    PoiContract.LocationEntry.TABLE_NAME +
 		    		"." + PoiContract.LocationEntry.COLUMN_LOCATION_LONGITUDE + " = ? ";
     
+    /**
+     * Constante para calcular la distancia entre dos posiciones dadas las coordenadas GPS mediante
+     * la fórmula de Haversine. Al utilizar la función arcocoseno, no es soportada por SQLite.
+     */
+    private static final String sHaversineDistance = 
+			"(6371 * acos( " + 
+			"cos((? * PI() / 180)) " + 
+			"* cos((" + PoiContract.LocationEntry.COLUMN_LOCATION_LATITUDE + " * PI() / 180)) " +
+			"* cos((" + PoiContract.LocationEntry.COLUMN_LOCATION_LONGITUDE + " * PI() / 180) " +
+			"- (? * PI() / 180)) + sin((? * PI() / 180)) " + 
+			"* sin((" + PoiContract.LocationEntry.COLUMN_LOCATION_LATITUDE + " * PI() / 180)) ) )";
+    
+    /**
+     * Constante para calcular una aproximación de la distancia entre dos posiciones dadas las
+     * coordenadas GPS.
+     */
+    private static final String sManhattanDistance = 
+    		"(abs( " + PoiContract.LocationEntry.COLUMN_LOCATION_LATITUDE + " - ( ? )) " +
+        			"+ abs( " + PoiContract.LocationEntry.COLUMN_LOCATION_LONGITUDE + " - ( ? )))";
     /** 
      * Constante para las consultas del ID de los PIs dadas como variables su nombre, latitud 
      * y longitud. Será:
@@ -71,7 +96,7 @@ public class PoiProvider extends ContentProvider {
      * variables su latitud y longitud. Será:
      * WHERE latitude = ? AND longitude = ?
      */
-    private static final String sIdLocationSearchSelection =
+    private static final String sLocationByCoords =
 			PoiContract.LocationEntry.COLUMN_LOCATION_LATITUDE + " = ? AND " +
 			PoiContract.LocationEntry.COLUMN_LOCATION_LONGITUDE + " = ?";
     
@@ -121,32 +146,54 @@ public class PoiProvider extends ContentProvider {
 
     
     
+    
     /************* FUNCIONES DONDE SE CREAN LAS QUERYS CONTRA EL CONTENT PROVIDER *****************/
+    
+//  /**
+//  * Método que crea una consulta sobre la Base de Datos para obtener los IDs de las posiciones
+//  * cercanas a unas coordendas dadas como parámetros en una URI. Se considerarán cercanas las 
+//  * posiciones a una distancia menor de MAX_DISTANCE.
+//  * @return String con la consulta generada sin ';' al final con ?s para asignar los valores
+//  * de las coordenadas como selectionArgs en una consulta
+//  */
+// private String getIdsNearLocationsQuery() {
+// 	String[] columns = {PoiContract.LocationEntry._ID};
+// 	String where = MAX_DISTANCE + " > " + sHaversineDistance;
+// 	
+//     
+//     return SQLiteQueryBuilder.buildQueryString( true, PoiContract.LocationEntry.TABLE_NAME, columns, where,
+//             null, // group by
+//             null, // having
+//             null, // order by
+//             null);	// limit
+// }
+    
+    
+    
     /**
-     * Método que crea una consulta sobre la Base de Datos para obtener los IDs de las posiciones
-     * cercanas a unas coordendas dadas como parámetros en una URI. Se considerarán cercanas las 
-     * posiciones a una distancia menor de 50 metros.
-     * @return String con la consulta generada sin ';' al final con ?s para asignar los valores
-     * de las coordenadas como selectionArgs en una consulta
+     * Método para generar una consulta con la que se obtienen los IDs de las posiciones que están
+     * dentro de un radio dado por MAX_DISTANCE. El radio es aproximado y está basado en la fórmula
+     * de la distancia de Manhattan o geometría taxicab. 
+     * @see Ver http://goodenoughpractices.blogspot.com.es/2011/08/query-by-proximity-in-android.html
+     * @return Cadena con la consulta SQL que incluye parámetros ? para asignar el valor de la
+     * latitud y la longitud actual.
      */
-    private String getLocationsNearCoordsQuery() {
-
-    	//TODO: Aquí hay que cambiar la consulta para que obtenga los cercanos... (Formula de Haversine o la que sea...)
-    	String[] columns = {PoiContract.LocationEntry._ID};
-
+    private String getIdsNearLocationsQuery() {      	
+    	String[] columns = {PoiContract.LocationEntry._ID};    	
+    	String where = MAX_DISTANCE + " > " + sManhattanDistance;
         
         return SQLiteQueryBuilder.buildQueryString(
                 true, // include distinct
                 PoiContract.LocationEntry.TABLE_NAME,
                 columns,
-                sLocationSelection,
+                where,
                 null, // group by
                 null, // having
                 null, // order by
                 null);	// limit
     }
-    
-    
+
+
     
     /**
      * Método que lanza una consulta sobre la Base de Datos para obtener los IDs de los PIs
@@ -186,14 +233,12 @@ public class PoiProvider extends ContentProvider {
      * 				según su propio criterio.
      * @return Cursor con el resultado de la consulta o null si algo falla.
      */
-    private Cursor getAllPoisByLocation(Uri uri, String[] projection, String sortOrder) { 
-
+    private Cursor getAllPoisByLocation(Uri uri, String[] projection, String sortOrder) {
         //1 - Query para IDs de location cercanos a las coordenadas dadas en la URI
-        String locationSubquery = getLocationsNearCoordsQuery();        
+        String locationSubquery = getIdsNearLocationsQuery();
         //2 - Query para IDs de los pois que pertenecen a los location de la 1
         String idPoisSubquery = getPoisByLocationIdQuery(locationSubquery);   
-        
-        
+
         //3 - Query para datos de los pois cuyos IDs son los de 2
         String poisByLocationQuery = SQLiteQueryBuilder.buildQueryString(
         		true, 
@@ -207,9 +252,9 @@ public class PoiProvider extends ContentProvider {
         
         String[] selectionArgs = {PoiContract.LocationEntry.getLocationLatitudeFromUri(uri), 
         		PoiContract.LocationEntry.getLocationLongitudeFromUri(uri)};
+  
         
-        
-         return mOpenHelper.getReadableDatabase().rawQuery(poisByLocationQuery, selectionArgs);
+        return mOpenHelper.getReadableDatabase().rawQuery(poisByLocationQuery, selectionArgs);
     }
     
     
@@ -275,7 +320,7 @@ public class PoiProvider extends ContentProvider {
         Cursor retCursor;
         //Dada una URI, se determina el tipo de consulta para realizarla de forma adecuada
         //Debe haber una por cada tipo de URI
-        //TODO:Borrar este Log...
+
         Log.d(LOG_TAG,"En Query!!. La uri es:"+uri+"-");
         Log.d(LOG_TAG,"El uri matcher es:"+sUriMatcher.match(uri));
        
@@ -489,31 +534,29 @@ public class PoiProvider extends ContentProvider {
             
             
             case LOCATIONS: {
-                //TODO: Aquí hay que aplicar lo de la distancia también
-            	//Comprobamos si la posición ya estaba insertada consultando por las columnas que
-                //indican la unicidad de cada entrada de la tabla location (además del ID):
-            	// LATITUD y LONGITUD
+            	//Comprobamos si hay alguna posición insertada 'cercana' a la que se intenta
+                //insertar en la tabla location
             	
-            	//Realizamos una consulta en la que solamente interesa la columna de ID
             	String[] columns = {PoiContract.LocationEntry._ID};
-            	//Parámetros para los ? de el WHERE de sIdLocationSearchSelection
+
             	String[] selectionArgs = {
             			values.getAsString(PoiContract.LocationEntry.COLUMN_LOCATION_LATITUDE),
             			values.getAsString(PoiContract.LocationEntry.COLUMN_LOCATION_LONGITUDE)
             			};
-            	//Consulta
+
+
             	Cursor c = db.query(
             			PoiContract.LocationEntry.TABLE_NAME,
             			columns,
-            			sIdLocationSearchSelection,
+            			sManhattanDistance,	
             			selectionArgs,
             			null,
             			null,
-            			null
+            			null	//order by
             	);
 
             	if (c.moveToFirst()) {
-            		//Si se ha encontrado la posición que se intentaba insertar, obtenemos el ID
+            		//Si se ha encontrado alguna posición 'cercana', obtenemos el ID
             		_id = c.getLong(c.getColumnIndex(PoiContract.LocationEntry._ID));
             	}else{
             		_id = db.insert(PoiContract.LocationEntry.TABLE_NAME, null, values);
@@ -655,7 +698,8 @@ public class PoiProvider extends ContentProvider {
 	 * Método para insertar un conjunto de filas en una misma transacción.
 	 * @param uri Representa a la URI dentro del content provider donde se realizará la inserción.
 	 * @param values Es un array de pares nombre-de-columna/valor que se añadirán al content 
-	 * 			provider. No puede ser null.
+	 * 			provider. No puede ser null y MUY IMPORTANTE: el último elemento debe contener el
+	 * 			ID de la posición a la que está asociado.
 	 * @return Devuelve un entero con el número de valores que se han insertado.
 	 */
 	@Override
@@ -668,18 +712,72 @@ public class PoiProvider extends ContentProvider {
             case POIS:
                 db.beginTransaction();
                 rowCount = 0;
+
+            	ArrayList<ContentValues> toLocationPoi = new ArrayList<>();
+            	
                 try {
-                    for (ContentValues value : values) {
-                        long _id = db.insert(PoiContract.PoiEntry.TABLE_NAME, null, value);
-                        if (_id != -1) {
-                        	rowCount++;
-                        }
+                	//Sacar el último elemento de values, donde está idLocation
+                	ArrayList<ContentValues> list = new ArrayList<>();
+                	for (int i=0; i<values.length; i++) {
+                		list.add(values[i]);
+                	}
+                	ContentValues locationValue = list.remove(list.size());
+                	long idLocation = locationValue.getAsLong(PoiContract.LocationEntry._ID);
+                	
+                	long _idPoi;
+                	                	
+                	
+                    for (ContentValues value : list) {
+
+                    	String[] columns = {PoiContract.PoiEntry._ID};
+                    	//Parámetros para los ? de el WHERE de sIdPoiSearchSelection
+                    	String[] selectionArgs = {
+                    			value.getAsString(PoiContract.PoiEntry.COLUMN_POI_NAME),
+                    			value.getAsString(PoiContract.PoiEntry.COLUMN_POI_LATITUDE),
+                    			value.getAsString(PoiContract.PoiEntry.COLUMN_POI_LONGITUDE)
+                    			};
+                    	//Consulta
+                    	Cursor c = db.query(
+                    			PoiContract.PoiEntry.TABLE_NAME,
+                    			columns, 
+                    			sIdPoiSearchSelection,
+                    			selectionArgs,
+                    			null,
+                    			null,
+                    			null
+                    	);
+                    	
+                    	if (c.moveToFirst()) {
+                    		//Si se ha encontrado el PI que se intentaba insertar, obtenemos el ID
+                    		_idPoi = c.getLong(c.getColumnIndex(PoiContract.PoiEntry._ID));
+                    	}else{
+                    		_idPoi = db.insert(PoiContract.PoiEntry.TABLE_NAME, null, value);
+                    		if (_idPoi != -1) {
+                            	rowCount++;
+                            }
+                    	}
+
+
+                    	ContentValues cv = new ContentValues();
+                    	cv.put(PoiContract.LocationPoiEntry.COLUMN_ID_LOCATION, idLocation);
+                    	cv.put(PoiContract.LocationPoiEntry.COLUMN_ID_POI, _idPoi);
+                	
+                    	toLocationPoi.add(cv);
+                        
                     }
                     db.setTransactionSuccessful();
                 } finally {
                     db.endTransaction();
                 }
                 getContext().getContentResolver().notifyChange(uri, null);
+                
+                //Si se llegaron a insertar PIs, se insertan las entradas en location_poi
+                if (!toLocationPoi.isEmpty()) {
+                	ContentValues[] valuesToInsert = new ContentValues[toLocationPoi.size()];
+                	toLocationPoi.toArray(valuesToInsert);
+                    bulkInsert(PoiContract.LocationPoiEntry.CONTENT_URI, valuesToInsert);
+                }
+                
                 return rowCount;
                 
                 
@@ -688,10 +786,36 @@ public class PoiProvider extends ContentProvider {
             	rowCount = 0;
             	try {
                     for (ContentValues value : values) {
-                        long _id = db.insert(PoiContract.LocationPoiEntry.TABLE_NAME, null, value);
-                        if (_id != -1) {
-                        	rowCount++;
-                        }
+                    	long _id;
+                    	
+                    	String[] columns = {PoiContract.LocationPoiEntry._ID};
+                    	//Parámetros para los ? de el WHERE de sIdLocationPoiSearchSelection
+                    	String[] selectionArgs = {
+                    			value.getAsString(PoiContract.LocationPoiEntry.COLUMN_ID_LOCATION),
+                    			value.getAsString(PoiContract.LocationPoiEntry.COLUMN_ID_POI)
+                    			};
+                    	//Consulta
+                    	Cursor c = db.query(
+                    			PoiContract.LocationPoiEntry.TABLE_NAME,
+                    			columns, 
+                    			sIdLocationPoiSearchSelection,
+                    			selectionArgs,
+                    			null,
+                    			null,
+                    			null
+                    	);
+                    	
+                    	if (c.moveToFirst()) {
+                    		//Si se ha encontrado la posición que se intentaba insertar, obtenemos el ID
+                    		_id = c.getLong(c.getColumnIndex(PoiContract.LocationPoiEntry._ID));
+                    	}else{
+                    		_id = db.insert(PoiContract.LocationPoiEntry.TABLE_NAME, null, value);
+                    		if (_id != -1) {
+                            	rowCount++;
+                            }
+                    	}
+
+                        
                     }
                     db.setTransactionSuccessful();
                 } finally {
@@ -704,5 +828,6 @@ public class PoiProvider extends ContentProvider {
                 return super.bulkInsert(uri, values);
         }
     }
+	
  
 }

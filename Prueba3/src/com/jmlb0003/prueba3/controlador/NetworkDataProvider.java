@@ -144,7 +144,7 @@ public abstract class NetworkDataProvider {
     	String url = createRequestURL(ARDataSource.getCurrentLocation().getLatitude(), 
     			ARDataSource.getCurrentLocation().getLongitude(), 
     			ARDataSource.getCurrentLocation().getAltitude(), 
-    			ARDataSource.getRadius(), "es", "jmlb0003");
+    			ARDataSource.MAX_RADIUS, "es", "jmlb0003");
     	
     	
         if (url == null) {

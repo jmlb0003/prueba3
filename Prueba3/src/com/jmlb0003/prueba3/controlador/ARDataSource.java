@@ -34,6 +34,7 @@ public abstract class ARDataSource {
 	private static final DecimalFormat FORMAT = new DecimalFormat("#.##");
     
     public static final Location HARD_FIX = new Location("ATL");
+    public static final int MAX_RADIUS = 50;
     
     static {
         //HARD_FIX.setLatitude(0);
@@ -48,7 +49,7 @@ public abstract class ARDataSource {
     }
     
     
-    private static final Object RADIUS_LOCK = new Object();
+    private static final Object RADIUS_LOCK = new Object();    
     
     private static final Object AZIMUTH_LOCK = new Object();    
     private static final Object PITCH_LOCK = new Object();    

@@ -59,7 +59,7 @@ public class TestDb extends AndroidTestCase {
 
         // Data's inserted.  IN THEORY.  Now pull some out to stare at it and verify it made
         // the round trip.
-
+        
         //Intentamos extraer ahora la fila insertada mediante una consulta
         Cursor cursor = db.query(
                 PoiEntry.TABLE_NAME,  // Table to Query

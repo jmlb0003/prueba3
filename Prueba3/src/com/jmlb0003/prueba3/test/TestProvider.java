@@ -9,6 +9,7 @@ import android.os.Build;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import com.jmlb0003.prueba3.modelo.data.PoiContract;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.LocationEntry;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.LocationPoiEntry;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
@@ -83,9 +84,21 @@ public class TestProvider extends AndroidTestCase {
     }
     
     
-    /**
-     * Prueba de inserción y lectura del Content Provider
-     */
+    
+    public void testbulkInsert(){
+    	/**********************************
+    	 * 
+    	 * Comprobar cómo se insertan los puntos en el bulkInsert...
+    	 * 
+    	 * 
+    	 * Comprobar la diferencia de tiempo de insertar con consultas o sin consultas(errores al repetirse entradas)
+    	 * 
+    	 * 
+    	 * 
+    	 */
+    }
+    
+
     public void testInsertReadProvider() {
 
     	//Primero probamos con la tabla poi
@@ -243,6 +256,86 @@ public class TestProvider extends AndroidTestCase {
     }
     
     
+    public void testInsertReadLocations() {
+	
+    	ContentValues locationBarranco = createUserPosition2(37.677568, -3.562658);
+    	ContentValues locationVegueta = createUserPosition2(37.679128,  -3.559011);
+    	ContentValues locationLoma = createUserPosition2(37.688069,  -3.562788);
+    	ContentValues casaManu = createUserPosition2(37.674105, -3.569006);
+    	ContentValues manchaReal = createUserPosition2(37.786779,-3.610379);
+    	ContentValues pegalajar = createUserPosition2(37.740619,-3.645887);
+    	ContentValues sitio1 = createUserPosition2(37.728501,-3.479748);
+    	ContentValues bornos = createUserPosition2(37.682192, -3.543474);
+    	ContentValues salao = createUserPosition2( 37.663903, -3.548809);
+    	ContentValues arco = createUserPosition2(37.685209,-3.581173);
+  
+    	insertarLocation(locationBarranco);
+    	insertarLocation(locationVegueta);
+    	insertarLocation(locationLoma);
+    	insertarLocation(casaManu);
+    	insertarLocation(manchaReal);
+    	insertarLocation(pegalajar);
+    	insertarLocation(sitio1);
+    	insertarLocation(bornos);
+    	insertarLocation(salao);
+    	insertarLocation(arco);
+
+
+    	String[] projection = {
+        		PoiEntry.TABLE_NAME + "." + PoiEntry._ID,
+        		PoiEntry.COLUMN_POI_NAME,
+        		PoiEntry.COLUMN_POI_LATITUDE,
+        		PoiEntry.COLUMN_POI_LONGITUDE
+        };
+    	Cursor locationCursor = mContext.getContentResolver().query(
+                PoiEntry.buildLocationUriWithCoords("37.6757738", "-3.5661434"),
+                projection, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null  // sort order
+        );
+    	
+    	//Comprobar las entradas obtenidas
+    	for (int i=0; i<locationCursor.getCount();i++) {
+        	locationCursor.moveToPosition(i);
+    		long id;
+    		
+    		id = locationCursor.getLong(locationCursor.getColumnIndex(PoiContract.LocationEntry._ID));
+    		Log.d(LOG_TAG,i + "-ID: " + id);
+    		Log.d(LOG_TAG,"\n *************** ");
+    		
+    	}
+      
+    	Log.d(LOG_TAG,"fin del recorrido");
+    	
+    }
+    
+    
+    private void insertarLocation(ContentValues values) {
+    	Uri locationUri = mContext.getContentResolver()
+                .insert(LocationEntry.CONTENT_URI, values);
+        long locationRowId = ContentUris.parseId(locationUri);
+        Log.d(LOG_TAG,"locationUri, con rowID:"+locationRowId+" vale: "+locationUri);
+        
+        
+        // Verify we got a row back.
+        assertTrue(locationRowId != -1);        
+        assertTrue(locationUri != null);
+    	
+    }
+    
+    private ContentValues createUserPosition2(double lat, double lon) {
+    	ContentValues testValues = new ContentValues();
+    	testValues.put(LocationEntry.COLUMN_RADIUS,40);
+    	testValues.put(LocationEntry.COLUMN_DATETEXT,"20112014");
+    	testValues.put(LocationEntry.COLUMN_LOCATION_LATITUDE, lat);
+    	testValues.put(LocationEntry.COLUMN_LOCATION_LONGITUDE, lon);
+    	
+    	return testValues;
+    }
+    
+    
+
     
     
     // The target api annotation is needed for the call to keySet -- we wouldn't want
@@ -255,4 +348,5 @@ public class TestProvider extends AndroidTestCase {
     }
     
 
+    //TODO: Pruebas de velocidad de insertar puntos...a ver la diferencia del bulkinsert consultando antes de insertar para eliminar errores, o intentando insertar, y si no, consultar
 }

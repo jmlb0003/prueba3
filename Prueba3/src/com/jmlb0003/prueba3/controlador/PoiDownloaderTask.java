@@ -31,8 +31,6 @@ import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
  */
 public class PoiDownloaderTask extends AsyncTask<Void, Void, Void> {
 	
-	private static final String LOG_TAG = PoiDownloaderTask.class.getSimpleName();
-	
 	
 	/**Variable que almacena los proveedores online de Puntos de Interés**/
 	private final Map<String,NetworkDataProvider> mSources = new HashMap<String,NetworkDataProvider>(); 
@@ -76,35 +74,25 @@ public class PoiDownloaderTask extends AsyncTask<Void, Void, Void> {
 	@Override
 	protected Void doInBackground(Void... params) {
 		long idLocation = insertCurrentLocation();
+		//TODO: Aquí estaría bien que se pusiera un loading o algo de que se están descargando e insertando cosas
+		//TODO: En vez de esperar a que se descargue y se inserte todo, se pueden ir añadiendo a una lista de puntos directamente pa ir cogiendo de ahi???
 		
 		//Recorremos cada proveedor de PIs para descargar y parsear los datos
         for (NetworkDataProvider source: mSources.values()) {
-        	ArrayList<ContentValues> poiData = source.fetchData();
+        	ArrayList<ContentValues> poiData = new ArrayList<>();
+        	poiData = source.fetchData();
         	
         	//Si se han obtenido datos, se insertan en la BD a través del Content Provider
         	if (poiData.size() > 0) {
+        		//Hacemos una trampa para añadir el idLocation al final de poiData
+        		ContentValues idLocationValue = new ContentValues();
+        		idLocationValue.put(LocationEntry._ID, idLocation);        		
+        		poiData.add(idLocationValue);
+        		
                 ContentValues[] poisToInsert = new ContentValues[poiData.size()];
                 poiData.toArray(poisToInsert);
                 mContext.getContentResolver().bulkInsert(PoiEntry.CONTENT_URI, poisToInsert);
                 
-                //Creamos pares idLocation-idPoi para insertarlos en location_poi
-                ArrayList<ContentValues> locPoiData = new ArrayList<>();
-                Iterator<ContentValues> it = poiData.iterator();
-                while (it.hasNext()) {                	
-                	ContentValues locationPoiValues = new ContentValues();
-                	locationPoiValues
-                		.put(LocationPoiEntry.COLUMN_ID_LOCATION, idLocation);
-                	locationPoiValues
-                		.put(LocationPoiEntry.COLUMN_ID_POI, it.next().getAsLong(PoiEntry._ID));
-                	locPoiData.add(locationPoiValues);
-                }
-                
-                if (locPoiData.size() > 0) {
-                	ContentValues[] locPoitoInsert = new ContentValues[locPoiData.size()];
-                	locPoiData.toArray(locPoitoInsert);
-                	mContext.getContentResolver()
-                		.bulkInsert(LocationPoiEntry.CONTENT_URI,locPoitoInsert);
-                }
             }
         	
         }
