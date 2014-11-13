@@ -30,12 +30,12 @@ public class TestDb extends AndroidTestCase {
     
     
     
-    public void testInsertReadDb() {
+    public void notestInsertReadDb() {
 
     	PoiDbHelper dbHelper = new PoiDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        ContentValues testPoiValues = createPoiCasaValues();
+        ContentValues testPoiValues = createPoiCasaValues("TestCasa");
         ContentValues testLocationValues = createUserPosition();
 
         
@@ -95,7 +95,7 @@ public class TestDb extends AndroidTestCase {
         validateCursor(cursorLocationPoi, testlocationPoiValues/*, locationPoiRowId*/);
         
         /******************Insertar otro poi*******************/
-        testPoiValues = createPoiCasaValues2();
+        testPoiValues = createPoiCasaValues("TestCasa2");
         
         poiRowId = db.insert(PoiEntry.TABLE_NAME, null, testPoiValues);
 
@@ -152,13 +152,13 @@ public class TestDb extends AndroidTestCase {
     }
     
     
-    static ContentValues createPoiCasaValues() {
+    static ContentValues createPoiCasaValues(String name) {
         // Create a new map of values, where column names are the keys
         ContentValues testValues = new ContentValues();
         testValues.put(PoiEntry.COLUMN_USUARIO_KEY, 1);
-        testValues.put(PoiEntry.COLUMN_POI_NAME, "TestCasa");
+        testValues.put(PoiEntry.COLUMN_POI_NAME, name);
         testValues.put(PoiEntry.COLUMN_POI_COLOR, Color.RED);
-        testValues.put(PoiEntry.COLUMN_POI_IMAGE, "wiki...");
+        testValues.put(PoiEntry.COLUMN_POI_IMAGE, "testDB");
         testValues.put(PoiEntry.COLUMN_POI_DESCRIPTION, "Esta es la descripción para el test del poi Casa");
         testValues.put(PoiEntry.COLUMN_POI_ALTITUDE, 760);
         testValues.put(PoiEntry.COLUMN_POI_LATITUDE, 37.6759861);
@@ -173,6 +173,7 @@ public class TestDb extends AndroidTestCase {
         return testValues;
     }
     
+    
     static ContentValues createUserPosition() {
     	ContentValues testValues = new ContentValues();
     	testValues.put(LocationEntry.COLUMN_RADIUS,40);
@@ -183,22 +184,5 @@ public class TestDb extends AndroidTestCase {
     	return testValues;
     }
     
-    
-    
-    static ContentValues createPoiCasaValues2() {
-        // Create a new map of values, where column names are the keys
-        ContentValues testValues = new ContentValues();
-        testValues.put(PoiEntry.COLUMN_USUARIO_KEY, 1);
-        testValues.put(PoiEntry.COLUMN_POI_NAME, "TestCasa22");
-        testValues.put(PoiEntry.COLUMN_POI_COLOR, Color.BLUE);
-        testValues.put(PoiEntry.COLUMN_POI_IMAGE, "wiki...");
-        testValues.put(PoiEntry.COLUMN_POI_DESCRIPTION, "Esta es la descripción para el test del poi Casa");
-        testValues.put(PoiEntry.COLUMN_POI_ALTITUDE, 760);
-        testValues.put(PoiEntry.COLUMN_POI_LATITUDE, 37.6759861);
-        testValues.put(PoiEntry.COLUMN_POI_LONGITUDE, -3.5661972);
-        testValues.put(PoiEntry.COLUMN_POI_WEBSITE, "joselopez.hol.es");
-        
-        return testValues;
-    }
 
 }

@@ -76,6 +76,7 @@ public class PoiProvider extends ContentProvider {
     /**
      * Constante para calcular una aproximación de la distancia entre dos posiciones dadas las
      * coordenadas GPS.
+     * @see http://goodenoughpractices.blogspot.com.es/2011/08/query-by-proximity-in-android.html
      */
     private static final String sManhattanDistance = 
     		"(abs( " + PoiContract.LocationEntry.COLUMN_LOCATION_LATITUDE + " - ( ? )) " +
@@ -544,22 +545,23 @@ public class PoiProvider extends ContentProvider {
             			values.getAsString(PoiContract.LocationEntry.COLUMN_LOCATION_LONGITUDE)
             			};
 
-
             	Cursor c = db.query(
             			PoiContract.LocationEntry.TABLE_NAME,
             			columns,
-            			sManhattanDistance,	
+            			MAX_DISTANCE + " > " + sManhattanDistance,	
             			selectionArgs,
             			null,
             			null,
-            			null	//order by
+            			null
             	);
 
             	if (c.moveToFirst()) {
             		//Si se ha encontrado alguna posición 'cercana', obtenemos el ID
             		_id = c.getLong(c.getColumnIndex(PoiContract.LocationEntry._ID));
+            		Log.d(LOG_TAG,"Insertando location repetida...El id que da es:"+_id);
             	}else{
             		_id = db.insert(PoiContract.LocationEntry.TABLE_NAME, null, values);
+            		Log.d(LOG_TAG,"Insertando location bien. El id que da es:"+_id);
             	}
             	c.close();
             	
@@ -712,7 +714,7 @@ public class PoiProvider extends ContentProvider {
             case POIS:
                 db.beginTransaction();
                 rowCount = 0;
-
+                Log.d(LOG_TAG,"Empieza la transaccion");
             	ArrayList<ContentValues> toLocationPoi = new ArrayList<>();
             	
                 try {
@@ -721,9 +723,9 @@ public class PoiProvider extends ContentProvider {
                 	for (int i=0; i<values.length; i++) {
                 		list.add(values[i]);
                 	}
-                	ContentValues locationValue = list.remove(list.size());
+                	ContentValues locationValue = list.remove((list.size()-1));
                 	long idLocation = locationValue.getAsLong(PoiContract.LocationEntry._ID);
-                	
+                	Log.d(LOG_TAG,"Sacado el Location:ID>"+idLocation);
                 	long _idPoi;
                 	                	
                 	
@@ -750,8 +752,10 @@ public class PoiProvider extends ContentProvider {
                     	if (c.moveToFirst()) {
                     		//Si se ha encontrado el PI que se intentaba insertar, obtenemos el ID
                     		_idPoi = c.getLong(c.getColumnIndex(PoiContract.PoiEntry._ID));
+                    		Log.d(LOG_TAG,"1El poi "+ _idPoi + " ya estaba");
                     	}else{
                     		_idPoi = db.insert(PoiContract.PoiEntry.TABLE_NAME, null, value);
+                    		Log.d(LOG_TAG,"2Insertado el poi "+ _idPoi);
                     		if (_idPoi != -1) {
                             	rowCount++;
                             }
@@ -770,9 +774,10 @@ public class PoiProvider extends ContentProvider {
                     db.endTransaction();
                 }
                 getContext().getContentResolver().notifyChange(uri, null);
-                
+                Log.d(LOG_TAG,"Insertados todos los pois, ahora los location_poi");
                 //Si se llegaron a insertar PIs, se insertan las entradas en location_poi
                 if (!toLocationPoi.isEmpty()) {
+                	Log.d(LOG_TAG,"Creando el array");
                 	ContentValues[] valuesToInsert = new ContentValues[toLocationPoi.size()];
                 	toLocationPoi.toArray(valuesToInsert);
                     bulkInsert(PoiContract.LocationPoiEntry.CONTENT_URI, valuesToInsert);
@@ -785,6 +790,7 @@ public class PoiProvider extends ContentProvider {
             	db.beginTransaction();
             	rowCount = 0;
             	try {
+            		Log.d(LOG_TAG,"Empieza el bulkinsert de location_poi");
                     for (ContentValues value : values) {
                     	long _id;
                     	
@@ -808,8 +814,10 @@ public class PoiProvider extends ContentProvider {
                     	if (c.moveToFirst()) {
                     		//Si se ha encontrado la posición que se intentaba insertar, obtenemos el ID
                     		_id = c.getLong(c.getColumnIndex(PoiContract.LocationPoiEntry._ID));
+                    		Log.d(LOG_TAG,"1El location_poi "+ _id + " ya estaba");
                     	}else{
                     		_id = db.insert(PoiContract.LocationPoiEntry.TABLE_NAME, null, value);
+                    		Log.d(LOG_TAG,"2Insertado el location_poi "+ _id);
                     		if (_id != -1) {
                             	rowCount++;
                             }
