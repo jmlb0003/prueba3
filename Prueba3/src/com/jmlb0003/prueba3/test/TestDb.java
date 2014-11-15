@@ -19,15 +19,14 @@ public class TestDb extends AndroidTestCase {
 	
 	public static final String LOG_TAG = TestDb.class.getSimpleName();
 
-    public void testCreateDb() throws Throwable {
+    public void notestCreateDb() throws Throwable {
 //    	Log.d(LOG_TAG,"Creando bd para tests");
         mContext.deleteDatabase(PoiDbHelper.DATABASE_NAME);
-        SQLiteDatabase db = new PoiDbHelper(this.mContext).getWritableDatabase();
+        SQLiteDatabase db = new PoiDbHelper(mContext).getWritableDatabase();
         assertEquals(true, db.isOpen());
         
         db.close();
     }
-    
     
     
     public void notestInsertReadDb() {
@@ -155,7 +154,7 @@ public class TestDb extends AndroidTestCase {
     static ContentValues createPoiCasaValues(String name) {
         // Create a new map of values, where column names are the keys
         ContentValues testValues = new ContentValues();
-        testValues.put(PoiEntry.COLUMN_USUARIO_KEY, 1);
+        testValues.put(PoiEntry.COLUMN_POI_USER_ID, 1);
         testValues.put(PoiEntry.COLUMN_POI_NAME, name);
         testValues.put(PoiEntry.COLUMN_POI_COLOR, Color.RED);
         testValues.put(PoiEntry.COLUMN_POI_IMAGE, "testDB");

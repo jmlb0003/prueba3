@@ -2,12 +2,10 @@ package com.jmlb0003.prueba3.test;
 
 import java.util.ArrayList;
 
-import android.annotation.TargetApi;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -75,7 +73,6 @@ public class TestProvider extends AndroidTestCase {
         cursor.close();
     }
     
-    
 
 
     /**
@@ -85,153 +82,6 @@ public class TestProvider extends AndroidTestCase {
 //        deleteAllRecords();
     }
 
-
-    
-    
-    private ArrayList<ContentValues> fetchData() {    	
-    	ArrayList<ContentValues> toRet = new ArrayList<>();
-    	    	
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa2"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa3"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa4"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa5"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa6"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa7"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa8"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa9"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa10"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa11"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa12"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa13"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa14"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa15"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa16"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa17"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa18"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa19"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCasa20"));
-    	
-    	return toRet;
-    }
-    
-    private ArrayList<ContentValues> fetchData2() {    	
-    	ArrayList<ContentValues> toRet = new ArrayList<>();
-    	    	
-    	toRet.add(TestDb.createPoiCasaValues("TestCas"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas2"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas3"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas4"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas5"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas6"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas7"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas8"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas9"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas10"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas11"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas12"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas13"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas14"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas15"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas16"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas17"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas18"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas19"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCas20"));
-    	
-    	return toRet;
-    }
-    
-    private ArrayList<ContentValues> fetchData3() {    	
-    	ArrayList<ContentValues> toRet = new ArrayList<>();
-    	    	
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa2"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa3"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa4"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa5"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa6"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa7"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa8"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa9"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa10"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa11"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa12"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa13"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa14"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa15"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa16"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa17"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa18"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa19"));
-    	toRet.add(TestDb.createPoiCasaValues("TestCsa20"));
-    	
-    	return toRet;
-    }
-    
-    private void createEntry(double lat,double lon) {
-    	long idLocation = createUserPosition(lat,lon);	//arco
-
-		ArrayList<ContentValues> poiData = new ArrayList<>();
-    	poiData = fetchData();
-
-    	//Si se han obtenido datos, se insertan en la BD a través del Content Provider
-    	if (poiData.size() > 0) {
-    		//Hacemos una trampa para añadir el idLocation al final de poiData
-    		ContentValues idLocationValue = new ContentValues();
-    		idLocationValue.put(LocationEntry._ID, idLocation);        		
-    		poiData.add(idLocationValue);
-
-            ContentValues[] poisToInsert = new ContentValues[poiData.size()];
-            poiData.toArray(poisToInsert);
-            
-            mContext.getContentResolver().bulkInsert(PoiEntry.CONTENT_URI, poisToInsert);
-           
-        }
-    }
-    
-    
-    private void createEntry2(double lat,double lon) {
-    	long idLocation = createUserPosition(lat,lon);	//arco
-
-		ArrayList<ContentValues> poiData = new ArrayList<>();
-    	poiData = fetchData2();
-
-    	//Si se han obtenido datos, se insertan en la BD a través del Content Provider
-    	if (poiData.size() > 0) {
-    		//Hacemos una trampa para añadir el idLocation al final de poiData
-    		ContentValues idLocationValue = new ContentValues();
-    		idLocationValue.put(LocationEntry._ID, idLocation);        		
-    		poiData.add(idLocationValue);
-
-            ContentValues[] poisToInsert = new ContentValues[poiData.size()];
-            poiData.toArray(poisToInsert);
-            
-            mContext.getContentResolver().bulkInsert(PoiEntry.CONTENT_URI, poisToInsert);
-           
-        }
-    }
-    
-    private void createEntry3(double lat,double lon) {
-    	long idLocation = createUserPosition(lat,lon);	//arco
-
-		ArrayList<ContentValues> poiData = new ArrayList<>();
-    	poiData = fetchData3();
-
-    	//Si se han obtenido datos, se insertan en la BD a través del Content Provider
-    	if (poiData.size() > 0) {
-    		//Hacemos una trampa para añadir el idLocation al final de poiData
-    		ContentValues idLocationValue = new ContentValues();
-    		idLocationValue.put(LocationEntry._ID, idLocation);        		
-    		poiData.add(idLocationValue);
-
-            ContentValues[] poisToInsert = new ContentValues[poiData.size()];
-            poiData.toArray(poisToInsert);
-            
-            mContext.getContentResolver().bulkInsert(PoiEntry.CONTENT_URI, poisToInsert);
-           
-        }
-    }
     
     public void testbulkInsert(){
     	long tInicio,tFin;
@@ -487,19 +337,149 @@ public class TestProvider extends AndroidTestCase {
     	return insertarLocation(testValues);
     }
     
+    private ArrayList<ContentValues> fetchData() {    	
+    	ArrayList<ContentValues> toRet = new ArrayList<>();
+    	    	
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa2"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa3"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa4"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa5"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa6"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa7"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa8"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa9"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa10"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa11"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa12"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa13"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa14"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa15"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa16"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa17"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa18"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa19"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCasa20"));
+    	
+    	return toRet;
+    }
     
+    private ArrayList<ContentValues> fetchData2() {    	
+    	ArrayList<ContentValues> toRet = new ArrayList<>();
+    	    	
+    	toRet.add(TestDb.createPoiCasaValues("TestCas"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas2"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas3"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas4"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas5"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas6"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas7"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas8"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas9"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas10"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas11"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas12"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas13"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas14"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas15"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas16"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas17"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas18"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas19"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCas20"));
+    	
+    	return toRet;
+    }
+    
+    private ArrayList<ContentValues> fetchData3() {    	
+    	ArrayList<ContentValues> toRet = new ArrayList<>();
+    	    	
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa2"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa3"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa4"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa5"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa6"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa7"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa8"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa9"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa10"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa11"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa12"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa13"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa14"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa15"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa16"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa17"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa18"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa19"));
+    	toRet.add(TestDb.createPoiCasaValues("TestCsa20"));
+    	
+    	return toRet;
+    }
+    
+    private void createEntry(double lat,double lon) {
+    	long idLocation = createUserPosition(lat,lon);	//arco
 
-    
-    
-    // The target api annotation is needed for the call to keySet -- we wouldn't want
-    // to use this in our app, but in a test it's fine to assume a higher target.
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    void addAllContentValues(ContentValues destination, ContentValues source) {
-        for (String key : source.keySet()) {
-            destination.put(key, source.getAsString(key));
+		ArrayList<ContentValues> poiData = new ArrayList<>();
+    	poiData = fetchData();
+
+    	//Si se han obtenido datos, se insertan en la BD a través del Content Provider
+    	if (poiData.size() > 0) {
+    		//Hacemos una trampa para añadir el idLocation al final de poiData
+    		ContentValues idLocationValue = new ContentValues();
+    		idLocationValue.put(LocationEntry._ID, idLocation);        		
+    		poiData.add(idLocationValue);
+
+            ContentValues[] poisToInsert = new ContentValues[poiData.size()];
+            poiData.toArray(poisToInsert);
+            
+            mContext.getContentResolver().bulkInsert(PoiEntry.CONTENT_URI, poisToInsert);
+           
         }
     }
     
+    
+    private void createEntry2(double lat,double lon) {
+    	long idLocation = createUserPosition(lat,lon);	//arco
 
-    //TODO: Pruebas de velocidad de insertar puntos...a ver la diferencia del bulkinsert consultando antes de insertar para eliminar errores, o intentando insertar, y si no, consultar
+		ArrayList<ContentValues> poiData = new ArrayList<>();
+    	poiData = fetchData2();
+
+    	//Si se han obtenido datos, se insertan en la BD a través del Content Provider
+    	if (poiData.size() > 0) {
+    		//Hacemos una trampa para añadir el idLocation al final de poiData
+    		ContentValues idLocationValue = new ContentValues();
+    		idLocationValue.put(LocationEntry._ID, idLocation);        		
+    		poiData.add(idLocationValue);
+
+            ContentValues[] poisToInsert = new ContentValues[poiData.size()];
+            poiData.toArray(poisToInsert);
+            
+            mContext.getContentResolver().bulkInsert(PoiEntry.CONTENT_URI, poisToInsert);
+           
+        }
+    }
+    
+    private void createEntry3(double lat,double lon) {
+    	long idLocation = createUserPosition(lat,lon);	//arco
+
+		ArrayList<ContentValues> poiData = new ArrayList<>();
+    	poiData = fetchData3();
+
+    	//Si se han obtenido datos, se insertan en la BD a través del Content Provider
+    	if (poiData.size() > 0) {
+    		//Hacemos una trampa para añadir el idLocation al final de poiData
+    		ContentValues idLocationValue = new ContentValues();
+    		idLocationValue.put(LocationEntry._ID, idLocation);        		
+    		poiData.add(idLocationValue);
+
+            ContentValues[] poisToInsert = new ContentValues[poiData.size()];
+            poiData.toArray(poisToInsert);
+            
+            mContext.getContentResolver().bulkInsert(PoiEntry.CONTENT_URI, poisToInsert);
+           
+        }
+    }
+    
 }

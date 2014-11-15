@@ -1,6 +1,8 @@
 package com.jmlb0003.prueba3.controlador;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -78,10 +80,13 @@ public class DetallesPIActivity extends ActionBarActivity {
 	
 	private void setImage() {
 		ImageView img = (ImageView) mContainer.findViewById(R.id.pi_image_container2);
-		if (img != null) {
-			img.setImageBitmap(mShowedPoi.getImage());
+		Bitmap bm = BitmapFactory.decodeResource(getResources(), mShowedPoi.getImage());
+		if (img != null && bm != null) {
+			img.setImageBitmap(bm);
+			
+			img.setContentDescription("Fotografía de "+mShowedPoi.getName());	
 		}else{
-			Log.d("DetallesActivity","No hay IMG container...");
+			Log.d("DetallesActivity","No hay IMG container... O no hay imagen para ponerle...");
 		}
 	}
 	

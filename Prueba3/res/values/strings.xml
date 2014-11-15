@@ -9,6 +9,10 @@
     <!-- Content Provider -->
     <string name="sync_account_type">prueba3.jmlb0003.com</string>
     <string name="content_authority">"com.jmlb0003.prueba3"</string>
+    
+    <!-- Ventana de diálogo de descarga de PIs -->
+    <string name="downloading_pois">Descargando&#8230;</string>
+    <string name="downloading_pois_description">Estamos descargando los lugares de interés. Pronto estarán listos.</string>
 
     <!-- Ventana de diálogo de ajustes de ubicación -->
     <string name="alert_location_title">Ajustes de ubicación</string>
@@ -16,6 +20,13 @@
     <string name="alert_location_positive_button">Ir a Ajustes</string>
     <string name="alert_location_negative_button">Cerrar</string>
     <string name="alert_location_negative_message">Si quiere que la app funcione, tiene que activar alguna opción de ubicación en los ajustes.</string>
+    
+    <!-- Ventana de diálogo de ajustes de conexión a Internet -->
+    <string name="alert_network_title">Ajustes de Internet</string>
+    <string name="alert_network_message">No se pueden descargar lugares de interés. Por favor, active alguna conexión a Internet.</string>
+    <string name="alert_network_positive_button">Ir a Ajustes</string>
+    <string name="alert_network_negative_button">Cerrar</string>
+    <string name="alert_network_negative_message">Se necesita una conexión a Internet para obtener los datos de lugares de interés cercanos y para mostrar el mapa.</string>
 
     <!-- Ventana de diálogo de ubicación -->
     <string name="alert_location2_title">Buscando ubicación</string>
@@ -35,4 +46,7 @@
     <!-- Clave para usar Google Maps en la app -->
     <string name="maps_key">AIzaSyAPWQlnZICVmAePBokkdXf4ic8ahjycq84</string>
 
+    
+    
 </resources>
+

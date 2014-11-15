@@ -237,7 +237,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
      * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
      * method in {@link #onResume()} to guarantee that it will be called.
      */
-    private void setUpMapIfNeeded() {
+    public void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
     	Log.d(LOG_TAG, "SetupIfNeeded:Entra");
         if (mMap == null && mMapFragment != null) {

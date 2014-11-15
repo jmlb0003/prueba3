@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.content.ContentUris;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
@@ -198,7 +199,7 @@ public class PoiContract {
         
         public static final String TABLE_NAME = "poi";
         /** Columna con la foreign key de la tabla de usuario (por si hace falta). **/
-        public static final String COLUMN_USUARIO_KEY = "usuario_ID_usuario";        
+        public static final String COLUMN_POI_USER_ID = "usuario_ID_usuario";        
 
         /** Nombre del PI **/
         public static final String COLUMN_POI_NAME = "poi_name";
@@ -235,7 +236,18 @@ public class PoiContract {
         /** Coordenada de longitud del PI en grados decimales, almacenada como float**/
         public static final String COLUMN_POI_LONGITUDE = "poi_longitude";
           
+        /** Constantes para distinguir el tipo de proveedor de PIs **/
+        public static final int WIKIPEDIA_PROVIDER = 1;
+        public static final int WIKIPEDIA_COLOR = Color.WHITE;
         
+        public static final int GOOGLE_PLACES_PROVIDER = 2;
+        public static final int GOOGLE_COLOR = Color.RED;
+        
+        public static final int UJA_PROVIDER = 3;
+        public static final int UJA_COLOR = Color.GREEN;
+        
+        public static final int LOCAL_PROVIDER = 4;
+        public static final int LOCAL_COLOR = Color.YELLOW;
 
         /**
          * Método que genera la URI de consulta del Content Provider por ID.

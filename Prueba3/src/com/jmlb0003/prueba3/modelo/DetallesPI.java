@@ -12,13 +12,30 @@ import java.util.Map;
  * @author Jose
  *
  */
-public class DetallesPI {//TODO: Para poner detallesPI como parcelable, revisar la mixarelib!!
+public class DetallesPI {
 	
 	/* - Atributos --------------------------------------------------------- */
+    public static final String DETALLESPI_ID_POI = "ID";
+    public static final String DETALLESPI_USER_ID = "id_usuario";
+    public static final String DETALLESPI_NAME = "nombre_poi";
+    public static final String DETALLESPI_LATITUDE = "latitud";
+    public static final String DETALLESPI_LONGITUDE = "longitud";
+    public static final String DETALLESPI_ALTITUDE = "altitud";
+    public static final String DETALLESPI_COLOR = "color";
+    public static final String DETALLESPI_DISTANCE = "distancia";
+    public static final String DETALLESPI_IMAGE = "imagen";
+    public static final String DETALLESPI_DESCRIPTION = "descripcion";
+    public static final String DETALLESPI_WEBSITE = "sitio_web";
+    public static final String DETALLESPI_PRICE = "precio";
+    public static final String DETALLESPI_OPEN_HOURS = "horario_apertura";
+    public static final String DETALLESPI_CLOSE_HOURS = "horario_cierre";
+    public static final String DETALLESPI_MAX_AGE = "edad_maxima";
+    public static final String DETALLESPI_MIN_AGE = "edad_minima";
     
 	/**
      * Contiene los detalles de un PI incluyendo pares: <nombre_del_campo, valor_del_campo>:<br>
      * <tt>"ID"</tt>: ID del PI'/'<br>
+     * <tt>"id_usuario"</tt>: ID del usuario autor del PI'/'<br>
      * <tt>"color"</tt>: Color del tipo de PI<br>
      * <tt>"distancia"</tt>: Distancia desde el usuario hasta el PI<br>
      * <tt>"imagen"</tt>: Imagen del PI<br>
@@ -70,7 +87,7 @@ public class DetallesPI {//TODO: Para poner detallesPI como parcelable, revisar 
      * distancia en metros o en kilómetros)
      */
     public void actualizaDistancia(String txt) {
-    	mDetalles.put("distancia", txt);
+    	mDetalles.put(DETALLESPI_DISTANCE, txt);
     }
     
     
@@ -82,6 +99,7 @@ public class DetallesPI {//TODO: Para poner detallesPI como parcelable, revisar 
      */
     public boolean coincide(DetallesPI criteriosBusqueda) {
 
+    	//TODO: El coincide del DetallesPI está sin implementar
         /**
          * Si es una busqueda de la interfaz, mira primero si el filtro (prestado)
          * es verdadero y despues por ISBN, titulo y autor

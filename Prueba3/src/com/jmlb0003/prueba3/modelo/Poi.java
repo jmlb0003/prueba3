@@ -190,15 +190,22 @@ public class Poi implements Comparable<Poi> {
 		return mName;
 	}
 	
-	public synchronized int getID(){
-		if (mDetails.getDetalle("ID") != null) {
-			return (int)mDetails.getDetalle("ID");
+	public synchronized long getID(){
+		if (mDetails.getDetalle(DetallesPI.DETALLESPI_ID_POI) != null) {
+			return (long)mDetails.getDetalle(DetallesPI.DETALLESPI_ID_POI);
+		}
+		return -1;
+	}
+	
+	public synchronized long getIDUsuario(){
+		if (mDetails.getDetalle(DetallesPI.DETALLESPI_USER_ID) != null) {
+			return (long)mDetails.getDetalle(DetallesPI.DETALLESPI_USER_ID);
 		}
 		return -1;
 	}
 
     public synchronized int getColor() {
-    	return (int)mDetails.getDetalle("color");
+    	return (int)mDetails.getDetalle(DetallesPI.DETALLESPI_COLOR);
     }
 
     public synchronized double getDistance() {
@@ -206,39 +213,39 @@ public class Poi implements Comparable<Poi> {
     }
     
     public synchronized String getTextDistance() {
-        return (String) mDetails.getDetalle("distancia");
+        return (String) mDetails.getDetalle(DetallesPI.DETALLESPI_DISTANCE);
     }
     
-    public synchronized Bitmap getImage() {
-        return (Bitmap)mDetails.getDetalle("imagen");
+    public synchronized int getImage() {
+        return (int)mDetails.getDetalle(DetallesPI.DETALLESPI_IMAGE);
     }
     
     public synchronized String getDescription() {
-        return (String)mDetails.getDetalle("descripcion");
+        return (String)mDetails.getDetalle(DetallesPI.DETALLESPI_DESCRIPTION);
     }
     
     public synchronized String getWebSite() {
-        return (String)mDetails.getDetalle("sitio_web");
+        return (String)mDetails.getDetalle(DetallesPI.DETALLESPI_WEBSITE);
     }
     
     public synchronized float getPrice() {
-        return (float)mDetails.getDetalle("precio");
+        return (float)mDetails.getDetalle(DetallesPI.DETALLESPI_PRICE);
     }
     
     public synchronized String getOpenHours() {
-        return (String)mDetails.getDetalle("horario_apertura");
+        return (String)mDetails.getDetalle(DetallesPI.DETALLESPI_OPEN_HOURS);
     }
     
     public synchronized String getCloseHours() {
-        return (String)mDetails.getDetalle("horario_cierre");
+        return (String)mDetails.getDetalle(DetallesPI.DETALLESPI_CLOSE_HOURS);
     }
     
     public synchronized int getMaxYears() {
-        return (int)mDetails.getDetalle("edad_maxima");
+        return (int)mDetails.getDetalle(DetallesPI.DETALLESPI_MAX_AGE);
     }
     
     public synchronized int getMinYears() {
-        return (int)mDetails.getDetalle("edad_minima");
+        return (int)mDetails.getDetalle(DetallesPI.DETALLESPI_MIN_AGE);
     }
     
     public synchronized Bitmap getIcon() {
@@ -826,12 +833,20 @@ public class Poi implements Comparable<Poi> {
         if(poi == null || mName == null) {
         	throw new NullPointerException();
         }
-
-        if ( ((Poi)poi).getID() != getID() ) {
+        
+        if (((Poi)poi).getID() != getID()) {
         	return false;
         }
         
         if (!mName.equals(((Poi)poi).getName())) {
+        	return false;
+        }
+        
+        if (((Poi)poi).getLatitude() != getLatitude()) {
+        	return false;
+        }
+        
+        if (((Poi)poi).getLongitude() != getLongitude()) {
         	return false;
         }
         

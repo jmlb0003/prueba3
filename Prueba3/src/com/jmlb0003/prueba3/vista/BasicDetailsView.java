@@ -1,6 +1,8 @@
 package com.jmlb0003.prueba3.vista;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,12 +23,14 @@ import com.jmlb0003.prueba3.modelo.Poi;
 public class BasicDetailsView extends ScrollView {
 	
 	private RelativeLayout mContainer = null;
+	private Context mContext;
 
 	public BasicDetailsView(Context context) {
 		super(context);
 		
+		mContext = context;
 		LayoutInflater inflater = 
-				(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				(LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		
 		inflater.inflate(R.layout.layout_detalles_basicos_pi, this, true);		
 		    
@@ -36,9 +40,9 @@ public class BasicDetailsView extends ScrollView {
 	public BasicDetailsView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
-		
+		mContext = context;
 		LayoutInflater inflater = 
-				(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				(LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		inflater.inflate(R.layout.layout_detalles_basicos_pi, this, true);
 		    
@@ -64,13 +68,18 @@ public class BasicDetailsView extends ScrollView {
 	}
 	
 	
-	private void setImage(Poi m) {
+	private void setImage(Poi p) {
 		ImageView img = (ImageView) mContainer.findViewById(R.id.pi_image_container);
-		if (img != null) {
-			img.setImageBitmap(m.getImage());
-			setContentDescription("Fotografía de "+m.getName());
+		Bitmap bm = BitmapFactory.decodeResource(mContext.getResources(), p.getImage());
+		if (img != null && bm != null) {
+			img.setImageBitmap(bm);
+			img.setContentDescription("Fotografía de "+p.getName());			
 		}else{
-			Log.d("BASICDETAILS","No hay IMG container...");
+			Log.d("BASICDETAILS","No hay IMG container... O no hay imagen para ponerle...");
+			
+			if (bm == null){
+				Log.d("BASICDETAILS","No hay imagen para ponerle...");
+			}
 		}
 	}
 	

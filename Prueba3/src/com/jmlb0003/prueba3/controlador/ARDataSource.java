@@ -6,15 +6,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.location.Location;
+import android.util.Log;
 
+import com.jmlb0003.prueba3.modelo.DetallesPI;
 import com.jmlb0003.prueba3.modelo.Poi;
+import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
 import com.jmlb0003.prueba3.utilidades.Matrix;
 
 
@@ -27,7 +33,7 @@ import com.jmlb0003.prueba3.utilidades.Matrix;
  */
 public abstract class ARDataSource {
 	
-	private static final Map<String,Poi> POI_LIST = new ConcurrentHashMap<String,Poi>();
+	private static final Map<Long,Poi> POI_LIST = new ConcurrentHashMap<Long,Poi>();
     private static final List<Poi> CACHE = new CopyOnWriteArrayList<Poi>();
     private static final AtomicBoolean COMPUTING = new AtomicBoolean(false);
     private static final float[] LOCATION_ARRAY = new float[3];
@@ -35,6 +41,8 @@ public abstract class ARDataSource {
     
     public static final Location HARD_FIX = new Location("ATL");
     public static final int MAX_RADIUS = 50;
+    
+    private static final String LOG_TAG = "ARDataSource";
     
     static {
         //HARD_FIX.setLatitude(0);
@@ -72,31 +80,6 @@ public abstract class ARDataSource {
     /**Variable donde se almacena la referencia del PI seleccionado en pantalla**/
     public static Poi SelectedPoi = null;
     
-    /**
-     * Modifica el texto del radio de búsqueda del Radar
-     * @param zoomLevel Nuevo valor para el radio de búsqueda de PIs
-     */
-    public static void setZoomLevel(String zoomLevel) {
-    	if (zoomLevel == null) {
-    		throw new NullPointerException();
-    	}
-    	
-    	synchronized (ARDataSource.sZoomLevel) {
-    		ARDataSource.sZoomLevel = zoomLevel;
-    	}
-    }
-    
-    
-    
-    /**
-     * Modifica el radio actual del radar con uno nuevo
-     * @param radius	Nuevo valor del radio del radar en metros
-     */
-    public static void setRadius(float radius) {
-        synchronized (ARDataSource.RADIUS_LOCK) {
-        	ARDataSource.sRadius = radius;
-        }
-    }
 
     /**
      * Método para obtener el actual radio del radar
@@ -243,9 +226,117 @@ public abstract class ARDataSource {
     	}
 
     	for(Poi poi : pois) {
-    	    if (!POI_LIST.containsKey(poi.getName())) {
+    	    if (!POI_LIST.containsKey(poi.getID())) {
     	        poi.calcRelativePosition(ARDataSource.getCurrentLocation());
-    	        POI_LIST.put(poi.getName(),poi);
+    	        POI_LIST.put(poi.getID(),poi);
+    	    }
+    	}
+
+    	if (COMPUTING.compareAndSet(false, true)) {
+    	    CACHE.clear();
+    	}
+    }
+    
+    public static void addPoisFromCursor(Cursor c) {
+    	if (c == null || !c.moveToFirst() ) {
+    		return;
+    	}
+    	
+    	ArrayList<ContentValues> toRet = new ArrayList<>();
+    	for (int i = 0; i < c.getCount(); i++) {
+    		c.moveToPosition(i);
+    		ContentValues cv = new ContentValues();
+    		
+    		//TODO: Asignar el bitmap como identificador
+    		/**************************************************************/
+    		Log.d(LOG_TAG,i+"-PI:"+c.getString(c.getColumnIndex(PoiEntry.COLUMN_POI_NAME)));
+    		
+    		cv.put(DetallesPI.DETALLESPI_ID_POI,
+    				c.getLong(c.getColumnIndex(PoiEntry._ID)));
+    		cv.put(DetallesPI.DETALLESPI_NAME, 
+    				c.getString(c.getColumnIndex(PoiEntry.COLUMN_POI_NAME)));    		
+    		cv.put(DetallesPI.DETALLESPI_LATITUDE, 
+    				c.getDouble(c.getColumnIndex(PoiEntry.COLUMN_POI_LATITUDE)));
+    		cv.put(DetallesPI.DETALLESPI_LONGITUDE,
+    				c.getDouble(c.getColumnIndex(PoiEntry.COLUMN_POI_LONGITUDE)));
+    		cv.put(DetallesPI.DETALLESPI_ALTITUDE,
+    				c.getDouble(c.getColumnIndex(PoiEntry.COLUMN_POI_ALTITUDE)));
+
+    		cv.put(DetallesPI.DETALLESPI_USER_ID, 
+    				c.getLong(c.getColumnIndex(PoiEntry.COLUMN_POI_USER_ID)));
+    		cv.put(DetallesPI.DETALLESPI_COLOR, 
+    				c.getInt(c.getColumnIndex(PoiEntry.COLUMN_POI_COLOR)));
+    		cv.put(DetallesPI.DETALLESPI_IMAGE, 
+    				c.getInt(c.getColumnIndex(PoiEntry.COLUMN_POI_IMAGE)));
+    		cv.put(DetallesPI.DETALLESPI_DESCRIPTION, 
+    				c.getString(c.getColumnIndex(PoiEntry.COLUMN_POI_DESCRIPTION)));
+    		cv.put(DetallesPI.DETALLESPI_WEBSITE,
+    				c.getString(c.getColumnIndex(PoiEntry.COLUMN_POI_WEBSITE)));
+    		cv.put(DetallesPI.DETALLESPI_PRICE,
+    				c.getFloat(c.getColumnIndex(PoiEntry.COLUMN_POI_PRICE)));
+    		cv.put(DetallesPI.DETALLESPI_OPEN_HOURS,
+    				c.getFloat(c.getColumnIndex(PoiEntry.COLUMN_POI_OPEN_HOURS)));
+    		cv.put(DetallesPI.DETALLESPI_CLOSE_HOURS,
+    				c.getFloat(c.getColumnIndex(PoiEntry.COLUMN_POI_CLOSE_HOURS)));
+    		cv.put(DetallesPI.DETALLESPI_MAX_AGE,
+    				c.getFloat(c.getColumnIndex(PoiEntry.COLUMN_POI_MAX_AGE)));
+    		cv.put(DetallesPI.DETALLESPI_MIN_AGE,
+    				c.getFloat(c.getColumnIndex(PoiEntry.COLUMN_POI_MIN_AGE)));
+    		
+    		toRet.add(cv);
+    	}
+    	
+    	if (!toRet.isEmpty()) {
+    		ARDataSource.addPoisFromValues(toRet);
+    	}
+    	
+    	
+    }
+    public static void addPoisFromValues(Collection<ContentValues> poiList) {
+    	if (poiList == null || poiList.size() <= 0) {
+    		return;
+    	}
+
+    	for(ContentValues pv : poiList) {
+    		Log.d(LOG_TAG, "metiendo el poi "+pv.getAsString(DetallesPI.DETALLESPI_NAME)+" en la lista");
+    		
+    		Map<String, Object> details = new HashMap<>();
+    		details.put(DetallesPI.DETALLESPI_ID_POI,
+    				pv.getAsLong(DetallesPI.DETALLESPI_ID_POI));
+    		Log.d(LOG_TAG, "Metido el idpoi "+pv.getAsLong(DetallesPI.DETALLESPI_ID_POI));
+    		details.put(DetallesPI.DETALLESPI_USER_ID, 
+    				pv.getAsLong(DetallesPI.DETALLESPI_USER_ID));
+    		details.put(DetallesPI.DETALLESPI_COLOR, 
+    				pv.getAsInteger(DetallesPI.DETALLESPI_COLOR));
+    		details.put(DetallesPI.DETALLESPI_IMAGE, 
+    				pv.getAsInteger(DetallesPI.DETALLESPI_IMAGE));
+    		details.put(DetallesPI.DETALLESPI_DESCRIPTION, 
+    				pv.getAsString(DetallesPI.DETALLESPI_DESCRIPTION));
+    		details.put(DetallesPI.DETALLESPI_WEBSITE,
+    				pv.getAsString(DetallesPI.DETALLESPI_WEBSITE));
+    		details.put(DetallesPI.DETALLESPI_PRICE,
+    				pv.getAsFloat(DetallesPI.DETALLESPI_PRICE));
+    		details.put(DetallesPI.DETALLESPI_OPEN_HOURS,
+    				pv.getAsFloat(DetallesPI.DETALLESPI_OPEN_HOURS));
+    		details.put(DetallesPI.DETALLESPI_CLOSE_HOURS,
+    				pv.getAsFloat(DetallesPI.DETALLESPI_CLOSE_HOURS));
+    		details.put(DetallesPI.DETALLESPI_MAX_AGE,
+    				pv.getAsFloat(DetallesPI.DETALLESPI_MAX_AGE));
+    		details.put(DetallesPI.DETALLESPI_MIN_AGE,
+    				pv.getAsFloat(DetallesPI.DETALLESPI_MIN_AGE));
+    		
+    		
+    		Poi poi = new Poi(
+    				pv.getAsString(DetallesPI.DETALLESPI_NAME),
+    				pv.getAsDouble(DetallesPI.DETALLESPI_LATITUDE), 
+    				pv.getAsDouble(DetallesPI.DETALLESPI_LONGITUDE), 
+    				pv.getAsDouble(DetallesPI.DETALLESPI_ALTITUDE), 
+    				new DetallesPI(details));
+    		//TODO: Los bitmaps se pondrán en la mainActivity O asignar aqui el identificador R.string.drawable no se que...según el tipo de PI
+    		/************************************************/
+    	    if (!POI_LIST.containsKey(poi.getID())) {
+    	        poi.calcRelativePosition(ARDataSource.getCurrentLocation());
+    	        POI_LIST.put(poi.getID(), poi);
     	    }
     	}
 
@@ -268,16 +359,22 @@ public abstract class ARDataSource {
     }
     
     
-    /**
-     *  //TODO: Aquí hay que hacer que se actualice menos. Si no,cada vez que cambia la posición se descarga todo.
-     *  1º solo se actualiza si la posición varía más de un margen (p.e. 100 metros)
-     *  2º Además de la opción 1º, guardar los PIs y crear una función que descargue aplicando como intersecciones... (tengo los PIs de la posición X y dame los de X+1 que no estén en X) 
+    /** 
      * Método para filtrar los datos que se muestran en pantalla según la distancia máxima
      * @param newMaxDistance Distancia máxima a la que pueden estar los PIs que se muestren en pantalla
      */
-    public static void updateDataWithMaxDistance(float newMaxDistance) {
-        ARDataSource.setRadius(newMaxDistance);
-        ARDataSource.setZoomLevel(FORMAT.format(newMaxDistance));
+    public static void updateRadarDistance(float newMaxDistance) {
+    	if (newMaxDistance <= 0) {
+    		return;
+    	}
+    	
+        synchronized (ARDataSource.RADIUS_LOCK) {
+        	ARDataSource.sRadius = newMaxDistance;
+        }
+        
+        synchronized (ARDataSource.sZoomLevel){
+        	ARDataSource.sZoomLevel = FORMAT.format(newMaxDistance);
+        }
     }
     
     

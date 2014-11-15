@@ -2,7 +2,6 @@ package com.jmlb0003.prueba3.modelo.data;
 
 import java.util.ArrayList;
 
-
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -36,7 +35,7 @@ public class PoiProvider extends ContentProvider {
     private PoiDbHelper mOpenHelper;
 
     /** Distancia en metros que representa la máxima distancia para considerar cercanos dos puntos **/
-    private static final float MAX_DISTANCE = 0.025f;// un poco menos de 2000m // 2000;
+    public static final float MAX_DISTANCE = 0.025f;// un poco menos de 2000m // 2000;
     
     private static final int POIS = 100;
     private static final int POI_BY_ID = 101;
@@ -78,7 +77,7 @@ public class PoiProvider extends ContentProvider {
      * coordenadas GPS.
      * @see http://goodenoughpractices.blogspot.com.es/2011/08/query-by-proximity-in-android.html
      */
-    private static final String sManhattanDistance = 
+    public static final String sManhattanDistance = 
     		"(abs( " + PoiContract.LocationEntry.COLUMN_LOCATION_LATITUDE + " - ( ? )) " +
         			"+ abs( " + PoiContract.LocationEntry.COLUMN_LOCATION_LONGITUDE + " - ( ? )))";
     /** 
@@ -146,7 +145,7 @@ public class PoiProvider extends ContentProvider {
     }
 
     
-    
+    //TODO: Buscar los cursores que no se cierran!
     
     /************* FUNCIONES DONDE SE CREAN LAS QUERYS CONTRA EL CONTENT PROVIDER *****************/
     
@@ -714,30 +713,28 @@ public class PoiProvider extends ContentProvider {
             case POIS:
                 db.beginTransaction();
                 rowCount = 0;
-                Log.d(LOG_TAG,"Empieza la transaccion");
+
             	ArrayList<ContentValues> toLocationPoi = new ArrayList<>();
             	
                 try {
                 	//Sacar el último elemento de values, donde está idLocation
                 	ArrayList<ContentValues> list = new ArrayList<>();
-                	for (int i=0; i<values.length; i++) {
+                	for (int i = 0; i < values.length; i++) {
                 		list.add(values[i]);
                 	}
                 	ContentValues locationValue = list.remove((list.size()-1));
                 	long idLocation = locationValue.getAsLong(PoiContract.LocationEntry._ID);
-                	Log.d(LOG_TAG,"Sacado el Location:ID>"+idLocation);
                 	long _idPoi;
                 	                	
                 	
                     for (ContentValues value : list) {
-
                     	String[] columns = {PoiContract.PoiEntry._ID};
                     	//Parámetros para los ? de el WHERE de sIdPoiSearchSelection
                     	String[] selectionArgs = {
                     			value.getAsString(PoiContract.PoiEntry.COLUMN_POI_NAME),
                     			value.getAsString(PoiContract.PoiEntry.COLUMN_POI_LATITUDE),
-                    			value.getAsString(PoiContract.PoiEntry.COLUMN_POI_LONGITUDE)
-                    			};
+                    			value.getAsString(PoiContract.PoiEntry.COLUMN_POI_LONGITUDE) };
+
                     	//Consulta
                     	Cursor c = db.query(
                     			PoiContract.PoiEntry.TABLE_NAME,
@@ -748,7 +745,7 @@ public class PoiProvider extends ContentProvider {
                     			null,
                     			null
                     	);
-                    	
+
                     	if (c.moveToFirst()) {
                     		//Si se ha encontrado el PI que se intentaba insertar, obtenemos el ID
                     		_idPoi = c.getLong(c.getColumnIndex(PoiContract.PoiEntry._ID));
@@ -758,7 +755,7 @@ public class PoiProvider extends ContentProvider {
                     		Log.d(LOG_TAG,"2Insertado el poi "+ _idPoi);
                     		if (_idPoi != -1) {
                             	rowCount++;
-                            }
+                            }                    		  
                     	}
 
 

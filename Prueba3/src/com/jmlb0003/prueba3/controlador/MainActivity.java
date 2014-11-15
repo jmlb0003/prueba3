@@ -1,14 +1,8 @@
 package com.jmlb0003.prueba3.controlador;
 
 
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -19,13 +13,14 @@ import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -38,12 +33,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.jmlb0003.prueba3.R;
-import com.jmlb0003.prueba3.modelo.LocalDataProvider;
-import com.jmlb0003.prueba3.modelo.NetworkDataProvider2;
 import com.jmlb0003.prueba3.modelo.Poi;
-import com.jmlb0003.prueba3.modelo.WikipediaDataProvider;
-import com.jmlb0003.prueba3.modelo.WikipediaDataProvider2;
+import com.jmlb0003.prueba3.modelo.data.PoiContract;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
+import com.jmlb0003.prueba3.modelo.sync.LocalDataProvider;
+import com.jmlb0003.prueba3.modelo.sync.NetworkDataProvider;
+import com.jmlb0003.prueba3.modelo.sync.PoiDownloaderTask;
+import com.jmlb0003.prueba3.modelo.sync.WikipediaDataProvider;
 
 /*
  * TODO Orden de los imports CODE GUIDELINES
@@ -73,14 +69,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	 * current dropdown position.
 	 */
 	private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
-	private static final String CLASS_TAG = "mainActivity";
+	private static final String LOG_TAG = "mainActivity";
 	
-	/*******************CONSTANTES URLs**********************************/
-	//private static final String TAG = "MainActivity";	//Para el log
-    private static final String USERNAME = "jmlb0003";	//Usuario para json de wikipedia
-    //TODO: Hay que investigar cómo parametrizar esta constante...
-    private static final String LOCALE = "es";		//Para el idioma de los resultados de wikipedia
-    
+	   
     
     /*******************CONSTANTES PARA LOCALIZACION**********************************/
     /**Tiempo mínimo en milisegundos entre lecturas de los sensores de posición (60 segundos)**/
@@ -89,17 +80,16 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     private static final int TWO_MINUTES = 1000 * 60 * 2;
     /**Distancia mínima en metros entre lecturas de los sensores de posición (50 metros)**/
     private static final int MIN_DISTANCE = 50;
+    /**Distancia máxima en metros entre dos posiciones para que se actualicen/descarguen PIs (1700 metros)**/
+    private static final int MAX_DISTANCE = 1700;
     /**Constante con el tiempo en milisegundos para descartar una lectura de posición anterior**/
     //TODO:Esta modificado para que no incordie con las posiciones. Volver a dejarlo en 30 minutos
     private static final int THIRTY_MINUTES = 30*60*1000    *2*24;
     
     
     /***************CONSTANTES DESCARGAS DE PIs DE LAS DISTINTAS APIs***********************/
-    //Estas variables permiten descargar los recursos en tareas asíncronas sin bloquear la interfaz
-    private static final BlockingQueue<Runnable> QUEUE = new ArrayBlockingQueue<Runnable>(1);
-    private static final ThreadPoolExecutor DOWNLOADS_SERVICE = new ThreadPoolExecutor(1, 1, 20, TimeUnit.SECONDS, QUEUE);
     /**Variable que almacena los proveedores online de Puntos de Interés**/
-	private static final Map<String,NetworkDataProvider2> SOURCES = new ConcurrentHashMap<String,NetworkDataProvider2>();
+	private static final Map<String,NetworkDataProvider> NETWORK_POI_SOURCES = new ConcurrentHashMap<String,NetworkDataProvider>();
 	
 	
     /**********************VARIABLES LOCALIZACION********************************/
@@ -118,8 +108,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     /**Indica si se han inicializado los recursos de donde se obtienen los PIs**/
     private boolean isDataSourcesInit = false;
     
+    /**Indica si el usuario quiere trabajar sin conexión a Internet**/
+    private boolean stopRememberNoNetwork = false;
+    /**Indica si la app está inicializada**/
+    private boolean isCreated = false;
     
-    /************* Constantes para el Loader ******************/
+    /************* CONSTANTES PARA EL LOADER ******************/
     /** Identificador del Loader. Actualmente solo hay uno **/
     private static final int POI_LOADER = 0;
 
@@ -156,13 +150,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.d("MainActivity","EV onCreate");
-		if (mTouchedPoi != null) {
-			Log.d("mainactivity","Y hay PoiSelected");
-		}else{
-			Log.d("mainactivity","Y NO hay PoiSelected");
-		}
-
-
+		
 		//Se indica a MainActivity que la vista que tiene que usar para meter todo el contenido que
 		//sigue ahora es activity_main
 		setContentView(R.layout.activity_main);
@@ -197,13 +185,13 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 		mFragmentManager = getSupportFragmentManager();
 
-
 		//No se pueden reemplazar los fragments añadidos por XML, por lo que hay que añadirlos 
 		//de forma dinámica. 
 		mFragmentManager.beginTransaction().add(R.id.container, mFragmentModoCamara).commit();
-		Log.d(CLASS_TAG, "PantallaPrincipal:añadido el fragment de la camara");
+		Log.d(LOG_TAG, "PantallaPrincipal:añadido el fragment de la camara");
 
 		
+		setPoiProviders();
 		aplicarValoresDeAjustes();
 		
 		
@@ -233,23 +221,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         getLocation();
         
         if (mLocation != null) {
-        	onLocationChanged(mLocation);
-        	
-        	cargarPIs();
-        	
-        	//TODO: Esto es provisional...hay que poner en condiciones lo de descargar/almacenar los datos
-        	if (hayLocation) {
-        		updateData(mLocation.getLatitude(),
-        					mLocation.getLongitude(),
-        					mLocation.getAltitude());
-        	}
+        	onLocationChanged(mLocation);        	
+        	isCreated = true;
+
+        	updateData(mLocation.getLatitude(), mLocation.getLongitude(), mLocation.getAltitude());
         }
         
-        /******************************************************************************************************/
-//        if (mLocation != null) {
-//            getSupportLoaderManager().restartLoader(POI_LOADER, null, this);
-//        }
-
     }// Fin de onResume()
 	
 	
@@ -264,6 +241,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         super.onPause();
         Log.d("MainActivity","EV onPause");
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        isCreated = false;
         try {
         	sLocationMgr.removeUpdates(this);
         } catch (Exception ex) {
@@ -326,12 +304,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	    }
 	}
 	
+	
 
 	@Override
 	public boolean onNavigationItemSelected(int position, long id) {
 		// When the given dropdown item is selected, show its contents in the
 		// container view.
-		
 		FragmentTransaction ft = mFragmentManager.beginTransaction();
 		
 		switch (position) {
@@ -339,12 +317,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				ft.replace(R.id.container, mFragmentModoCamara);
 				//ft.addToBackStack(null);		//Quitar esto porque da fallos y no es necesario
 				
-				ft.commit();
+				ft.commit();				
 				
 				break;
 			case 1:
 				ft.replace(R.id.container, mFragmentModoMapa,"tagMapa");
-				//ft.addToBackStack(null);	//Quitar esto porque da fallos y no es necesario
+				//ft.addToBackStack(null);	//Quitar esto porque da fallos y no es necesario				
 				
 				ft.commit();
 				
@@ -379,26 +357,24 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		// Solo se tiene en cuenta la nueva ubicación si es mejor que la anterior 
 		// (más precisa y reciente)
 		if (isBetterLocation(newLocation, ARDataSource.getCurrentLocation())) {
-    		Log.d(CLASS_TAG,"la posicion nueva es mejor: La:"+newLocation.getLatitude()+" lo:"+newLocation.getLongitude()+" Precision:"+newLocation.getAccuracy()+"\nEl anterior tenia precision: "+ARDataSource.getCurrentLocation().getAccuracy());    		
+    		Log.d(LOG_TAG,"la posicion nueva es mejor: La:"+newLocation.getLatitude()+" lo:"+newLocation.getLongitude()+" Precision:"+newLocation.getAccuracy()+"\nEl anterior tenia precision: "+ARDataSource.getCurrentLocation().getAccuracy());    		
     		float locationsDistance = newLocation.distanceTo(ARDataSource.getCurrentLocation());
     		ARDataSource.setCurrentLocation(newLocation);
+    		mLocation = newLocation;
 
 	        mFragmentModoCamara.calculateMagneticNorthCompensation();
-	        Log.d(CLASS_TAG,"UPDATEDATA: locationsDistance vale:"+locationsDistance);
-	        //TODO: Si varia la posicion mas de 50 metros...
-	        if ( (locationsDistance > MIN_DISTANCE) && (hayLocation) ) {
-	        	Log.d(CLASS_TAG,"UPDATEDATA: Hay que llamar a updateData");
+	        //TODO: Esto está para que se actualice el mapa si cambia la posición...habría que probar si funciona o no...
+	        mFragmentModoMapa.setUpMapIfNeeded();
+
+
+	        if ( (locationsDistance > MAX_DISTANCE) && (hayLocation) ) {
+	        	Log.d(LOG_TAG,"UPDATEDATA: Hay que llamar a updateData");
 		        //Se actualizan/descargan los PIs según la posición obtenida
 		        updateData(newLocation.getLatitude(),
 		        			newLocation.getLongitude(),
 		        			newLocation.getAltitude());
-	        }else{
-	        	Log.d(CLASS_TAG,"UPDATEDATA: No hace falta llamar a updateData");
 	        }
-		}else{
-    		Log.d(CLASS_TAG,"la posicion anterior es mejor: La:"+ARDataSource.getCurrentLocation().getLatitude()+" lo:"+ARDataSource.getCurrentLocation().getLongitude()+" Precision:"+ARDataSource.getCurrentLocation().getAccuracy()+"\nLa nueva tenia precision: "+newLocation.getAccuracy());
-    	}
-		
+		}		
 		
 	}
 
@@ -409,7 +385,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		if (!sLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
 				!sLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
 			
-			mostrarSettingsAlert();
+			mostrarLocationSettingsAlert();
 		}
 		
 	}
@@ -417,8 +393,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
 	@Override
 	public void onProviderEnabled(String arg0) {
-		//Función de onLocationListener - No se utiliza
-		
+		//Función de onLocationListener - No se utiliza		
 	}
 
 
@@ -443,19 +418,17 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
        //Comprobar si la nueva ubicación es más o menos reciente que la anterior
        long timeDelta = location.getTime() - currentBestLocation.getTime();
-       boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
-       boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
        boolean isNewer = timeDelta > 0;
 
-       // Si hace más de dos minutos de la última ubicación, usar la nueva por si el usuario 
-       // se ha movido
-       if (isSignificantlyNewer) {
-           return true;           
-       } else if (isSignificantlyOlder) {
+        // Si hace más de dos minutos de la última ubicación ->nueva es mejor
+       if (timeDelta > TWO_MINUTES) {
+           return true;
+           //Si la nueva ubicación es antigua -> nueva es peor
+       } else if (timeDelta < -TWO_MINUTES) {
            return false;
        }
 
-       // Comprobar las precisiones de las ubicaciones
+
        int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
        boolean isLessAccurate = accuracyDelta > 0;
        boolean isMoreAccurate = accuracyDelta < 0;
@@ -495,53 +468,37 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     */
    private void updateData(final double lat, final double lon, final double alt) {
 	   if (isDataSourcesInit) {
-	       try {
-	    	   DOWNLOADS_SERVICE.execute(
-	    			   new Runnable() {
-	    				   public void run() {
-	    					   //TODO: Si la distancia no ha variado mucho, no descargar (se hace en onLocationChanged)
-	    					   for (NetworkDataProvider2 source : SOURCES.values()) {
-	    						   download(source, lat, lon, alt);
-	    					   }
-	    						   
-	    				   }
-	    			   }
-	           );
-	       } catch (RejectedExecutionException rej) {
-	           Log.w("FragmentModoCamara", "Not running new download Runnable, queue is full.");
-	       } catch (Exception e) {
-	           Log.e("FragmentModoCamara", "Exception running download Runnable.",e);
-	       }
+		   
+		   Cursor poisByLocation = getContentResolver().query(
+				   PoiContract.PoiEntry
+				   .buildLocationUriWithCoords(Double.toString(lat), Double.toString(lon)),
+				   null, 
+				   null, 
+				   null, 
+				   null);
+		   
+		   if (poisByLocation != null && poisByLocation.moveToFirst()) {
+			   Log.d(LOG_TAG,"poisfrom LOCATION");
+			   ARDataSource.addPoisFromCursor(poisByLocation);
+		   }else{
+			   //TODO: Esto solo deberia llamarse una vez que tenemos una posición muy exacta...porque si no, se insertan mal los puntos
+			   //http://developer.android.com/training/location/retrieve-current.html
+			   NetworkInfo ni = ((ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE))
+					   	.getActiveNetworkInfo();
+			   
+			   
+			   if (ni != null && ni.isConnected()) {
+				   Log.d(LOG_TAG,"1poisfrom TASK");
+				   new PoiDownloaderTask(this, NETWORK_POI_SOURCES).execute();
+			   }else{
+				   mostrarNetworkAlert();
+			   }
+		   }
+		   poisByLocation.close();
 	   }
    }
    
-   
-   private static boolean download(NetworkDataProvider2 source, double lat, double lon, double alt) {
-		if (source == null) {
-			return false;
-		}
-		
-		String url = null;
-		try {
-			url = source.createRequestURL(lat, lon, alt, ARDataSource.getRadius(), LOCALE, USERNAME);
-			Log.d("mainactivity","createrequestURL de:"+url);
-		} catch (NullPointerException e) {
-			return false;
-		}
-   	
-		List<Poi> pois = null;
-		try {
-			pois = source.parse(url);
-		} catch (NullPointerException e) {
-			return false;
-		}
-		
-		ARDataSource.addPois(pois);
-		
-		
-		return true;
-   }
-   
+ 
    
    /**
     * Método con el que se lee cada ajuste que pueda haber aplicado el usuario para que se 
@@ -554,17 +511,17 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	   //Obtenemos la distancia hasta la que se buscan PI en los ajustes
 	   SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	   mRadarSearch = prefs.getInt(getString(R.string.pref_seekBar_distance_key),0);
-	   ARDataSource.updateDataWithMaxDistance(mRadarSearch);
+	   ARDataSource.updateRadarDistance(mRadarSearch);
 	   
 	   
 	   
-	   /***********Recorriendo todas las preferencias almacenadas******************/
+	   /***********Recorriendo todas las preferencias almacenadas******************
 	   Map<String,?> keys = prefs.getAll();
 	   Log.d("map values!","En prefs hay: "+ keys.size()+ " valores");
 	   for(Map.Entry<String,?> entry : keys.entrySet()) {
 		   Log.d("map values!",entry.getKey() + ": " +  entry.getValue().toString());
 	   }
-	   /************************************/
+	   ************************************/
 	   
    }
    
@@ -580,6 +537,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		boolean isNetworkEnabled = false;
 		Time now = new Time();
 		
+		
+		//TODO: En este enlace está la forma de obtener la posición y poner una pantalla de buscando mientras tanto
+		//http://stackoverflow.com/questions/11752961/how-to-show-a-progress-spinner-in-android-when-doinbackground-is-being-execut
 		
 		
 		now.setToNow();
@@ -618,7 +578,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     	   
     	   
 			if (!isGPSEnabled && !isNetworkEnabled) {
-				mostrarSettingsAlert();
+				mostrarLocationSettingsAlert();
 			}
     	   
 			//Si hay posición de los dos proveedores nos quedamos con la mejor
@@ -717,7 +677,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     * Método para avisar de que no se puede obtener ubicación en el dispositivo. Se mostrará
     * un cuadro de diálogo que permite activar las funciones de localización.
     */
-   private void mostrarSettingsAlert(){
+   private void mostrarLocationSettingsAlert(){
        AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);
 
        ventanaAlerta.setTitle(getString(R.string.alert_location_title));
@@ -742,6 +702,48 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         	   
         	   dialog.cancel();
         	   toast.show();
+           }
+       });
+
+       //Mostrar la ventana
+       ventanaAlerta.show();
+   }
+   
+   
+   /**
+    * Método para avisar de que no hay conexión a Internet para descargar datos.
+    */
+   private void mostrarNetworkAlert () {
+	   Log.d(LOG_TAG,"MostrarNetworkAlert: ha entrado ahora y iscreated es "+isCreated);
+	   if (!isCreated) {
+		   return;
+	   }
+	   
+	   AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);
+
+       ventanaAlerta.setTitle(getString(R.string.alert_network_title));
+       ventanaAlerta.setMessage(getString(R.string.alert_network_message));
+
+       //Si se pulsa el botón de ajustes, abrir los ajustes de localización
+       ventanaAlerta.setPositiveButton(getString(R.string.alert_network_positive_button),
+    		   											new DialogInterface.OnClickListener() {
+    	   public void onClick(DialogInterface dialog, int which) {
+               Intent intent = new Intent(Settings.ACTION_SETTINGS);
+               startActivity(intent);
+           }
+       });
+
+       //Si se pulsa el botón de cancelar, cerrar la ventana de diálogo
+       ventanaAlerta.setNegativeButton(getString(R.string.alert_network_negative_button), 
+    		   											new DialogInterface.OnClickListener() {
+           public void onClick(DialogInterface dialog, int which) {
+        	   Toast toast = Toast.makeText(getApplicationContext(), 
+        			   				getString(R.string.alert_network_negative_message), 
+        			   				Toast.LENGTH_LONG);
+        	   
+        	   dialog.cancel();
+        	   toast.show();
+        	   stopRememberNoNetwork = true;
            }
        });
 
@@ -782,14 +784,17 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	 * Método para cargar los distintos proveedores de datos disponibles. En este método no se
 	 * descargan datos, solamente se preparan los proveedores. 
 	 */
-	private void cargarPIs() {
+	private void setPoiProviders() {
 		//Ahora se cargan en memoria los PIs disponibles en el dispositivo
-		LocalDataProvider localData = new LocalDataProvider(getResources());
-		ARDataSource.addPois(localData.getPois());
+//		LocalDataProvider localData = new LocalDataProvider(getResources());
+//		ARDataSource.addPois(localData.getPois());
 		
 		//Se añaden recursos a la colección SOURCES para descargar PIs
-		NetworkDataProvider2 wikipedia = new WikipediaDataProvider2(getResources());
-		SOURCES.put("wiki",wikipedia);
+		NetworkDataProvider wikipedia = new WikipediaDataProvider(getResources());
+		NETWORK_POI_SOURCES.put("wiki",wikipedia);
+		
+		NetworkDataProvider local = new WikipediaDataProvider(getResources());
+		NETWORK_POI_SOURCES.put("local",local);
 		
 		isDataSourcesInit = true;
 	}

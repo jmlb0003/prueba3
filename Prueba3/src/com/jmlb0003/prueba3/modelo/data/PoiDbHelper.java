@@ -75,7 +75,7 @@ public class PoiDbHelper extends SQLiteOpenHelper {
 
                 PoiEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 
-                PoiEntry.COLUMN_USUARIO_KEY + " INTEGER NOT NULL DEFAULT 1, " +
+				PoiEntry.COLUMN_POI_USER_ID + " INTEGER NOT NULL DEFAULT 1, " +
                 PoiEntry.COLUMN_POI_NAME + " TEXT NOT NULL, " +
                 PoiEntry.COLUMN_POI_COLOR + " INTEGER NOT NULL, " +
                 PoiEntry.COLUMN_POI_IMAGE + " TEXT NOT NULL," +
