@@ -10,12 +10,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.ContentValues;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.data.PoiContract;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
 
@@ -28,35 +24,8 @@ import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
  */
 public class WikipediaDataProvider extends NetworkDataProvider {
 	private static final String BASE_URL = "http://api.geonames.org/findNearbyWikipediaJSON";
-	private static final String LOG_TAG = "WikipediaPRovider";
-
-	private static Bitmap sIcon = null;
-	private static Bitmap sSelectedIcon = null;
-	private static Bitmap sWikipediaIcon = null;
+	private static final String LOG_TAG = "WikipediaProvider";
 	
-	private Resources mResources;
-
-
-	
-	
-	/**
-	 * Constructor de la clase para poder descargar recursos geolocalizados de Wikipedia
-	 * @param res
-	 */
-	public WikipediaDataProvider(Resources res) {
-		if (res == null) {
-	    	throw new NullPointerException();
-	    }
-        
-		mResources = res;
-        createIcon();
-	}
-
-    private void createIcon() {
-        sIcon = BitmapFactory.decodeResource(mResources, R.drawable.icono_pi);
-        sSelectedIcon = BitmapFactory.decodeResource(mResources, R.drawable.icono_pi_seleccionado);
-        sWikipediaIcon = BitmapFactory.decodeResource(mResources, R.drawable.wikipedia);
-    }
 
     
     /**
@@ -103,6 +72,7 @@ public class WikipediaDataProvider extends NetworkDataProvider {
         final String WIKI_LATITUDE = "lat";
         final String WIKI_LONGITUDE = "lng";
         final String WIKI_ALTITUDE = "elevation";
+        final String WIKI_IMAGE = "thumbnailImg";
         
         
         try {
@@ -125,7 +95,7 @@ public class WikipediaDataProvider extends NetworkDataProvider {
 				int color;
 				String name;
 				long userID;
-				int image;
+				String image;
 				String description;
 				String webSite;
 				double lat,lon,alt;
@@ -136,17 +106,13 @@ public class WikipediaDataProvider extends NetworkDataProvider {
 				
 				JSONObject jo = poisArray.getJSONObject(i);
 
-		        if (jo != null && jo.has("title") && jo.has("lat") && jo.has("lng") && jo.has("elevation") ) {
+		        if (jo != null && jo.has(WIKI_NAME) && jo.has(WIKI_LATITUDE) && 
+		        		jo.has(WIKI_LONGITUDE) && jo.has(WIKI_ALTITUDE) ) {
 		        	name = jo.getString(WIKI_NAME);
 		        	userID = PoiContract.PoiEntry.WIKIPEDIA_PROVIDER;
 		        	color = PoiContract.PoiEntry.WIKIPEDIA_COLOR;
-//		        	image = jo.getString(WIKI_IMAGE);
-		        	//Adaptar a la BD que llevaría el String...
-		        	image = R.drawable.wikipedia; //"android.resource://com.jmlb0003.prueba3/drawable/wikipedia.png";
 		        	description = jo.getString(WIKI_DESC);
 		        	webSite = jo.getString(WIKI_WEB);
-//		        	lat = jo.getDouble(WIKI_LATITUDE);
-//		        	lon = jo.getDouble(WIKI_LONGITUDE);
 		        	lat = new BigDecimal(jo.getDouble(WIKI_LATITUDE))
 		        				.setScale(6,BigDecimal.ROUND_FLOOR).doubleValue();
 		        	lon = new BigDecimal(jo.getDouble(WIKI_LONGITUDE))
@@ -157,6 +123,12 @@ public class WikipediaDataProvider extends NetworkDataProvider {
 		        	closeTime = 0;
 		        	maxAge = 0;
 		        	minAge = 0;
+		        	
+		        	if (jo.has(WIKI_IMAGE)) {
+		        		image = jo.getString(WIKI_IMAGE);
+		        	}else{
+		        		image = "http://www.gratisylegal.com/2009/02/wikipedia.html";
+		        	}
 
 		        	ContentValues poiValues = new ContentValues();
 

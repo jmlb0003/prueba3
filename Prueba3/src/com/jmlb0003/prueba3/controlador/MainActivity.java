@@ -36,7 +36,6 @@ import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.modelo.data.PoiContract;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
-import com.jmlb0003.prueba3.modelo.sync.LocalDataProvider;
 import com.jmlb0003.prueba3.modelo.sync.NetworkDataProvider;
 import com.jmlb0003.prueba3.modelo.sync.PoiDownloaderTask;
 import com.jmlb0003.prueba3.modelo.sync.WikipediaDataProvider;
@@ -790,10 +789,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 //		ARDataSource.addPois(localData.getPois());
 		
 		//Se añaden recursos a la colección SOURCES para descargar PIs
-		NetworkDataProvider wikipedia = new WikipediaDataProvider(getResources());
+		NetworkDataProvider wikipedia = new WikipediaDataProvider();
 		NETWORK_POI_SOURCES.put("wiki",wikipedia);
 		
-		NetworkDataProvider local = new WikipediaDataProvider(getResources());
+		NetworkDataProvider local = new WikipediaDataProvider();
 		NETWORK_POI_SOURCES.put("local",local);
 		
 		isDataSourcesInit = true;

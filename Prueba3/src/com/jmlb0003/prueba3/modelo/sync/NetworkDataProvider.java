@@ -175,7 +175,7 @@ public abstract class NetworkDataProvider {
         	throw new NullPointerException();
         }
 
-        Log.d(LOG_TAG,"llamando con el json");
+
         return getDataFromJSON(json);
     }
     

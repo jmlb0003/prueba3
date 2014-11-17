@@ -1,18 +1,18 @@
 package com.jmlb0003.prueba3.vista;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.Poi;
+import com.jmlb0003.prueba3.modelo.sync.LoadPoisImagesTask;
 
 
 /**
@@ -21,8 +21,9 @@ import com.jmlb0003.prueba3.modelo.Poi;
  * @see http://developer.android.com/training/custom-views/create-view.html
  */
 public class BasicDetailsView extends ScrollView {
-	
+	private static final String LOG_TAG = "BasicDetails";
 	private RelativeLayout mContainer = null;
+	private ProgressBar mProgressBar;
 	private Context mContext;
 
 	public BasicDetailsView(Context context) {
@@ -61,7 +62,7 @@ public class BasicDetailsView extends ScrollView {
 			setDescription(m);
 			
 		}else {
-			Log.d("BASICDETAILS","No hay container...");
+			Log.d(LOG_TAG,"No hay container...");
 		}
 		
 
@@ -69,18 +70,30 @@ public class BasicDetailsView extends ScrollView {
 	
 	
 	private void setImage(Poi p) {
+		mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 		ImageView img = (ImageView) mContainer.findViewById(R.id.pi_image_container);
-		Bitmap bm = BitmapFactory.decodeResource(mContext.getResources(), p.getImage());
-		if (img != null && bm != null) {
-			img.setImageBitmap(bm);
-			img.setContentDescription("Fotografía de "+p.getName());			
-		}else{
-			Log.d("BASICDETAILS","No hay IMG container... O no hay imagen para ponerle...");
-			
-			if (bm == null){
-				Log.d("BASICDETAILS","No hay imagen para ponerle...");
-			}
+		
+		if (mProgressBar == null || img == null) {
+			return;
 		}
+
+
+		new LoadPoisImagesTask(p.getImage(), mProgressBar, img, mContext).execute();
+
+		img.setContentDescription("Fotografía de "+p.getName());
+		
+//		ImageView img = (ImageView) mContainer.findViewById(R.id.pi_image_container);
+//		Bitmap bm = BitmapFactory.decodeResource(mContext.getResources(), p.getImage());
+//		if (img != null && bm != null) {
+//			img.setImageBitmap(bm);
+//			img.setContentDescription("Fotografía de "+p.getName());			
+//		}else{
+//			Log.d("BASICDETAILS","No hay IMG container... O no hay imagen para ponerle...");
+//			
+//			if (bm == null){
+//				Log.d("BASICDETAILS","No hay imagen para ponerle...");
+//			}
+//		}
 	}
 	
 	
@@ -89,7 +102,7 @@ public class BasicDetailsView extends ScrollView {
 		if (name != null) {
 			name.setText(m.getName());
 		}else{
-			Log.d("BASICDETAILS","No hay name container...");
+			Log.d(LOG_TAG,"No hay name container...");
 		}
 	}
 	
@@ -98,7 +111,7 @@ public class BasicDetailsView extends ScrollView {
 		if (distance != null) {			
 			distance.setText(m.getTextDistance());
 		}else{
-			Log.d("BASICDETAILS","No hay distance container...");
+			Log.d(LOG_TAG,"No hay distance container...");
 		}
 	}
 	
@@ -108,7 +121,7 @@ public class BasicDetailsView extends ScrollView {
 		if (description != null) {
 			description.setText(m.getDescription());
 		}else{
-			Log.d("BASICDETAILS","No hay description container...");
+			Log.d(LOG_TAG,"No hay description container...");
 		}
 	}
 	

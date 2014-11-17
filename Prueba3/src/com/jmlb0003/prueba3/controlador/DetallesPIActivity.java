@@ -1,23 +1,26 @@
 package com.jmlb0003.prueba3.controlador;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.Poi;
+import com.jmlb0003.prueba3.modelo.sync.LoadPoisImagesTask;
 
 public class DetallesPIActivity extends ActionBarActivity {
+	private static final String LOG_TAG = "DetallesPIActivity";
+	
 	private Poi mShowedPoi = null;
 	private RelativeLayout mContainer = null;
+	private ProgressBar mProgressBar = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -79,15 +82,27 @@ public class DetallesPIActivity extends ActionBarActivity {
 	
 	
 	private void setImage() {
+		
+		mProgressBar = (ProgressBar) findViewById(R.id.progressBar2);
 		ImageView img = (ImageView) mContainer.findViewById(R.id.pi_image_container2);
-		Bitmap bm = BitmapFactory.decodeResource(getResources(), mShowedPoi.getImage());
-		if (img != null && bm != null) {
-			img.setImageBitmap(bm);
-			
-			img.setContentDescription("Fotografía de "+mShowedPoi.getName());	
-		}else{
-			Log.d("DetallesActivity","No hay IMG container... O no hay imagen para ponerle...");
+		
+		if (mProgressBar == null || img == null) {
+			return;
 		}
+		
+		new LoadPoisImagesTask(mShowedPoi.getImage(), mProgressBar, img, this).execute();
+
+		img.setContentDescription("Fotografía de "+mShowedPoi.getName());
+		
+		
+//		Bitmap bm = BitmapFactory.decodeResource(getResources(), mShowedPoi.getImage());
+//		if (bm != null) {
+//			img.setImageBitmap(bm);
+//			
+//			
+//		}else{
+//			Log.d("DetallesActivity","No hay IMG container... O no hay imagen para ponerle...");
+//		}
 	}
 	
 	

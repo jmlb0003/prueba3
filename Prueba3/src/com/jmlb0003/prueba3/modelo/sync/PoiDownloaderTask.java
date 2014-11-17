@@ -69,7 +69,7 @@ public class PoiDownloaderTask extends AsyncTask<Void, Integer, Void> {
         }
 
     	mProgressDialog = new ProgressDialog(mContext);
-        mProgressDialog.setTitle(R.string.downloading_pois);
+        mProgressDialog.setTitle(R.string.downloading);
         mProgressDialog.setMessage(mContext.getString(R.string.downloading_pois_description));
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
@@ -189,7 +189,7 @@ public class PoiDownloaderTask extends AsyncTask<Void, Integer, Void> {
     			null, 
     			null, 
     			null);
-    	Log.d(LOG_TAG,"2poisfrom TASK");
+
     	ARDataSource.addPoisFromCursor(pois);
     	
     	pois.close();

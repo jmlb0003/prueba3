@@ -197,7 +197,7 @@ public class Poi implements Comparable<Poi> {
 		return -1;
 	}
 	
-	public synchronized long getIDUsuario(){
+	public synchronized long getUserId(){
 		if (mDetails.getDetalle(DetallesPI.DETALLESPI_USER_ID) != null) {
 			return (long)mDetails.getDetalle(DetallesPI.DETALLESPI_USER_ID);
 		}
@@ -216,8 +216,8 @@ public class Poi implements Comparable<Poi> {
         return (String) mDetails.getDetalle(DetallesPI.DETALLESPI_DISTANCE);
     }
     
-    public synchronized int getImage() {
-        return (int)mDetails.getDetalle(DetallesPI.DETALLESPI_IMAGE);
+    public synchronized String getImage() {
+        return (String)mDetails.getDetalle(DetallesPI.DETALLESPI_IMAGE);
     }
     
     public synchronized String getDescription() {

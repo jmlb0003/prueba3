@@ -6,16 +6,37 @@
     android:layout_height="match_parent"
     android:padding="16dp" >
     
-    <ImageView 
-        android:id="@+id/pi_image_container2"
-        android:contentDescription="@string/pi_content_description"
+    <FrameLayout 
+        android:id="@+id/pi_image_layout2"
         android:clickable="true"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginBottom="8dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:background="@color/md_blue_100" />
+        android:layout_centerInParent="true"
+        android:background="@color/md_blue_100" >
+        
+        <ImageView 
+	        android:id="@+id/pi_image_container2"
+	        android:visibility="invisible"
+	        android:contentDescription="@string/pi_content_description"
+	        android:clickable="true"
+	        android:layout_width="200dp"
+	        android:layout_height="200dp"
+	        android:layout_marginBottom="8dp"
+	        android:layout_gravity="center"
+	        android:background="@color/md_blue_100" />
+
+        <ProgressBar
+            android:id="@+id/progressBar2"
+            android:visibility="invisible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+        
+    </FrameLayout>
+    
     
     <LinearLayout
         android:id="@+id/name_container2"
@@ -23,7 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_below="@id/pi_image_container2"
+        android:layout_below="@id/pi_image_layout2"
         android:background="@color/blue" >
         <TextView 
             android:text="@string/pi_name"

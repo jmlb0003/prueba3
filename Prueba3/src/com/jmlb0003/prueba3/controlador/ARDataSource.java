@@ -249,7 +249,6 @@ public abstract class ARDataSource {
     		
     		//TODO: Asignar el bitmap como identificador
     		/**************************************************************/
-    		Log.d(LOG_TAG,i+"-PI:"+c.getString(c.getColumnIndex(PoiEntry.COLUMN_POI_NAME)));
     		
     		cv.put(DetallesPI.DETALLESPI_ID_POI,
     				c.getLong(c.getColumnIndex(PoiEntry._ID)));
@@ -267,7 +266,7 @@ public abstract class ARDataSource {
     		cv.put(DetallesPI.DETALLESPI_COLOR, 
     				c.getInt(c.getColumnIndex(PoiEntry.COLUMN_POI_COLOR)));
     		cv.put(DetallesPI.DETALLESPI_IMAGE, 
-    				c.getInt(c.getColumnIndex(PoiEntry.COLUMN_POI_IMAGE)));
+    				c.getString(c.getColumnIndex(PoiEntry.COLUMN_POI_IMAGE)));
     		cv.put(DetallesPI.DETALLESPI_DESCRIPTION, 
     				c.getString(c.getColumnIndex(PoiEntry.COLUMN_POI_DESCRIPTION)));
     		cv.put(DetallesPI.DETALLESPI_WEBSITE,
@@ -303,13 +302,12 @@ public abstract class ARDataSource {
     		Map<String, Object> details = new HashMap<>();
     		details.put(DetallesPI.DETALLESPI_ID_POI,
     				pv.getAsLong(DetallesPI.DETALLESPI_ID_POI));
-    		Log.d(LOG_TAG, "Metido el idpoi "+pv.getAsLong(DetallesPI.DETALLESPI_ID_POI));
     		details.put(DetallesPI.DETALLESPI_USER_ID, 
     				pv.getAsLong(DetallesPI.DETALLESPI_USER_ID));
     		details.put(DetallesPI.DETALLESPI_COLOR, 
     				pv.getAsInteger(DetallesPI.DETALLESPI_COLOR));
     		details.put(DetallesPI.DETALLESPI_IMAGE, 
-    				pv.getAsInteger(DetallesPI.DETALLESPI_IMAGE));
+    				pv.getAsString(DetallesPI.DETALLESPI_IMAGE));
     		details.put(DetallesPI.DETALLESPI_DESCRIPTION, 
     				pv.getAsString(DetallesPI.DETALLESPI_DESCRIPTION));
     		details.put(DetallesPI.DETALLESPI_WEBSITE,
@@ -332,8 +330,23 @@ public abstract class ARDataSource {
     				pv.getAsDouble(DetallesPI.DETALLESPI_LONGITUDE), 
     				pv.getAsDouble(DetallesPI.DETALLESPI_ALTITUDE), 
     				new DetallesPI(details));
-    		//TODO: Los bitmaps se pondrán en la mainActivity O asignar aqui el identificador R.string.drawable no se que...según el tipo de PI
-    		/************************************************/
+
+    		//TODO: Los bitmaps se pondrán aqui
+    		/************************************************
+    		 * 
+    		 * 1º Asignar los iconos de augmentedView
+    		 * 
+    		 * 
+    		 * Al solicitar una imagen, buscarla en memoria, si no esta:
+    		 * Abrir un downloaderImages como está y guardarla en memoria
+    		 * 
+    		 * 
+    		 * 
+    		 * 
+    		 * 
+    		 * 
+    		 * 
+    		 */
     	    if (!POI_LIST.containsKey(poi.getID())) {
     	        poi.calcRelativePosition(ARDataSource.getCurrentLocation());
     	        POI_LIST.put(poi.getID(), poi);

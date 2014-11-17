@@ -11,22 +11,25 @@
     <string name="content_authority">"com.jmlb0003.prueba3"</string>
     
     <!-- Ventana de diálogo de descarga de PIs -->
-    <string name="downloading_pois">Descargando&#8230;</string>
-    <string name="downloading_pois_description">Estamos descargando los lugares de interés. Pronto estarán listos.</string>
+    <string name="downloading">Descargando&#8230;</string>
+    <string name="downloading_pois_description">Estamos descargando los Puntos de Interés. Pronto estarán listos.</string>
+    
+    <!-- Tarea de descarga de imágenes -->
+    <string name="downloading_images_de"></string>
 
     <!-- Ventana de diálogo de ajustes de ubicación -->
     <string name="alert_location_title">Ajustes de ubicación</string>
     <string name="alert_location_message">No se puede ubicar su dispositivo. Por favor, active alguna opción de ubicación.</string>
     <string name="alert_location_positive_button">Ir a Ajustes</string>
     <string name="alert_location_negative_button">Cerrar</string>
-    <string name="alert_location_negative_message">Si quiere que la app funcione, tiene que activar alguna opción de ubicación en los ajustes.</string>
+    <string name="alert_location_negative_message">Para que la app funcione tiene que activar alguna opción de ubicación en los ajustes.</string>
     
     <!-- Ventana de diálogo de ajustes de conexión a Internet -->
     <string name="alert_network_title">Ajustes de Internet</string>
-    <string name="alert_network_message">No se pueden descargar lugares de interés. Por favor, active alguna conexión a Internet.</string>
+    <string name="alert_network_message">No se pueden descargar Puntos de Interés. Por favor, active alguna conexión a Internet.</string>
     <string name="alert_network_positive_button">Ir a Ajustes</string>
     <string name="alert_network_negative_button">Cerrar</string>
-    <string name="alert_network_negative_message">Se necesita una conexión a Internet para obtener los datos de lugares de interés cercanos y para mostrar el mapa.</string>
+    <string name="alert_network_negative_message">Se necesita conexión a Internet para obtener los datos de Puntos de Interés y para mostrar el mapa.</string>
 
     <!-- Ventana de diálogo de ubicación -->
     <string name="alert_location2_title">Buscando ubicación</string>

@@ -78,7 +78,7 @@ public class AugmentedView extends View {
 		if (canvas == null) {
     		return;
     	}
-//TODO: aqui hay que mejorar esto para el manejo de los PIs que hay en memoria y tal...
+
         if (sDrawing.compareAndSet(false, true)) { 
 	        List<Poi> collection = ARDataSource.getPois();
 
@@ -86,6 +86,7 @@ public class AugmentedView extends View {
             for (Poi m : collection) {
                 m.update(canvas, 0, 0);
                 if (m.isOnRadar() && m.isInView()) {
+                	//TODO: Poner el icono y después añadirlo para que se muestre
                 	COLLECTION_CACHE.add(m);
                 }
 	        }
