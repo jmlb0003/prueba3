@@ -107,29 +107,6 @@ public class PoiDownloaderTask extends AsyncTask<Void, Integer, Void> {
             }
         }
         
-        /************* Metiendo los datos del LocalDataProvider ***********************
-        LocalDataProvider lp = new LocalDataProvider(mContext.getResources());
-        ArrayList<ContentValues> poiData = new ArrayList<>();
-    	poiData = lp.fetchData();
-
-    	Log.d(LOG_TAG,"1 con size:"+poiData.size());
-    	if (poiData.size() > 0) {
-    		Log.d(LOG_TAG,"2");
-    		//Hacemos una trampa para añadir el idLocation al final de poiData
-    		idLocationValue.clear();
-    		idLocationValue.put(PoiContract.LocationEntry._ID, idLocation);        		
-    		poiData.add(idLocationValue);
-    		
-            ContentValues[] poisToInsert = new ContentValues[poiData.size()];
-            poiData.toArray(poisToInsert);
-            int n = mContext.getContentResolver().bulkInsert(
-            		PoiEntry.CONTENT_URI, poisToInsert);
-            
-            Log.d(LOG_TAG,"3 con numero de insertados:"+n);
-            //Ahora cargamos en memoria los PIs de este proveedor
-            cargarPIs();
-        }
-    	*****************************************************************************/
         
         mProgressDialog.dismiss();
         mProgressDialog = null;

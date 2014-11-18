@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.util.Log;
 
@@ -80,6 +81,10 @@ public abstract class ARDataSource {
     /**Variable donde se almacena la referencia del PI seleccionado en pantalla**/
     public static Poi SelectedPoi = null;
     
+    /** Colección que contiene los iconos de los PIs mostrados en pantalla. Muy importante 
+     * inicializar en cuanto arranca la app
+     */
+    public static HashMap<String, Bitmap> sPoiIcons = new HashMap<>();
 
     /**
      * Método para obtener el actual radio del radar
@@ -247,9 +252,6 @@ public abstract class ARDataSource {
     		c.moveToPosition(i);
     		ContentValues cv = new ContentValues();
     		
-    		//TODO: Asignar el bitmap como identificador
-    		/**************************************************************/
-    		
     		cv.put(DetallesPI.DETALLESPI_ID_POI,
     				c.getLong(c.getColumnIndex(PoiEntry._ID)));
     		cv.put(DetallesPI.DETALLESPI_NAME, 
@@ -291,13 +293,14 @@ public abstract class ARDataSource {
     	
     	
     }
+    
+    
     public static void addPoisFromValues(Collection<ContentValues> poiList) {
     	if (poiList == null || poiList.size() <= 0) {
     		return;
     	}
 
     	for(ContentValues pv : poiList) {
-    		Log.d(LOG_TAG, "metiendo el poi "+pv.getAsString(DetallesPI.DETALLESPI_NAME)+" en la lista");
     		
     		Map<String, Object> details = new HashMap<>();
     		details.put(DetallesPI.DETALLESPI_ID_POI,
@@ -329,24 +332,11 @@ public abstract class ARDataSource {
     				pv.getAsDouble(DetallesPI.DETALLESPI_LATITUDE), 
     				pv.getAsDouble(DetallesPI.DETALLESPI_LONGITUDE), 
     				pv.getAsDouble(DetallesPI.DETALLESPI_ALTITUDE), 
-    				new DetallesPI(details));
+    				new DetallesPI(details),
+    				sPoiIcons.get(DetallesPI.DETALLESPI_ICON),
+    				sPoiIcons.get(DetallesPI.DETALLESPI_SELECTED_ICON));
 
-    		//TODO: Los bitmaps se pondrán aqui
-    		/************************************************
-    		 * 
-    		 * 1º Asignar los iconos de augmentedView
-    		 * 
-    		 * 
-    		 * Al solicitar una imagen, buscarla en memoria, si no esta:
-    		 * Abrir un downloaderImages como está y guardarla en memoria
-    		 * 
-    		 * 
-    		 * 
-    		 * 
-    		 * 
-    		 * 
-    		 * 
-    		 */
+
     	    if (!POI_LIST.containsKey(poi.getID())) {
     	        poi.calcRelativePosition(ARDataSource.getCurrentLocation());
     	        POI_LIST.put(poi.getID(), poi);

@@ -10,6 +10,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -33,6 +35,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.jmlb0003.prueba3.R;
+import com.jmlb0003.prueba3.modelo.DetallesPI;
 import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.modelo.data.PoiContract;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
@@ -41,7 +44,7 @@ import com.jmlb0003.prueba3.modelo.sync.PoiDownloaderTask;
 import com.jmlb0003.prueba3.modelo.sync.WikipediaDataProvider;
 
 /*
- * TODO Orden de los imports CODE GUIDELINES
+ * //TODO Orden de los imports CODE GUIDELINES
  * Android imports
  * Imports from third parties (com, junit, net, org)
  * java and javax
@@ -191,7 +194,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
 		
 		setPoiProviders();
+		setPoiIcons();
 		aplicarValoresDeAjustes();
+		
+		
+		
 		
 		
 		/**********************************************************************************/
@@ -199,8 +206,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 	}// Fin de onCreate()
 	
-	
-	
+
+
 	
 	/**
 	 * Se llama cada vez que la actividad está preparada para interactuar con el usuario.
@@ -483,8 +490,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			   //TODO: Esto solo deberia llamarse una vez que tenemos una posición muy exacta...porque si no, se insertan mal los puntos
 			   //http://developer.android.com/training/location/retrieve-current.html
 			   NetworkInfo ni = ((ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE))
-					   	.getActiveNetworkInfo();
-			   
+					   	.getActiveNetworkInfo();			   
 			   
 			   if (ni != null && ni.isConnected()) {
 				   Log.d(LOG_TAG,"1poisfrom TASK");
@@ -779,6 +785,19 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
        ventanaAlerta.show();
    }
    
+   
+   /**
+	 * Aquí se crean y almacenan los iconos de los PIs que se utilizarán en la app. Si hay alguna
+	 * distinción entre los iconos de los PIs, aquí han de guardarse todos los que hagan falta.
+	 */
+	private void setPoiIcons() {
+		ARDataSource.sPoiIcons.put(DetallesPI.DETALLESPI_ICON, 
+				BitmapFactory.decodeResource(getResources(), R.drawable.icono_pi));
+		ARDataSource.sPoiIcons.put(DetallesPI.DETALLESPI_SELECTED_ICON, 
+				BitmapFactory.decodeResource(getResources(), R.drawable.icono_pi_seleccionado));
+	}
+	
+	
    /**
 	 * Método para cargar los distintos proveedores de datos disponibles. En este método no se
 	 * descargan datos, solamente se preparan los proveedores. 

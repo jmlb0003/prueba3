@@ -127,7 +127,7 @@ public class WikipediaDataProvider extends NetworkDataProvider {
 		        	if (jo.has(WIKI_IMAGE)) {
 		        		image = jo.getString(WIKI_IMAGE);
 		        	}else{
-		        		image = "http://www.gratisylegal.com/2009/02/wikipedia.html";
+		        		image = PoiContract.PoiEntry.WIKIPEDIA_DEFAULT_IMAGE;
 		        	}
 
 		        	ContentValues poiValues = new ContentValues();

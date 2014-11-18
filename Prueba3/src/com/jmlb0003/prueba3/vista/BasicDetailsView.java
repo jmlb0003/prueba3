@@ -78,22 +78,10 @@ public class BasicDetailsView extends ScrollView {
 		}
 
 
-		new LoadPoisImagesTask(p.getImage(), mProgressBar, img, mContext).execute();
+		new LoadPoisImagesTask(p, mProgressBar, img, mContext).execute();
 
 		img.setContentDescription("Fotografía de "+p.getName());
-		
-//		ImageView img = (ImageView) mContainer.findViewById(R.id.pi_image_container);
-//		Bitmap bm = BitmapFactory.decodeResource(mContext.getResources(), p.getImage());
-//		if (img != null && bm != null) {
-//			img.setImageBitmap(bm);
-//			img.setContentDescription("Fotografía de "+p.getName());			
-//		}else{
-//			Log.d("BASICDETAILS","No hay IMG container... O no hay imagen para ponerle...");
-//			
-//			if (bm == null){
-//				Log.d("BASICDETAILS","No hay imagen para ponerle...");
-//			}
-//		}
+	
 	}
 	
 	

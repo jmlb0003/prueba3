@@ -90,19 +90,10 @@ public class DetallesPIActivity extends ActionBarActivity {
 			return;
 		}
 		
-		new LoadPoisImagesTask(mShowedPoi.getImage(), mProgressBar, img, this).execute();
+		new LoadPoisImagesTask(mShowedPoi, mProgressBar, img, this).execute();
 
 		img.setContentDescription("Fotografía de "+mShowedPoi.getName());
 		
-		
-//		Bitmap bm = BitmapFactory.decodeResource(getResources(), mShowedPoi.getImage());
-//		if (bm != null) {
-//			img.setImageBitmap(bm);
-//			
-//			
-//		}else{
-//			Log.d("DetallesActivity","No hay IMG container... O no hay imagen para ponerle...");
-//		}
 	}
 	
 	

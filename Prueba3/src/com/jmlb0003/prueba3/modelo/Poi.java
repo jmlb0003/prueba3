@@ -124,21 +124,6 @@ public class Poi implements Comparable<Poi> {
     /**Variable que contiene otros atributos del PI**/    
     private DetallesPI mDetails = new DetallesPI(null);
     
-    /**
-     * Constructor de la clase Poi sin icono.
-     * @param name
-     * @param latitude
-     * @param longitude
-     * @param altitude
-     * @param otrosDetalles
-     */
-	public Poi(String name, double latitude, double longitude, double altitude, 
-																DetallesPI otrosDetalles) {
-		set(name, latitude, longitude, altitude, otrosDetalles);
-		mBitmap = null;
-		mSelectedBitmap = null;
-		mCurrentBitmap = mBitmap;
-	}
 	
 	
     /**

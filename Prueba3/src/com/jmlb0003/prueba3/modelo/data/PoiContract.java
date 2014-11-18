@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.jmlb0003.prueba3.R;
+
 import android.content.ContentUris;
 import android.graphics.Color;
 import android.net.Uri;
@@ -239,6 +241,8 @@ public class PoiContract {
         /** Constantes para distinguir el tipo de proveedor de PIs **/
         public static final int WIKIPEDIA_PROVIDER = 1;
         public static final int WIKIPEDIA_COLOR = Color.WHITE;
+        public static final String WIKIPEDIA_DEFAULT_IMAGE = "android.resource://" +
+        								CONTENT_AUTHORITY + "/" + R.drawable.wikipedia;
         
         public static final int GOOGLE_PLACES_PROVIDER = 2;
         public static final int GOOGLE_COLOR = Color.RED;

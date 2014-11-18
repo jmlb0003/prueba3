@@ -3,19 +3,13 @@ package com.jmlb0003.prueba3.modelo.sync;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.json.JSONObject;
 
 import android.content.ContentValues;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Log;
 
-import com.jmlb0003.prueba3.R;
-import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.modelo.data.PoiContract;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
 
@@ -27,28 +21,8 @@ import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
  */
 public class LocalDataProvider extends NetworkDataProvider {
 	private static final String LOG_TAG = "LocalDataProvider";
-	
-    private List<Poi> cachedPois = new ArrayList<Poi>();
-    private static Bitmap sIcon = null;
-    private static Bitmap sSelectedIcon = null;
     
-    public LocalDataProvider(Resources res) {
-        if (res == null) {
-        	throw new NullPointerException();
-        }
-        
-        createIcons(res);
-    }
-    
-    
-    protected void createIcons(Resources res) {
-        if (res == null) {
-        	throw new NullPointerException();
-        }
-        
-        sIcon = BitmapFactory.decodeResource(res, R.drawable.icono_pi);
-        sSelectedIcon = BitmapFactory.decodeResource(res, R.drawable.icono_pi_seleccionado);
-    }
+
     
     /*
     public List<Poi> getPois() {

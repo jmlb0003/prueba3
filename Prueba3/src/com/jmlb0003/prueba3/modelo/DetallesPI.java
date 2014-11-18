@@ -24,6 +24,8 @@ public class DetallesPI {
     public static final String DETALLESPI_COLOR = "color";
     public static final String DETALLESPI_DISTANCE = "distancia";
     public static final String DETALLESPI_IMAGE = "imagen";
+    public static final String DETALLESPI_ICON = "icono";
+    public static final String DETALLESPI_SELECTED_ICON = "icono_seleccionado";    
     public static final String DETALLESPI_DESCRIPTION = "descripcion";
     public static final String DETALLESPI_WEBSITE = "sitio_web";
     public static final String DETALLESPI_PRICE = "precio";
