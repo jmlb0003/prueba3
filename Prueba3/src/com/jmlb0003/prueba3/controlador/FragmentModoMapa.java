@@ -494,6 +494,9 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 		mBasicDetails.setVisibility(View.INVISIBLE);
 	}
 
+	
+	
+	//TODO: Arreglar para que se muestren los detalles en la pantalla del mapa
 
 
 }

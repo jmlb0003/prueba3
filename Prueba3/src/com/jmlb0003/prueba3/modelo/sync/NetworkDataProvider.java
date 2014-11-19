@@ -20,13 +20,11 @@ import android.util.Log;
 
 
 /**
- * Clase abstracta que forma parte del paquete Controlador de la app. Se encarga de 
- * sincronizar/descargar los datos para almacenarlos en la base de datos interna según 
- * la posición actual.
+ * Clase que representa a un proveedor de PIs en Internet.
  * @author Jose
  *
  */
-public abstract class NetworkDataProvider {
+public abstract class NetworkDataProvider extends DataProvider {
 
 	private static final String LOG_TAG = "NetworkDataProvider";
 	

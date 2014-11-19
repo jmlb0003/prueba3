@@ -112,17 +112,9 @@ public class PoiDownloaderTask extends AsyncTask<Void, Integer, Void> {
         mProgressDialog = null;
         return null;
 	}
-	
-	@Override
-	protected void onProgressUpdate(Integer... progress) {
-		super.onProgressUpdate(progress);
-		Log.d(LOG_TAG, "progreso:"+progress[0]);
-		mProgressDialog.setProgress(progress[0]);
-    }
 
 
     protected void onPostExecute() {
-    	Log.d(LOG_TAG, "Fin del asyncTask");
     	mProgressDialog.dismiss();
     	mProgressDialog = null;
     }

@@ -252,6 +252,8 @@ public class PoiContract {
         
         public static final int LOCAL_PROVIDER = 4;
         public static final int LOCAL_COLOR = Color.YELLOW;
+        public static final String LOCAL_DEFAULT_IMAGE = "android.resource://" +
+				CONTENT_AUTHORITY + "/" + R.drawable.local_data;
 
         /**
          * Método que genera la URI de consulta del Content Provider por ID.

@@ -1,6 +1,7 @@
 package com.jmlb0003.prueba3.controlador;
 
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -10,7 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
@@ -39,11 +39,13 @@ import com.jmlb0003.prueba3.modelo.DetallesPI;
 import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.modelo.data.PoiContract;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
+import com.jmlb0003.prueba3.modelo.sync.LocalDataProvider;
+import com.jmlb0003.prueba3.modelo.sync.LocalPoiLoaderTask;
 import com.jmlb0003.prueba3.modelo.sync.NetworkDataProvider;
 import com.jmlb0003.prueba3.modelo.sync.PoiDownloaderTask;
 import com.jmlb0003.prueba3.modelo.sync.WikipediaDataProvider;
 
-/*
+/**
  * //TODO Orden de los imports CODE GUIDELINES
  * Android imports
  * Imports from third parties (com, junit, net, org)
@@ -59,7 +61,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				LocationListener,OnPoiTouchedListener, LoaderCallbacks<Cursor> {
 	
 	/**
-	 * Nomenclatura de variables CODE GUIDELINES
+	 * //TODO:Nomenclatura de variables CODE GUIDELINES
 	 * Non-public, non-static field names start with m.
 	 * Static field names start with s.
 	 * Public static final fields (constants) are ALL_CAPS_WITH_UNDERSCORES.
@@ -92,6 +94,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     /***************CONSTANTES DESCARGAS DE PIs DE LAS DISTINTAS APIs***********************/
     /**Variable que almacena los proveedores online de Puntos de Interés**/
 	private static final Map<String,NetworkDataProvider> NETWORK_POI_SOURCES = new ConcurrentHashMap<String,NetworkDataProvider>();
+	private static final Map<String,LocalDataProvider> LOCAL_POI_SOURCES = new ConcurrentHashMap<String,LocalDataProvider>();
 	
 	
     /**********************VARIABLES LOCALIZACION********************************/
@@ -99,6 +102,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     private static LocationManager sLocationMgr = null;
     //Variable que almacena la posición
     private Location mLocation = null;
+    //Variable donde se almacena la última posición que se utilizó para actualizar los datos
+    private Location mLastUpdateDataLocation = null;
     //Variable que controla si se ha encontrado alguna ubicación válida
     private boolean hayLocation;
     //Variable con el radio de búsqueda de PI del radar
@@ -110,8 +115,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     /**Indica si se han inicializado los recursos de donde se obtienen los PIs**/
     private boolean isDataSourcesInit = false;
     
-    /**Indica si el usuario quiere trabajar sin conexión a Internet**/
-    private boolean stopRememberNoNetwork = false;
     /**Indica si la app está inicializada**/
     private boolean isCreated = false;
     
@@ -230,7 +233,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         	onLocationChanged(mLocation);        	
         	isCreated = true;
 
-        	updateData(mLocation.getLatitude(), mLocation.getLongitude(), mLocation.getAltitude());
+        	updateData(mLocation);
         }
         
     }// Fin de onResume()
@@ -364,7 +367,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		// (más precisa y reciente)
 		if (isBetterLocation(newLocation, ARDataSource.getCurrentLocation())) {
     		Log.d(LOG_TAG,"la posicion nueva es mejor: La:"+newLocation.getLatitude()+" lo:"+newLocation.getLongitude()+" Precision:"+newLocation.getAccuracy()+"\nEl anterior tenia precision: "+ARDataSource.getCurrentLocation().getAccuracy());    		
-    		float locationsDistance = newLocation.distanceTo(ARDataSource.getCurrentLocation());
+    		float locationsDistance = newLocation.distanceTo(mLastUpdateDataLocation);
     		ARDataSource.setCurrentLocation(newLocation);
     		mLocation = newLocation;
 
@@ -376,9 +379,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	        if ( (locationsDistance > MAX_DISTANCE) && (hayLocation) ) {
 	        	Log.d(LOG_TAG,"UPDATEDATA: Hay que llamar a updateData");
 		        //Se actualizan/descargan los PIs según la posición obtenida
-		        updateData(newLocation.getLatitude(),
-		        			newLocation.getLongitude(),
-		        			newLocation.getAltitude());
+		        updateData(newLocation);
 	        }
 		}		
 		
@@ -412,46 +413,54 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	
 	
 	/** 
-	 * Determines whether one Location reading is better than the current Location fix
+	 * Determines whether one Location reading is better than another Location fix
      * @param location  The new Location that you want to evaluate
-     * @param currentBestLocation  The current Location fix, to which you want to compare the new one
+     * @param anotherLocation  Another Location fix, to which you want to compare the new one
      * @see http://developer.android.com/guide/topics/location/strategies.html#BestEstimate
      */
-	private boolean isBetterLocation(Location location, Location currentBestLocation) {
-       if (currentBestLocation == null) {
+	private boolean isBetterLocation(Location location, Location anotherLocation) {
+       if (anotherLocation == null) {
            return true;
        }
 
+       String log = "beterlocation";
        //Comprobar si la nueva ubicación es más o menos reciente que la anterior
-       long timeDelta = location.getTime() - currentBestLocation.getTime();
+       long timeDelta = location.getTime() - anotherLocation.getTime();
        boolean isNewer = timeDelta > 0;
-
+       Log.d(log,"1.1: "+location.getLatitude() + ","+location.getLongitude()+" AC:"+location.getAccuracy()+" aLT:"+location.getAltitude()+"\n");
+       Log.d(log,"1.2: "+anotherLocation.getLatitude() + ","+anotherLocation.getLongitude()+" AC:"+anotherLocation.getAccuracy()+" aLT:"+anotherLocation.getAltitude()+"\n");
         // Si hace más de dos minutos de la última ubicación ->nueva es mejor
        if (timeDelta > TWO_MINUTES) {
+    	   Log.d(log,"2");
            return true;
            //Si la nueva ubicación es antigua -> nueva es peor
        } else if (timeDelta < -TWO_MINUTES) {
+    	   Log.d(log,"3");
            return false;
        }
 
 
-       int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
+       int accuracyDelta = (int) (location.getAccuracy() - anotherLocation.getAccuracy());
        boolean isLessAccurate = accuracyDelta > 0;
        boolean isMoreAccurate = accuracyDelta < 0;
        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
 
        
        boolean isFromSameProvider = isSameProvider(location.getProvider(),
-               currentBestLocation.getProvider());
-
+               anotherLocation.getProvider());
+       Log.d(log,"4");
        // Determinar la mejor localización según las variables calculadas
        if (isMoreAccurate) {
+    	   Log.d(log,"5");
            return true;
        } else if (isNewer && !isLessAccurate) {
+    	   Log.d(log,"6");
            return true;
        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+    	   Log.d(log,"7");
            return true;
        }
+       Log.d(log,"8");
        return false;
    }
 
@@ -468,16 +477,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
    /**
     * Método que actualiza el conjunto de PIs disponibles en memoria según la última localización
     * válida del dispositivo.
-    * @param lat Latitud de la última posición válida del dispositivo
-    * @param lon Longitud de la última posición válida del dispositivo
-    * @param alt Altitud de la última posición válida del dispositivo
+    * @param loc Posición válida del dispositivo
     */
-   private void updateData(final double lat, final double lon, final double alt) {
+   private void updateData(final Location loc) {
 	   if (isDataSourcesInit) {
 		   
 		   Cursor poisByLocation = getContentResolver().query(
 				   PoiContract.PoiEntry
-				   .buildLocationUriWithCoords(Double.toString(lat), Double.toString(lon)),
+				   .buildLocationUriWithCoords(Double.toString(loc.getLatitude()), Double.toString(loc.getLongitude())),
 				   null, 
 				   null, 
 				   null, 
@@ -487,19 +494,20 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			   Log.d(LOG_TAG,"poisfrom LOCATION");
 			   ARDataSource.addPoisFromCursor(poisByLocation);
 		   }else{
-			   //TODO: Esto solo deberia llamarse una vez que tenemos una posición muy exacta...porque si no, se insertan mal los puntos
-			   //http://developer.android.com/training/location/retrieve-current.html
 			   NetworkInfo ni = ((ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE))
 					   	.getActiveNetworkInfo();			   
 			   
 			   if (ni != null && ni.isConnected()) {
 				   Log.d(LOG_TAG,"1poisfrom TASK");
 				   new PoiDownloaderTask(this, NETWORK_POI_SOURCES).execute();
+				   new LocalPoiLoaderTask(this, LOCAL_POI_SOURCES).execute();
 			   }else{
 				   mostrarNetworkAlert();
 			   }
 		   }
 		   poisByLocation.close();
+		   
+		   mLastUpdateDataLocation = loc;
 	   }
    }
    
@@ -530,6 +538,37 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	   
    }
    
+   private Location getBestLastKnownLocation(long minTime) {
+	   	Location bestLocation = null;
+		float bestAccuracy = Float.MAX_VALUE;
+	   	long bestTime = Long.MIN_VALUE;
+	     
+		// Iterate through all the providers on the system, keeping
+		// note of the most accurate result within the acceptable time limit.
+		// If no result is found within maxTime, return the newest Location.
+		List<String> matchingProviders = sLocationMgr.getAllProviders();
+		for (String provider: matchingProviders) {
+			Location location = sLocationMgr.getLastKnownLocation(provider);
+	 
+			if (location != null) {
+				float accuracy = location.getAccuracy();
+				long time = location.getTime();
+	     
+				if ( (time > minTime) && (accuracy < bestAccuracy) ) {	//Tiempo y precisión mejores
+					bestLocation = location;
+					bestAccuracy = accuracy;
+					bestTime = time;
+				}else if ( (time < minTime) && (bestAccuracy == Float.MAX_VALUE) && (time > bestTime) ) {	
+					//Tiempo peor que el mínimo, pero no hay otro mejor -> se acepta la posición 
+					bestLocation = location;
+					bestTime = time;
+				}
+			}
+		}
+		
+		
+		return bestLocation;
+   }
    
    
    /**
@@ -546,106 +585,50 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		//TODO: En este enlace está la forma de obtener la posición y poner una pantalla de buscando mientras tanto
 		//http://stackoverflow.com/questions/11752961/how-to-show-a-progress-spinner-in-android-when-doinbackground-is-being-execut
 		
-		
+
 		now.setToNow();
+		mLocation = getBestLastKnownLocation(now.toMillis(true) - THIRTY_MINUTES);		
 		
 		
 		try {
-			Location gps = null;
-			Location network = null;
        	
-			//Obtenemos la última posición almacenada de los proveedores y comprobamos
-			//si es válida
 			if (sLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+				Log.d(LOG_TAG,"1");
 				isGPSEnabled = true;
-				gps = sLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 				sLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 						MIN_TIME, MIN_DISTANCE, this);
-				
-				//Si la localización es de hace más de 30 minutos se descarta
-				if ( gps != null && (now.toMillis(true) - gps.getTime()) > THIRTY_MINUTES ) {
-					gps = null;
-				}
-				
-				
 			}
+			
 			if (sLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+				Log.d(LOG_TAG,"2");
 				isNetworkEnabled = true;
-				network = sLocationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 				sLocationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
 						MIN_TIME, MIN_DISTANCE, this);
-				
-				//Si la localización es de hace más de 30 minutos se descarta
-				if ( network != null && (now.toMillis(true) - network.getTime()) > THIRTY_MINUTES ) {
-					network = null;
-				}
-			}
-    	   
+			}    	   
     	   
 			if (!isGPSEnabled && !isNetworkEnabled) {
 				mostrarLocationSettingsAlert();
 			}
     	   
-			//Si hay posición de los dos proveedores nos quedamos con la mejor
-			if ( (gps != null) && (network != null) ) {
-				if (isBetterLocation(gps, network)) {
-					Log.d("MainActivity","LastKnownLocation: mejor la del GPS");
-					mLocation = gps;
-					
-				}else {
-					Log.d("MainActivity","LastKnownLocation: mejor la de network");
-					mLocation = network;
-				}
-    		   
-				//Si no, nos quedamos con la que haya
-			}else {
-				if (gps != null) {	
-					Log.d("MainActivity","LastKnownLocation: solo hay de network");
-					mLocation = gps;
-				}else {
-					if (network != null) {
-						Log.d("MainActivity","LastKnownLocation: solo hay del GPS");
-						mLocation = network;
-						
-					}else {
-						hayLocation = false;
-						//Si no hay localización ninguna, por defecto se pone la de la biblioteca de la UJA
-						Log.e("MainActivity","No hay ubicación, se pone la de la biblioteca");
-						
-						mLocation = sLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-						setLocationProviders(5*1000);
-						
-						//Ubicación de la biblioteca de la UJA
-//						mLocation.setLatitude(37.789);
-//						mLocation.setLongitude(-3.779);
-//						mLocation.setAltitude(700);
-						mLocation.setLatitude(0);
-						mLocation.setLongitude(0);
-						mLocation.setAltitude(0);
-						mLocation.setAccuracy(0);
-					}
-				}
+			if ( mLocation == null ) {
+				hayLocation = false;
+				//Si no hay localización ninguna, por defecto se pone la de la biblioteca de la UJA
+				Log.e(LOG_TAG,"No hay ubicación, se pone la de la biblioteca");
+				
+//				mLocation = sLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+				setLocationProviders(5*1000);
+				
+				//Ubicación de la biblioteca de la UJA
+				mLocation.setLatitude(37.789);
+				mLocation.setLongitude(-3.779);
+				mLocation.setAltitude(700);
+//				mLocation.setLatitude(0);
+//				mLocation.setLongitude(0);
+//				mLocation.setAltitude(0);
+//				mLocation.setAccuracy(0);				
 			}
-			
-			//Si no se encuentra la posición, se vuelve a llamar con intervalos de tiempo de 5 
-			//segundos para encontrarla más rápido
-//			if (!hayLocation) {
-//				getLocation(5*1000);
-//				mostrarLocationAlert();
-//				
-//				
-//			}else{
-//				//Si ya se ha encontrado la posición, se vuelve al intervalo original para 
-//				// ahorrar batería realizando menos lecturas
-//				if (isGPSEnabled) {
-//					sLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-//							MIN_TIME, MIN_DISTANCE, this);
-//				}
-//				if (isNetworkEnabled) {
-//					sLocationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-//							MIN_TIME, MIN_DISTANCE, this);
-//				}
-//			}
+			//Inicializamos la variable para cuando se compruebe la distancia en onLocationChanged
+			mLastUpdateDataLocation = mLocation;
     	   
 		} catch (Exception ex) {
 			if (sLocationMgr != null) {
@@ -658,21 +641,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
    
    
    private void setLocationProviders(long toMinTime) {
-	   Log.d("MAINACTIVITY","haylocation:"+hayLocation+" y toMinTime:"+toMinTime);
+	   Log.d(LOG_TAG,"haylocation:"+hayLocation+" y toMinTime:"+toMinTime);
 	   if (toMinTime == MIN_TIME) {
 		   hayLocation = true;
 	   }
-	 
-	   if (sLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-		   sLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-					toMinTime, MIN_DISTANCE, this);
-		   Log.d("MAINACTIVITY","Se pone GPS con toMinTime:"+toMinTime);
-	   }
 	   
-	   if (sLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-			sLocationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-					toMinTime, MIN_DISTANCE, this);
-			Log.d("MAINACTIVITY","Se pone NETWORK con toMinTime:"+toMinTime);
+	   List<String> providers = sLocationMgr.getAllProviders();
+	   for (String provider: providers) {
+		   sLocationMgr.requestLocationUpdates(provider, toMinTime, MIN_DISTANCE, this);
 	   }
    }
    
@@ -748,7 +724,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         	   
         	   dialog.cancel();
         	   toast.show();
-        	   stopRememberNoNetwork = true;
            }
        });
 
@@ -811,8 +786,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		NetworkDataProvider wikipedia = new WikipediaDataProvider();
 		NETWORK_POI_SOURCES.put("wiki",wikipedia);
 		
-		NetworkDataProvider local = new WikipediaDataProvider();
-		NETWORK_POI_SOURCES.put("local",local);
+		LocalDataProvider local = new LocalDataProvider();
+		LOCAL_POI_SOURCES.put("local",local);
 		
 		isDataSourcesInit = true;
 	}

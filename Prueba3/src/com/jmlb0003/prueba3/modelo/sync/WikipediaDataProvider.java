@@ -18,7 +18,8 @@ import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
 
 
 /**
- * Clase que representa a Wikipedia como proveedor de recursos descargables
+ * Clase que representa a Wikipedia como proveedor de recursos descargables para crear PIs en la
+ * app.
  * @author Jose
  *
  */

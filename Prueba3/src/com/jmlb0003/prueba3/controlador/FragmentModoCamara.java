@@ -356,7 +356,21 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
             	return true;
 
             case MotionEvent.ACTION_UP:
-            	
+            	/************************************************
+            	 * 
+            	 * 1º si hay un poi seleccionado y si se ha pulsado en los detalles 
+            	 * 				-> mcallback.onpoiSelected (abrir la ventana de detalles completos)
+            	 * 				return true;
+            	 * 
+            	 * 2º si hay un poi seleccionado y se pulsa en pantalla 
+            	 * 				-> deseleccionar
+            	 * 
+            	 * 3º si no hay seleccionado y se pulsa un poi -> seleccionarlo
+            	 * 
+            	 * 
+            	 * 
+            	 * 
+            	 * */
             	for (Poi poi : ARDataSource.getPois()) {
         	        if (poi.handleClick(event.getX(), event.getY())) {
         	            poiTouched(poi);

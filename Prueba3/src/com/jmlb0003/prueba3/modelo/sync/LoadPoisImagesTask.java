@@ -112,9 +112,14 @@ public class LoadPoisImagesTask extends AsyncTask<Void, Integer, Void> {
 				toRetBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.wikipedia);
 
 				break;
+				
+			case PoiContract.PoiEntry.LOCAL_DEFAULT_IMAGE:
+				toRetBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.local_data);
+				
+				break;
 //			case PoiContract.PoiEntry.GOOGLE_PLACES_DEFAULT
 
-//			case PoiContract.PoiEntry.LOCAL_DEFAULT
+
 				
 			default:
 				try {
