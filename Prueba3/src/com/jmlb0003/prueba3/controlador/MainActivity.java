@@ -34,6 +34,7 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+
 import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.DetallesPI;
 import com.jmlb0003.prueba3.modelo.Poi;
@@ -73,6 +74,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	 * current dropdown position.
 	 */
 	private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
+	private static final String STATE_SELECTED_POI_ID = "selected_poi_id";
 	private static final String LOG_TAG = "mainActivity";
 	
 	   
@@ -260,13 +262,28 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
     
     
+    @Override
+    protected void onDestroy() {
+    	Log.d("MainActivity","EV onDestroy");
+    	onPoiUnselected(mTouchedPoi);
+    	super.onDestroy();
+    }// Fin de onDestroy
+    
+    
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		Log.d(LOG_TAG,"Onrestore");
 		// Restore the previously serialized current dropdown position.
 		if (savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
 			getSupportActionBar().setSelectedNavigationItem(
 					savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM));
+		}
+		
+		if(savedInstanceState.containsKey(STATE_SELECTED_POI_ID)) {
+			Log.d(LOG_TAG,"Se guarda la pestaña:"+getSupportActionBar().getSelectedNavigationIndex());
+			mTouchedPoi = ARDataSource
+					.getPoi(Long.toString(savedInstanceState.getLong(STATE_SELECTED_POI_ID)));
 		}
 	}
 	
@@ -276,8 +293,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		// Serialize the current dropdown position.
+		Log.d(LOG_TAG,"OnSaveInstance");
+		Log.d(LOG_TAG,"Se guarda la pestaña:"+getSupportActionBar().getSelectedNavigationIndex());
 		outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, getSupportActionBar()
 				.getSelectedNavigationIndex());
+		if(mTouchedPoi != null) {
+			Log.d(LOG_TAG,"Se guarda la pestaña:"+getSupportActionBar().getSelectedNavigationIndex());
+			outState.getLong(STATE_SELECTED_POI_ID,mTouchedPoi.getID());
+		}
 	}
 	
 	
@@ -319,14 +342,15 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	public boolean onNavigationItemSelected(int position, long id) {
 		// When the given dropdown item is selected, show its contents in the
 		// container view.
-		FragmentTransaction ft = mFragmentManager.beginTransaction();
+		FragmentTransaction ft = mFragmentManager.beginTransaction();		
 		
 		switch (position) {
 			case 0:
+				
 				ft.replace(R.id.container, mFragmentModoCamara);
 				//ft.addToBackStack(null);		//Quitar esto porque da fallos y no es necesario
 				
-				ft.commit();				
+				ft.commit();
 				
 				break;
 			case 1:
@@ -374,7 +398,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	        mFragmentModoCamara.calculateMagneticNorthCompensation();
 	        //TODO: Esto está para que se actualice el mapa si cambia la posición...habría que probar si funciona o no...
 	        mFragmentModoMapa.setUpMapIfNeeded();
-
+	        //////////////////////////////////////////////////////////
 
 	        if ( (locationsDistance > MAX_DISTANCE) && (hayLocation) ) {
 	        	Log.d(LOG_TAG,"UPDATEDATA: Hay que llamar a updateData");
@@ -581,26 +605,21 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		boolean isNetworkEnabled = false;
 		Time now = new Time();
 		
-		
-		//TODO: En este enlace está la forma de obtener la posición y poner una pantalla de buscando mientras tanto
-		//http://stackoverflow.com/questions/11752961/how-to-show-a-progress-spinner-in-android-when-doinbackground-is-being-execut
-		
 
 		now.setToNow();
-		mLocation = getBestLastKnownLocation(now.toMillis(true) - THIRTY_MINUTES);		
-		
-		
+		mLocation = getBestLastKnownLocation(now.toMillis(true) - THIRTY_MINUTES);
+				
 		try {
        	
 			if (sLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-				Log.d(LOG_TAG,"1");
+				Log.d(LOG_TAG,"1GetLocation");
 				isGPSEnabled = true;
 				sLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 						MIN_TIME, MIN_DISTANCE, this);
 			}
 			
 			if (sLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-				Log.d(LOG_TAG,"2");
+				Log.d(LOG_TAG,"2GetLocation");
 				isNetworkEnabled = true;
 				sLocationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
 						MIN_TIME, MIN_DISTANCE, this);
@@ -613,9 +632,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			if ( mLocation == null ) {
 				hayLocation = false;
 				//Si no hay localización ninguna, por defecto se pone la de la biblioteca de la UJA
-				Log.e(LOG_TAG,"No hay ubicación, se pone la de la biblioteca");
+				Log.e(LOG_TAG,"GetLocation_No hay ubicación, se pone la de la biblioteca");
 				
-//				mLocation = sLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 				setLocationProviders(5*1000);
 				
 				//Ubicación de la biblioteca de la UJA
@@ -778,10 +796,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	 * descargan datos, solamente se preparan los proveedores. 
 	 */
 	private void setPoiProviders() {
-		//Ahora se cargan en memoria los PIs disponibles en el dispositivo
-//		LocalDataProvider localData = new LocalDataProvider(getResources());
-//		ARDataSource.addPois(localData.getPois());
-		
 		//Se añaden recursos a la colección SOURCES para descargar PIs
 		NetworkDataProvider wikipedia = new WikipediaDataProvider();
 		NETWORK_POI_SOURCES.put("wiki",wikipedia);
@@ -796,26 +810,39 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
 
 	@Override
-	public void onPoiSelected(Poi poiTouched) {
+	public void onPoiTouched(Poi poiTouched) {
+		//Si hay uno seleccionado, se deselecciona
+		if (ARDataSource.hasSelectededPoi()) {
+			if (ARDataSource.SelectedPoi != poiTouched) {
+				onPoiUnselected(ARDataSource.SelectedPoi);				
+			}
+		}
+		
+		poiTouched.setTouched(true);
+		ARDataSource.SelectedPoi = poiTouched;
 		//Si no hay un PI seleccionado, se pone seleccionado y fin
 		if (mTouchedPoi == null) {
 			mTouchedPoi = poiTouched;
 		}else{
 
 			if (mTouchedPoi.isSelected() && mTouchedPoi == poiTouched) {
-				//TODO: Está quitado del manifest lo de parentActivity...
 				startActivity(new Intent(this,DetallesPIActivity.class));
 			}else{
 				mTouchedPoi = poiTouched;
 			}
 			
 		}
-		
 	}   
    
 	@Override
-	public void onPoiUnselected(Poi PoiUnselected) {
-		mTouchedPoi = null;
+	public void onPoiUnselected(Poi poiUnselected) {
+		if (ARDataSource.hasSelectededPoi()) {
+			if (ARDataSource.SelectedPoi == poiUnselected) {
+				ARDataSource.SelectedPoi.setTouched(false);
+				mTouchedPoi = null;
+				ARDataSource.SelectedPoi = null;
+			}
+		}		
 	}
 
 

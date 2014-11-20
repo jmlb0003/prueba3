@@ -64,11 +64,8 @@
         
         <activity
             android:name=".controlador.DetallesPIActivity"
-            android:label="@string/title_activity_detalles_pi" >
-            <!--
-            Dentro de esta etiqueta activity: 
-            android:parentActivityName=".controlador.MainActivity"
-             -->
+            android:label="@string/title_activity_detalles_pi" 
+            android:parentActivityName=".controlador.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jmlb0003.prueba3.controlador.MainActivity" />

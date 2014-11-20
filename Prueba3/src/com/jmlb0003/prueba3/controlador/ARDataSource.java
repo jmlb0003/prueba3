@@ -17,7 +17,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.util.Log;
 
 import com.jmlb0003.prueba3.modelo.DetallesPI;
 import com.jmlb0003.prueba3.modelo.Poi;
@@ -382,13 +381,30 @@ public abstract class ARDataSource {
     
     
     /**
+     * Método para obtener un Poi de la lista de PIs dado su ID.
+     * @param idPoi ID del PI que se está buscando
+     * @return PoI de la lista con el ID dado o null si no hay ninguno.
+     */
+    public static Poi getPoi(String idPoi) {
+    	return POI_LIST.get(idPoi);
+    }
+    
+    /**
      * Método para obtener un Poi de la lista de PIs cuyo nombre coincida con el que se pasa como
      * parámetro en PoiName.
-     * @param PoiName Nombre del PI que se está buscando
+     * @param poiName Nombre del PI que se está buscando
      * @return PoI de la lista cuyo nombre coincida con PoiName o null si no hay ninguno.
      */
-    public static Poi getPoiByName(String PoiName) {
-    	return POI_LIST.get(PoiName);
+    public static Poi getPoiByName(String poiName) {    
+    	for (long id:POI_LIST.keySet()) {
+    		Poi p = POI_LIST.get(id);
+    		
+    		if (p.getName().equals(poiName)) {
+    			return p;
+    		}
+    	}
+    	
+    	return null;
     }
 
 }

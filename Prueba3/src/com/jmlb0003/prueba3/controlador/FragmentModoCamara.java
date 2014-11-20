@@ -32,6 +32,7 @@ import com.jmlb0003.prueba3.vista.BasicDetailsView;
 
 
 public class FragmentModoCamara extends Fragment implements SensorEventListener, OnTouchListener {
+	private static final String LOG_TAG = "FragmentModoCamara";
 		
 	/***************CONSTANTES ORIENTACION*******************************************/
 	//Flag para controlar si los sensores se pueden leer o no
@@ -76,7 +77,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     
     
 
-	/**Interfaz para indicar a MainActivity que se ha pulsado un PI*********/
+	/** Interfaz para indicar a MainActivity que se ha pulsado un PI **/
     OnPoiTouchedListener mCallback;
     
     /***************FUNCIONES*******************************************/
@@ -155,7 +156,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         mAugmentedView.setOnTouchListener(this);
         
         mBasicDetails = (BasicDetailsView) preview.findViewById(R.id.basic_details_id);
-        
+        mBasicDetails.setOnTouchListener(this);
         
         //Se establece que el alto conserve el ratio 1:1 (aproximado) para seguir las líneas de diseño
         //https://www.google.com/design/spec/layout/metrics-and-keylines.html#metrics-and-keylines-ratio-keylines
@@ -183,6 +184,11 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         sSensorMgr.registerListener(this, sSensorGrav, SensorManager.SENSOR_DELAY_NORMAL);
         sSensorMgr.registerListener(this, sSensorMag, SensorManager.SENSOR_DELAY_NORMAL);
         
+        if (ARDataSource.hasSelectededPoi()) {
+        	mBasicDetails.setVisibility(View.VISIBLE);
+    		mBasicDetails.initView(ARDataSource.SelectedPoi);
+        }
+        
 	}// Fin de onResume()
 	
 	
@@ -202,9 +208,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     public void onDestroy() {
     	super.onDestroy();
     	Log.d("FragmentCamara","EV onDestroy");
-    	if (ARDataSource.hasSelectededPoi()) {
-    		deseleccionarPoi(ARDataSource.SelectedPoi);
-    	}    	
     }
 
     /**
@@ -356,101 +359,56 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
             	return true;
 
             case MotionEvent.ACTION_UP:
-            	/************************************************
-            	 * 
-            	 * 1º si hay un poi seleccionado y si se ha pulsado en los detalles 
-            	 * 				-> mcallback.onpoiSelected (abrir la ventana de detalles completos)
-            	 * 				return true;
-            	 * 
-            	 * 2º si hay un poi seleccionado y se pulsa en pantalla 
-            	 * 				-> deseleccionar
-            	 * 
-            	 * 3º si no hay seleccionado y se pulsa un poi -> seleccionarlo
-            	 * 
-            	 * 
-            	 * 
-            	 * 
-            	 * */
-            	for (Poi poi : ARDataSource.getPois()) {
-        	        if (poi.handleClick(event.getX(), event.getY())) {
-        	            poiTouched(poi);
-        	            
-        	            return true;
-        	        }
-        	    }
             	
-            	if (ARDataSource.hasSelectededPoi()) {
-            		deseleccionarPoi(ARDataSource.SelectedPoi);
+            	//Cuando el evento no es de la vista de detalles básicos se comprueban los PIs
+            	if (view != mBasicDetails) {
+            		Log.d(LOG_TAG,"1 A revisar pois con...X: "+event.getX()+" Y: "+event.getY());
+                	for (Poi poi : ARDataSource.getPois()) {
+            	        if (poi.handleClick(event.getX(), event.getY())) {
+            	            poiTouched(poi);
+            	            
+            	            return true;
+            	        }
+            	    }            		
+            	}
+
+
+            	if (ARDataSource.hasSelectededPoi()) {            		
+            		if (view == mBasicDetails) {
+            			Log.d(LOG_TAG,"4 SE HA PULSADO");
+                		mCallback.onPoiTouched(ARDataSource.SelectedPoi);
+                		
+                		return true;
+            		}
+                	
+            		mCallback.onPoiUnselected(ARDataSource.SelectedPoi);
+
+            		mBasicDetails.setVisibility(View.INVISIBLE);            		
             	}
             	
             	return false;
             	
         }
-        return false; // Return false for other touch events
+        return false;
 	}
+	
 	
 	
 	/**
 	 * Método con las acciones a realizar cuando se pulsa un PI
-	 * @param poi
+	 * @param poi PI que ha sido pulsado
 	 */
 	private void poiTouched(Poi poi) {
 		if (poi == null) {
 			return;
 		}
-		/**
-		 * Se ha pulsado Poi.
-		 * 1º si hay ya uno pulsado:
-		 * 		1.1 Si es distinto, se cambia el seleccionado y se abre o se cambian los detalles básicos
-		 * 		1.2 Si es igual, se abre la ventana de detalles
-		 * 2º si no hay ninguno pulsado:
-		 * 		2.1 Se pone como seleccionado y se abre la vista de detalles básicos
-		 */		
-		if (ARDataSource.hasSelectededPoi()) {
 
-			if (ARDataSource.SelectedPoi != poi) {
-				//Se deselecciona el Poi actual y se selecciona el nuevo
-				deseleccionarPoi(ARDataSource.SelectedPoi);
-				
-			}
-		}
-		
-		
-		seleccionarPoi(poi);
-	}
-	
-	
-	/**
-	 * Método para marcar como seleccionado un PI de los que actualmente se encuentran en pantalla
-	 * @param m Poi que se va a marcar como seleccionado
-	 */
-	private void seleccionarPoi(Poi m) {
-		Log.d("FragmentCamara","Seleccionar poi:"+m.getName());
-		m.setTouched(true);
-		ARDataSource.SelectedPoi = m;
-		mCallback.onPoiSelected(m);
+		mCallback.onPoiTouched(poi);
 		
 		mBasicDetails.setVisibility(View.VISIBLE);
-		mBasicDetails.initView(m);
+		mBasicDetails.initView(poi);		
 	}
 	
-
-	
-	
-	/**
-	 * Método para desmarcar como seleccionado un PI previamente seleccionado
-	 * @param m Poi que se va a deseleccionar
-	 */
-	private void deseleccionarPoi(Poi m) {
-		Log.d("FragmentCamara","Deseleccionar poi:"+m.getName());
-		if (m != null) {
-			m.setTouched(false);
-			mCallback.onPoiUnselected(m);
-			ARDataSource.SelectedPoi = null;
-		}
-		
-		mBasicDetails.setVisibility(View.INVISIBLE);
-	}
 
 
 }

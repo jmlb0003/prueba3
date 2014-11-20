@@ -1,6 +1,7 @@
 package com.jmlb0003.prueba3.controlador;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,7 +10,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
@@ -27,6 +30,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.jmlb0003.prueba3.R;
+import com.jmlb0003.prueba3.modelo.DetallesPI;
 import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.vista.BasicDetailsView;
 
@@ -34,8 +38,8 @@ import com.jmlb0003.prueba3.vista.BasicDetailsView;
 
 
 
-public class FragmentModoMapa extends Fragment implements OnMarkerClickListener, OnMapClickListener,
-				OnInfoWindowClickListener {
+public class FragmentModoMapa extends Fragment implements OnMarkerClickListener, 
+				OnMapClickListener, OnInfoWindowClickListener, OnTouchListener {
 	
 	/**Constante con el tag representativo de la clase para el logcat**/
 	private static final String LOG_TAG = "FragmentModoMapa";
@@ -43,6 +47,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 
 	private static GoogleMap mMap = null; // Might be null if Google Play services APK is not available.
 	private SupportMapFragment mMapFragment;
+	private Marker mSelectedMarker = null;
 	
 	private FragmentActivity mActivity;
 	private BasicDetailsView mBasicDetails;
@@ -151,7 +156,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
     }
 	    
 	    
-
+    @SuppressLint("ClickableViewAccessibility")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -172,7 +177,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 
 		//Por último se obtiene el BasicDetailsView de rootView
 		mBasicDetails = (BasicDetailsView) rootView.findViewById(R.id.basic_details2_id);
-		
+		mBasicDetails.setOnTouchListener(this);
 
 		
 		//Se establece que el alto conserve el ratio 1:1 (aproximado) para seguir las líneas de diseño
@@ -215,10 +220,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
     @Override
     public void onDestroy() {
     	super.onDestroy();
-    	Log.d(LOG_TAG,"EV onDestroy");
-    	if (ARDataSource.hasSelectededPoi()) {
-    		deseleccionarPoi(ARDataSource.SelectedPoi);
-    	}    	
+    	Log.d(LOG_TAG,"EV onDestroy"); 	
     }
     
 
@@ -288,7 +290,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
     private void setUpMap() {
     	Log.d(LOG_TAG,"Setup Map: Añadiendo marcadores, etc...");
     	// Hide the zoom controls as the button panel will cover it.
-        mMap.getUiSettings().setZoomControlsEnabled(false);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
         
         if (isVisible()) {
 	        // Add lots of markers to the map.
@@ -304,12 +306,18 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 	        mMap.setOnMapClickListener(this);
 	        mMap.setOnInfoWindowClickListener(this);
 	        
-	        LatLng currentPosition = new LatLng(ARDataSource.getCurrentLocation().getLatitude(),
-	        								ARDataSource.getCurrentLocation().getLongitude());
 	        
-	        
-	        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 
-	        								calculateMapZoomLevel(ARDataSource.getRadius()*1000)));
+	        double lat,lon;
+	        if (ARDataSource.hasSelectededPoi()) {
+	        	lat = ARDataSource.SelectedPoi.getLatitude();
+	        	lon = ARDataSource.SelectedPoi.getLongitude();	        	
+	        }else{
+	        	lat = ARDataSource.getCurrentLocation().getLatitude();
+	        	lon = ARDataSource.getCurrentLocation().getLongitude();
+	        }
+	        mMap.animateCamera(
+	        		CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lon),
+    				calculateMapZoomLevel(ARDataSource.getRadius()*1000)));
         }
     } 
 		    
@@ -320,27 +328,39 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
      */
     private void addMarkersToMap() {
 
-    	Log.d(LOG_TAG,"añandiendo Poi al mapa");
+    	Log.d(LOG_TAG,"añandiendo Pois al mapa");
     	
     	for (Poi poi : ARDataSource.getPois()) {
     		if (poi.getIcon() != null) {
-   
-    			mMap.addMarker(new MarkerOptions()
-	    					.position( new LatLng(poi.getLatitude(), poi.getLongitude()) )
-	    					.title( poi.getName() )
-	    					.icon(BitmapDescriptorFactory.fromBitmap(poi.getIcon()) )  );
-	    			
+    			
+    			if (poi.isSelected()) {
+    				Log.d(LOG_TAG,"SELECCIONADO!!!El poi "+poi.getName()+" tiene icono");
+
+    				mSelectedMarker = mMap.addMarker(new MarkerOptions()
+										.position(new LatLng(poi.getLatitude(), poi.getLongitude()))
+										.title( poi.getName() )
+										.icon(BitmapDescriptorFactory.fromBitmap(poi.getIcon())) );
+    			}else{
+    				mMap.addMarker(new MarkerOptions()
+					.position( new LatLng(poi.getLatitude(), poi.getLongitude()) )
+					.title( poi.getName() )
+					.icon(BitmapDescriptorFactory.fromBitmap(poi.getIcon()) )  );
+    			}
     		}else{
     			mMap.addMarker(new MarkerOptions()
 							.position( new LatLng(poi.getLatitude(), poi.getLongitude()) )
 							.title( poi.getName() )
-							.icon( BitmapDescriptorFactory.fromResource(R.drawable.icono_pi) )  );
+							.icon( BitmapDescriptorFactory.fromBitmap(ARDataSource.sPoiIcons
+									.get(DetallesPI.DETALLESPI_ICON)) )  );
     		}
 	    		
 	    }
     	
-    	
-    	/////////////////////////////////////////
+    	if (ARDataSource.hasSelectededPoi()) {
+    		mBasicDetails.setVisibility(View.VISIBLE);
+    		mBasicDetails.initView(ARDataSource.SelectedPoi);
+    	}
+
     	mMap.addMarker(new MarkerOptions().position(new LatLng(ARDataSource.getCurrentLocation().getLatitude(),ARDataSource.getCurrentLocation().getLongitude()))
     			.title(getString(R.string.you_are_here))
     			.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))  );
@@ -363,7 +383,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 		Log.d(LOG_TAG,"EV onMapClick");
 		
 		if (ARDataSource.hasSelectededPoi()) {
-			deseleccionarPoi(ARDataSource.SelectedPoi);
+    		deseleccionarMarker();
 		}
 		
 	}
@@ -392,9 +412,14 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
                     }
                 }
             });
-            
+
+
             if ( !marker.getTitle().equals(getString(R.string.you_are_here)) ) {
-            	poiTouched(ARDataSource.getPoiByName(marker.getTitle()));
+            	poiTouched(ARDataSource.getPoiByName(marker.getTitle()), marker);
+            }else{
+            	if (ARDataSource.hasSelectededPoi()) {
+            		deseleccionarMarker();
+            	}
             }
             
         }
@@ -409,32 +434,37 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 	
 	/**
 	 * Método con las acciones a realizar cuando se pulsa un PI
-	 * @param poi
+	 * @param poi PI que ha sido pulsado
+	 * @param m Marker que ha sido pulsado
 	 */
-	private void poiTouched(Poi poi) {		
+	private void poiTouched(Poi poi, Marker m) {
 		if (poi == null) {
 			return;			
 		}
 		
-		/**
-		 * Se ha pulsado Poi.
-		 * 1º si hay ya uno pulsado:
-		 * 		1.1 Si es distinto, se cambia el seleccionado y se abre o se cambian los detalles básicos
-		 * 		1.2 Si es igual, se abre la ventana de detalles
-		 * 2º si no hay ninguno pulsado:
-		 * 		2.1 Se pone como seleccionado y se abre la vista de detalles básicos
-		 */		
-		if (ARDataSource.hasSelectededPoi()) {
-
-			if (ARDataSource.SelectedPoi != poi) {
-				//Se deselecciona el Poi actual y se selecciona el nuevo
-				deseleccionarPoi(ARDataSource.SelectedPoi);
-				
-			}
+		mCallback.onPoiTouched(poi);
+		
+		m.setIcon(BitmapDescriptorFactory.fromBitmap(
+				ARDataSource.sPoiIcons.get(DetallesPI.DETALLESPI_SELECTED_ICON)));
+		
+		if (mSelectedMarker != null && mSelectedMarker != m) {
+			mSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(
+					ARDataSource.sPoiIcons.get(DetallesPI.DETALLESPI_ICON)));
 		}
+		mSelectedMarker = m;
 		
+		mBasicDetails.setVisibility(View.VISIBLE);
+		mBasicDetails.initView(poi);
+	}
+	
+	
+	private void deseleccionarMarker() {
+		mCallback.onPoiUnselected(ARDataSource.SelectedPoi);
+		mSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(
+				ARDataSource.sPoiIcons.get(DetallesPI.DETALLESPI_ICON)));
+		mSelectedMarker = null;
 		
-		seleccionarPoi(poi);
+		mBasicDetails.setVisibility(View.INVISIBLE);
 	}
 	
 	
@@ -451,56 +481,30 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
         return (int) (16 - Math.log(maxDistance/500) / Math.log(2));
 	}
 
-	
-	
-	/**
-	 * Método para marcar como seleccionado un Poi de los que actualmente se encuentran en pantalla
-	 * @param poi PI que se va a marcar como seleccionado
-	 */
-	private void seleccionarPoi(Poi poi) {
-		if (poi == null) {
-			return;			
+
+
+	@Override
+	public boolean onTouch(View view, MotionEvent event) {
+		view.performClick();
+		
+		switch (event.getAction()) {
+			case MotionEvent.ACTION_DOWN:
+				
+                return true;
+                
+            
+            case MotionEvent.ACTION_UP:
+            	if (ARDataSource.hasSelectededPoi() && view == mBasicDetails) {
+            		mCallback.onPoiTouched(ARDataSource.SelectedPoi);
+            		
+            		return true;
+            	}
+            	
+            	return false;
 		}
 		
-		Log.d(LOG_TAG,"Seleccionar poi:"+poi.getName());
-		poi.setTouched(true);
-		ARDataSource.SelectedPoi = poi;
-		mCallback.onPoiSelected(poi);
-		
-		mBasicDetails.setVisibility(View.VISIBLE);
-		mBasicDetails.initView(poi);
+		return false;
 	}
-	
-
-
-	
-	
-	/**
-	 * Método para desmarcar como seleccionado un Poi previamente seleccionado
-	 * @param poi Marker que se va a deseleccionar
-	 */
-	private void deseleccionarPoi(Poi poi) {
-		if (poi == null) {
-			return;			
-		}
-		
-		Log.d(LOG_TAG,"Deseleccionar poi:"+poi.getName());
-		if (poi != null) {
-			poi.setTouched(false);
-			mCallback.onPoiUnselected(poi);
-			ARDataSource.SelectedPoi = null;
-		}
-		
-		mBasicDetails.setVisibility(View.INVISIBLE);
-	}
-
-	
-	
-	//TODO: Arreglar para que se muestren los detalles en la pantalla del mapa
 
 
 }
-
-
-
-

@@ -26,6 +26,7 @@ public class DetallesPIActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_detalles_pi);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 	
 	@Override
