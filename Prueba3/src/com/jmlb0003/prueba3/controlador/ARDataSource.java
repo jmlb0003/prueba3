@@ -18,7 +18,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.Location;
 
-import com.jmlb0003.prueba3.modelo.DetallesPI;
+import com.jmlb0003.prueba3.modelo.DetallesPoi;
 import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
 import com.jmlb0003.prueba3.utilidades.Matrix;
@@ -251,36 +251,36 @@ public abstract class ARDataSource {
     		c.moveToPosition(i);
     		ContentValues cv = new ContentValues();
     		
-    		cv.put(DetallesPI.DETALLESPI_ID_POI,
+    		cv.put(DetallesPoi.DETALLESPI_ID_POI,
     				c.getLong(c.getColumnIndex(PoiEntry._ID)));
-    		cv.put(DetallesPI.DETALLESPI_NAME, 
+    		cv.put(DetallesPoi.DETALLESPI_NAME, 
     				c.getString(c.getColumnIndex(PoiEntry.COLUMN_POI_NAME)));    		
-    		cv.put(DetallesPI.DETALLESPI_LATITUDE, 
+    		cv.put(DetallesPoi.DETALLESPI_LATITUDE, 
     				c.getDouble(c.getColumnIndex(PoiEntry.COLUMN_POI_LATITUDE)));
-    		cv.put(DetallesPI.DETALLESPI_LONGITUDE,
+    		cv.put(DetallesPoi.DETALLESPI_LONGITUDE,
     				c.getDouble(c.getColumnIndex(PoiEntry.COLUMN_POI_LONGITUDE)));
-    		cv.put(DetallesPI.DETALLESPI_ALTITUDE,
+    		cv.put(DetallesPoi.DETALLESPI_ALTITUDE,
     				c.getDouble(c.getColumnIndex(PoiEntry.COLUMN_POI_ALTITUDE)));
 
-    		cv.put(DetallesPI.DETALLESPI_USER_ID, 
+    		cv.put(DetallesPoi.DETALLESPI_USER_ID, 
     				c.getLong(c.getColumnIndex(PoiEntry.COLUMN_POI_USER_ID)));
-    		cv.put(DetallesPI.DETALLESPI_COLOR, 
+    		cv.put(DetallesPoi.DETALLESPI_COLOR, 
     				c.getInt(c.getColumnIndex(PoiEntry.COLUMN_POI_COLOR)));
-    		cv.put(DetallesPI.DETALLESPI_IMAGE, 
+    		cv.put(DetallesPoi.DETALLESPI_IMAGE, 
     				c.getString(c.getColumnIndex(PoiEntry.COLUMN_POI_IMAGE)));
-    		cv.put(DetallesPI.DETALLESPI_DESCRIPTION, 
+    		cv.put(DetallesPoi.DETALLESPI_DESCRIPTION, 
     				c.getString(c.getColumnIndex(PoiEntry.COLUMN_POI_DESCRIPTION)));
-    		cv.put(DetallesPI.DETALLESPI_WEBSITE,
+    		cv.put(DetallesPoi.DETALLESPI_WEBSITE,
     				c.getString(c.getColumnIndex(PoiEntry.COLUMN_POI_WEBSITE)));
-    		cv.put(DetallesPI.DETALLESPI_PRICE,
+    		cv.put(DetallesPoi.DETALLESPI_PRICE,
     				c.getFloat(c.getColumnIndex(PoiEntry.COLUMN_POI_PRICE)));
-    		cv.put(DetallesPI.DETALLESPI_OPEN_HOURS,
+    		cv.put(DetallesPoi.DETALLESPI_OPEN_HOURS,
     				c.getFloat(c.getColumnIndex(PoiEntry.COLUMN_POI_OPEN_HOURS)));
-    		cv.put(DetallesPI.DETALLESPI_CLOSE_HOURS,
+    		cv.put(DetallesPoi.DETALLESPI_CLOSE_HOURS,
     				c.getFloat(c.getColumnIndex(PoiEntry.COLUMN_POI_CLOSE_HOURS)));
-    		cv.put(DetallesPI.DETALLESPI_MAX_AGE,
+    		cv.put(DetallesPoi.DETALLESPI_MAX_AGE,
     				c.getFloat(c.getColumnIndex(PoiEntry.COLUMN_POI_MAX_AGE)));
-    		cv.put(DetallesPI.DETALLESPI_MIN_AGE,
+    		cv.put(DetallesPoi.DETALLESPI_MIN_AGE,
     				c.getFloat(c.getColumnIndex(PoiEntry.COLUMN_POI_MIN_AGE)));
     		
     		toRet.add(cv);
@@ -302,38 +302,38 @@ public abstract class ARDataSource {
     	for(ContentValues pv : poiList) {
     		
     		Map<String, Object> details = new HashMap<>();
-    		details.put(DetallesPI.DETALLESPI_ID_POI,
-    				pv.getAsLong(DetallesPI.DETALLESPI_ID_POI));
-    		details.put(DetallesPI.DETALLESPI_USER_ID, 
-    				pv.getAsLong(DetallesPI.DETALLESPI_USER_ID));
-    		details.put(DetallesPI.DETALLESPI_COLOR, 
-    				pv.getAsInteger(DetallesPI.DETALLESPI_COLOR));
-    		details.put(DetallesPI.DETALLESPI_IMAGE, 
-    				pv.getAsString(DetallesPI.DETALLESPI_IMAGE));
-    		details.put(DetallesPI.DETALLESPI_DESCRIPTION, 
-    				pv.getAsString(DetallesPI.DETALLESPI_DESCRIPTION));
-    		details.put(DetallesPI.DETALLESPI_WEBSITE,
-    				pv.getAsString(DetallesPI.DETALLESPI_WEBSITE));
-    		details.put(DetallesPI.DETALLESPI_PRICE,
-    				pv.getAsFloat(DetallesPI.DETALLESPI_PRICE));
-    		details.put(DetallesPI.DETALLESPI_OPEN_HOURS,
-    				pv.getAsFloat(DetallesPI.DETALLESPI_OPEN_HOURS));
-    		details.put(DetallesPI.DETALLESPI_CLOSE_HOURS,
-    				pv.getAsFloat(DetallesPI.DETALLESPI_CLOSE_HOURS));
-    		details.put(DetallesPI.DETALLESPI_MAX_AGE,
-    				pv.getAsFloat(DetallesPI.DETALLESPI_MAX_AGE));
-    		details.put(DetallesPI.DETALLESPI_MIN_AGE,
-    				pv.getAsFloat(DetallesPI.DETALLESPI_MIN_AGE));
+    		details.put(DetallesPoi.DETALLESPI_ID_POI,
+    				pv.getAsLong(DetallesPoi.DETALLESPI_ID_POI));
+    		details.put(DetallesPoi.DETALLESPI_USER_ID, 
+    				pv.getAsLong(DetallesPoi.DETALLESPI_USER_ID));
+    		details.put(DetallesPoi.DETALLESPI_COLOR, 
+    				pv.getAsInteger(DetallesPoi.DETALLESPI_COLOR));
+    		details.put(DetallesPoi.DETALLESPI_IMAGE, 
+    				pv.getAsString(DetallesPoi.DETALLESPI_IMAGE));
+    		details.put(DetallesPoi.DETALLESPI_DESCRIPTION, 
+    				pv.getAsString(DetallesPoi.DETALLESPI_DESCRIPTION));
+    		details.put(DetallesPoi.DETALLESPI_WEBSITE,
+    				pv.getAsString(DetallesPoi.DETALLESPI_WEBSITE));
+    		details.put(DetallesPoi.DETALLESPI_PRICE,
+    				pv.getAsFloat(DetallesPoi.DETALLESPI_PRICE));
+    		details.put(DetallesPoi.DETALLESPI_OPEN_HOURS,
+    				pv.getAsFloat(DetallesPoi.DETALLESPI_OPEN_HOURS));
+    		details.put(DetallesPoi.DETALLESPI_CLOSE_HOURS,
+    				pv.getAsFloat(DetallesPoi.DETALLESPI_CLOSE_HOURS));
+    		details.put(DetallesPoi.DETALLESPI_MAX_AGE,
+    				pv.getAsFloat(DetallesPoi.DETALLESPI_MAX_AGE));
+    		details.put(DetallesPoi.DETALLESPI_MIN_AGE,
+    				pv.getAsFloat(DetallesPoi.DETALLESPI_MIN_AGE));
     		
     		
     		Poi poi = new Poi(
-    				pv.getAsString(DetallesPI.DETALLESPI_NAME),
-    				pv.getAsDouble(DetallesPI.DETALLESPI_LATITUDE), 
-    				pv.getAsDouble(DetallesPI.DETALLESPI_LONGITUDE), 
-    				pv.getAsDouble(DetallesPI.DETALLESPI_ALTITUDE), 
-    				new DetallesPI(details),
-    				sPoiIcons.get(DetallesPI.DETALLESPI_ICON),
-    				sPoiIcons.get(DetallesPI.DETALLESPI_SELECTED_ICON));
+    				pv.getAsString(DetallesPoi.DETALLESPI_NAME),
+    				pv.getAsDouble(DetallesPoi.DETALLESPI_LATITUDE), 
+    				pv.getAsDouble(DetallesPoi.DETALLESPI_LONGITUDE), 
+    				pv.getAsDouble(DetallesPoi.DETALLESPI_ALTITUDE), 
+    				new DetallesPoi(details),
+    				sPoiIcons.get(DetallesPoi.DETALLESPI_ICON),
+    				sPoiIcons.get(DetallesPoi.DETALLESPI_SELECTED_ICON));
 
 
     	    if (!POI_LIST.containsKey(poi.getID())) {

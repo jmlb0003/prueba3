@@ -6,6 +6,12 @@
     <string name="title_section_modoMapa">Modo Mapa</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Ajustes</string>
+    
+    <!-- Cadena "estás aquí" para el marcador del modo mapa -->
+    <string name="you_are_here">Estás aquí</string>
+    <!-- Clave para usar Google Maps en la app -->
+    <string name="maps_key">AIzaSyAPWQlnZICVmAePBokkdXf4ic8ahjycq84</string>
+    
     <!-- Content Provider -->
     <string name="sync_account_type">prueba3.jmlb0003.com</string>
     <string name="content_authority">"com.jmlb0003.prueba3"</string>
@@ -44,10 +50,18 @@
     <string name="pi_content_description">Fotografía del PI</string>
     <string name="title_activity_detalles_pi">DetallesPIActivity</string>
     
-    <!-- Cadena "estás aquí" para el marcador del modo mapa -->
-    <string name="you_are_here">Estás aquí</string>
-    <!-- Clave para usar Google Maps en la app -->
-    <string name="maps_key">AIzaSyAPWQlnZICVmAePBokkdXf4ic8ahjycq84</string>
+    <!-- Strings de búsqueda -->
+    <string name="search_hint">Buscar PIs</string>
+    <string name="action_search">Búsqueda</string>
+    
+    <!-- Número de resultados encontrados -->
+    <plurals name="search_results">
+      <item quantity="one">%1$d resultado para \"%2$s\": </item>
+      <item quantity="other">%1$d resultados para \"%2$s\": </item>
+    </plurals>
+
+    <!-- Search failure message. -->
+    <string name="no_search_results">No se encontraron resultados para \"%s\"</string>
 
     
     

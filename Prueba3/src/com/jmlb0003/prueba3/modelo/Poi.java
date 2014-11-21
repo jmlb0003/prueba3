@@ -122,7 +122,7 @@ public class Poi implements Comparable<Poi> {
 
 
     /**Variable que contiene otros atributos del PI**/    
-    private DetallesPI mDetails = new DetallesPI(null);
+    private DetallesPoi mDetails = new DetallesPoi(null);
     
 	
 	
@@ -132,12 +132,12 @@ public class Poi implements Comparable<Poi> {
      * @param latitude	Latitud del Poi
      * @param longitude Longitud del Poi
      * @param altitude Altitud del Poi
-     * @param otrosDetalles Contiene otros atributos del PI. Ver la clase DetallesPI.
+     * @param otrosDetalles Contiene otros atributos del PI. Ver la clase DetallesPoi.
      * @param toBitmap Icono que se aplicará al Poi
      * @param toSelectedBitmap Icono que se aplicará al PI cuando sea seleccionado.
      */
 	public Poi(String name, double latitude, double longitude, double altitude, 
-					DetallesPI otrosDetalles, Bitmap toBitmap, Bitmap toSelectedBitmap) {
+					DetallesPoi otrosDetalles, Bitmap toBitmap, Bitmap toSelectedBitmap) {
 		set(name, latitude, longitude, altitude, otrosDetalles);
 		mBitmap = toBitmap;
 		mSelectedBitmap = toSelectedBitmap;
@@ -151,10 +151,10 @@ public class Poi implements Comparable<Poi> {
 	 * @param toLatitude Coordenada de latitud del PI en grados decimales
 	 * @param toLongitude Coordenada de longitud del PI en grados decimales
 	 * @param toAltitude Altitud del PI en metros
-	 * @param detalles Contiene otros atributos de los PI. Ver la clase DetallesPI.
+	 * @param detalles Contiene otros atributos de los PI. Ver la clase DetallesPoi.
 	 */
 	public synchronized void set(String toName, double toLatitude, double toLongitude, 
-													double toAltitude, DetallesPI detalles) {
+													double toAltitude, DetallesPoi detalles) {
 		if (toName == null) {
 			throw new NullPointerException();
 		}
@@ -176,21 +176,21 @@ public class Poi implements Comparable<Poi> {
 	}
 	
 	public synchronized long getID(){
-		if (mDetails.getDetalle(DetallesPI.DETALLESPI_ID_POI) != null) {
-			return (long)mDetails.getDetalle(DetallesPI.DETALLESPI_ID_POI);
+		if (mDetails.getDetalle(DetallesPoi.DETALLESPI_ID_POI) != null) {
+			return (long)mDetails.getDetalle(DetallesPoi.DETALLESPI_ID_POI);
 		}
 		return -1;
 	}
 	
 	public synchronized long getUserId(){
-		if (mDetails.getDetalle(DetallesPI.DETALLESPI_USER_ID) != null) {
-			return (long)mDetails.getDetalle(DetallesPI.DETALLESPI_USER_ID);
+		if (mDetails.getDetalle(DetallesPoi.DETALLESPI_USER_ID) != null) {
+			return (long)mDetails.getDetalle(DetallesPoi.DETALLESPI_USER_ID);
 		}
 		return -1;
 	}
 
     public synchronized int getColor() {
-    	return (int)mDetails.getDetalle(DetallesPI.DETALLESPI_COLOR);
+    	return (int)mDetails.getDetalle(DetallesPoi.DETALLESPI_COLOR);
     }
 
     public synchronized double getDistance() {
@@ -198,39 +198,39 @@ public class Poi implements Comparable<Poi> {
     }
     
     public synchronized String getTextDistance() {
-        return (String) mDetails.getDetalle(DetallesPI.DETALLESPI_DISTANCE);
+        return (String) mDetails.getDetalle(DetallesPoi.DETALLESPI_DISTANCE);
     }
     
     public synchronized String getImage() {
-        return (String)mDetails.getDetalle(DetallesPI.DETALLESPI_IMAGE);
+        return (String)mDetails.getDetalle(DetallesPoi.DETALLESPI_IMAGE);
     }
     
     public synchronized String getDescription() {
-        return (String)mDetails.getDetalle(DetallesPI.DETALLESPI_DESCRIPTION);
+        return (String)mDetails.getDetalle(DetallesPoi.DETALLESPI_DESCRIPTION);
     }
     
     public synchronized String getWebSite() {
-        return (String)mDetails.getDetalle(DetallesPI.DETALLESPI_WEBSITE);
+        return (String)mDetails.getDetalle(DetallesPoi.DETALLESPI_WEBSITE);
     }
     
     public synchronized float getPrice() {
-        return (float)mDetails.getDetalle(DetallesPI.DETALLESPI_PRICE);
+        return (float)mDetails.getDetalle(DetallesPoi.DETALLESPI_PRICE);
     }
     
     public synchronized String getOpenHours() {
-        return (String)mDetails.getDetalle(DetallesPI.DETALLESPI_OPEN_HOURS);
+        return (String)mDetails.getDetalle(DetallesPoi.DETALLESPI_OPEN_HOURS);
     }
     
     public synchronized String getCloseHours() {
-        return (String)mDetails.getDetalle(DetallesPI.DETALLESPI_CLOSE_HOURS);
+        return (String)mDetails.getDetalle(DetallesPoi.DETALLESPI_CLOSE_HOURS);
     }
     
     public synchronized int getMaxYears() {
-        return (int)mDetails.getDetalle(DetallesPI.DETALLESPI_MAX_AGE);
+        return (int)mDetails.getDetalle(DetallesPoi.DETALLESPI_MAX_AGE);
     }
     
     public synchronized int getMinYears() {
-        return (int)mDetails.getDetalle(DetallesPI.DETALLESPI_MIN_AGE);
+        return (int)mDetails.getDetalle(DetallesPoi.DETALLESPI_MIN_AGE);
     }
     
     public synchronized Bitmap getIcon() {

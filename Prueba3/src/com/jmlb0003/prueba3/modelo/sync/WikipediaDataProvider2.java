@@ -19,7 +19,7 @@ import android.graphics.Color;
 import android.util.Log;
 
 import com.jmlb0003.prueba3.R;
-import com.jmlb0003.prueba3.modelo.DetallesPI;
+import com.jmlb0003.prueba3.modelo.DetallesPoi;
 import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.modelo.data.PoiContract;
 
@@ -142,7 +142,7 @@ public class WikipediaDataProvider2 extends NetworkDataProvider2 {
             	datos.put("edad_minima", 0);
             	
         		ma = new Poi(jo.getString("title"), jo.getDouble("lat"), jo.getDouble("lng"),
-        							jo.getDouble("elevation"), new DetallesPI(datos), sIcon, sSelectedIcon);
+        							jo.getDouble("elevation"), new DetallesPoi(datos), sIcon, sSelectedIcon);
         		Log.d("wikipediaDatasource","Creado un Poi de wikipedia");
         	} catch (JSONException e) {
         		e.printStackTrace();

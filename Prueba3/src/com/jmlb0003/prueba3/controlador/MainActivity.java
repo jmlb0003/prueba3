@@ -17,13 +17,12 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.format.Time;
@@ -32,19 +31,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.jmlb0003.prueba3.R;
-import com.jmlb0003.prueba3.modelo.DetallesPI;
+import com.jmlb0003.prueba3.modelo.DetallesPoi;
 import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.modelo.data.PoiContract;
-import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
 import com.jmlb0003.prueba3.modelo.sync.LocalDataProvider;
 import com.jmlb0003.prueba3.modelo.sync.LocalPoiLoaderTask;
 import com.jmlb0003.prueba3.modelo.sync.NetworkDataProvider;
 import com.jmlb0003.prueba3.modelo.sync.PoiDownloaderTask;
 import com.jmlb0003.prueba3.modelo.sync.WikipediaDataProvider;
+import com.jmlb0003.prueba3.utilidades.LocationUtility;
 
 /**
  * //TODO Orden de los imports CODE GUIDELINES
@@ -59,7 +59,7 @@ import com.jmlb0003.prueba3.modelo.sync.WikipediaDataProvider;
  *
  */
 public class MainActivity extends ActionBarActivity implements ActionBar.OnNavigationListener,
-				LocationListener,OnPoiTouchedListener, LoaderCallbacks<Cursor> {
+				LocationListener,OnPoiTouchedListener {
 	
 	/**
 	 * //TODO:Nomenclatura de variables CODE GUIDELINES
@@ -82,8 +82,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     /*******************CONSTANTES PARA LOCALIZACION**********************************/
     /**Tiempo mínimo en milisegundos entre lecturas de los sensores de posición (60 segundos)**/
     private static final int MIN_TIME = 60*1000;
-    /**Constante para el descartar lecturas de ubicaciones en el método isBetterLocation**/
-    private static final int TWO_MINUTES = 1000 * 60 * 2;
+    
     /**Distancia mínima en metros entre lecturas de los sensores de posición (50 metros)**/
     private static final int MIN_DISTANCE = 50;
     /**Distancia máxima en metros entre dos posiciones para que se actualicen/descarguen PIs (1700 metros)**/
@@ -119,29 +118,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     
     /**Indica si la app está inicializada**/
     private boolean isCreated = false;
-    
-    /************* CONSTANTES PARA EL LOADER ******************/
-    /** Identificador del Loader. Actualmente solo hay uno **/
-    private static final int POI_LOADER = 0;
-
-    /** Datos necesarios del PI de entre los disponibles en la BD **/
-    private static final String[] POI_COLUMNS = {
-            PoiEntry.TABLE_NAME + "." + PoiEntry._ID,
-            PoiEntry.COLUMN_POI_NAME,
-            PoiEntry.COLUMN_POI_COLOR,
-            PoiEntry.COLUMN_POI_IMAGE,
-            PoiEntry.COLUMN_POI_DESCRIPTION,
-            PoiEntry.COLUMN_POI_WEBSITE,
-            PoiEntry.COLUMN_POI_PRICE,
-            PoiEntry.COLUMN_POI_OPEN_HOURS,
-            PoiEntry.COLUMN_POI_CLOSE_HOURS,
-            PoiEntry.COLUMN_POI_MAX_AGE,
-            PoiEntry.COLUMN_POI_MIN_AGE,
-            PoiEntry.COLUMN_POI_LATITUDE,
-            PoiEntry.COLUMN_POI_LONGITUDE,
-            PoiEntry.COLUMN_POI_ALTITUDE
-    };
-    
     
     
 	private FragmentModoCamara mFragmentModoCamara;
@@ -202,12 +178,26 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		setPoiIcons();
 		aplicarValoresDeAjustes();
 		
-		
-		
-		
-		
-		/**********************************************************************************/
-//		getSupportLoaderManager().initLoader(POI_LOADER, null, this);
+		Log.d(LOG_TAG,"\nEsto es por lo que se crea el mainActivity:"+getIntent().getAction()+"\n");
+		/*************************************************************************
+		Uri uri = getIntent().getData();
+        Cursor cursor = managedQuery(uri, null, null, null, null);
+
+        if (cursor == null) {
+            finish();
+        } else {
+            cursor.moveToFirst();
+
+            TextView word = (TextView) findViewById(R.id.word);
+            TextView definition = (TextView) findViewById(R.id.definition);
+
+            int wIndex = cursor.getColumnIndexOrThrow(DictionaryDatabase.KEY_WORD);
+            int dIndex = cursor.getColumnIndexOrThrow(DictionaryDatabase.KEY_DEFINITION);
+
+            word.setText(cursor.getString(wIndex));
+            definition.setText(cursor.getString(dIndex));
+        }
+        *************************************************************************/
 		
 	}// Fin de onCreate()
 	
@@ -321,12 +311,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		switch (item.getItemId()) {
-			/*case R.id.action_search:
-	            // search action
-	            return super.onOptionsItemSelected(item);
+			/*
 	        case R.id.action_help:
 	            //helpAction();
 	            return super.onOptionsItemSelected(item);*/
+			case R.id.action_search:
+				// search action
+	            return onSearchRequested();
+	            
 	        case R.id.action_settings:
 	        	// Settings action
 	        	startActivity( new Intent(this,SettingsActivity.class) );
@@ -389,7 +381,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 		// Solo se tiene en cuenta la nueva ubicación si es mejor que la anterior 
 		// (más precisa y reciente)
-		if (isBetterLocation(newLocation, ARDataSource.getCurrentLocation())) {
+		if (LocationUtility.isBetterLocation(newLocation, ARDataSource.getCurrentLocation())) {
     		Log.d(LOG_TAG,"la posicion nueva es mejor: La:"+newLocation.getLatitude()+" lo:"+newLocation.getLongitude()+" Precision:"+newLocation.getAccuracy()+"\nEl anterior tenia precision: "+ARDataSource.getCurrentLocation().getAccuracy());    		
     		float locationsDistance = newLocation.distanceTo(mLastUpdateDataLocation);
     		ARDataSource.setCurrentLocation(newLocation);
@@ -435,69 +427,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
 
 	
-	
-	/** 
-	 * Determines whether one Location reading is better than another Location fix
-     * @param location  The new Location that you want to evaluate
-     * @param anotherLocation  Another Location fix, to which you want to compare the new one
-     * @see http://developer.android.com/guide/topics/location/strategies.html#BestEstimate
-     */
-	private boolean isBetterLocation(Location location, Location anotherLocation) {
-       if (anotherLocation == null) {
-           return true;
-       }
-
-       String log = "beterlocation";
-       //Comprobar si la nueva ubicación es más o menos reciente que la anterior
-       long timeDelta = location.getTime() - anotherLocation.getTime();
-       boolean isNewer = timeDelta > 0;
-       Log.d(log,"1.1: "+location.getLatitude() + ","+location.getLongitude()+" AC:"+location.getAccuracy()+" aLT:"+location.getAltitude()+"\n");
-       Log.d(log,"1.2: "+anotherLocation.getLatitude() + ","+anotherLocation.getLongitude()+" AC:"+anotherLocation.getAccuracy()+" aLT:"+anotherLocation.getAltitude()+"\n");
-        // Si hace más de dos minutos de la última ubicación ->nueva es mejor
-       if (timeDelta > TWO_MINUTES) {
-    	   Log.d(log,"2");
-           return true;
-           //Si la nueva ubicación es antigua -> nueva es peor
-       } else if (timeDelta < -TWO_MINUTES) {
-    	   Log.d(log,"3");
-           return false;
-       }
-
-
-       int accuracyDelta = (int) (location.getAccuracy() - anotherLocation.getAccuracy());
-       boolean isLessAccurate = accuracyDelta > 0;
-       boolean isMoreAccurate = accuracyDelta < 0;
-       boolean isSignificantlyLessAccurate = accuracyDelta > 200;
-
-       
-       boolean isFromSameProvider = isSameProvider(location.getProvider(),
-               anotherLocation.getProvider());
-       Log.d(log,"4");
-       // Determinar la mejor localización según las variables calculadas
-       if (isMoreAccurate) {
-    	   Log.d(log,"5");
-           return true;
-       } else if (isNewer && !isLessAccurate) {
-    	   Log.d(log,"6");
-           return true;
-       } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
-    	   Log.d(log,"7");
-           return true;
-       }
-       Log.d(log,"8");
-       return false;
-   }
-
-   /** Checks whether two providers are the same */
-   private boolean isSameProvider(String provider1, String provider2) {
-       if (provider1 == null) {
-    	   return provider2 == null;
-       }
-       
-       return provider1.equals(provider2);
-   }
-   
-   
    /**
     * Método que actualiza el conjunto de PIs disponibles en memoria según la última localización
     * válida del dispositivo.
@@ -562,37 +491,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	   
    }
    
-   private Location getBestLastKnownLocation(long minTime) {
-	   	Location bestLocation = null;
-		float bestAccuracy = Float.MAX_VALUE;
-	   	long bestTime = Long.MIN_VALUE;
-	     
-		// Iterate through all the providers on the system, keeping
-		// note of the most accurate result within the acceptable time limit.
-		// If no result is found within maxTime, return the newest Location.
-		List<String> matchingProviders = sLocationMgr.getAllProviders();
-		for (String provider: matchingProviders) {
-			Location location = sLocationMgr.getLastKnownLocation(provider);
-	 
-			if (location != null) {
-				float accuracy = location.getAccuracy();
-				long time = location.getTime();
-	     
-				if ( (time > minTime) && (accuracy < bestAccuracy) ) {	//Tiempo y precisión mejores
-					bestLocation = location;
-					bestAccuracy = accuracy;
-					bestTime = time;
-				}else if ( (time < minTime) && (bestAccuracy == Float.MAX_VALUE) && (time > bestTime) ) {	
-					//Tiempo peor que el mínimo, pero no hay otro mejor -> se acepta la posición 
-					bestLocation = location;
-					bestTime = time;
-				}
-			}
-		}
-		
-		
-		return bestLocation;
-   }
+   
    
    
    /**
@@ -607,7 +506,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 
 		now.setToNow();
-		mLocation = getBestLastKnownLocation(now.toMillis(true) - THIRTY_MINUTES);
+		mLocation = LocationUtility
+				.getBestLastKnownLocation(sLocationMgr, now.toMillis(true) - THIRTY_MINUTES);
 				
 		try {
        	
@@ -784,9 +684,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	 * distinción entre los iconos de los PIs, aquí han de guardarse todos los que hagan falta.
 	 */
 	private void setPoiIcons() {
-		ARDataSource.sPoiIcons.put(DetallesPI.DETALLESPI_ICON, 
+		ARDataSource.sPoiIcons.put(DetallesPoi.DETALLESPI_ICON, 
 				BitmapFactory.decodeResource(getResources(), R.drawable.icono_pi));
-		ARDataSource.sPoiIcons.put(DetallesPI.DETALLESPI_SELECTED_ICON, 
+		ARDataSource.sPoiIcons.put(DetallesPoi.DETALLESPI_SELECTED_ICON, 
 				BitmapFactory.decodeResource(getResources(), R.drawable.icono_pi_seleccionado));
 	}
 	
@@ -826,7 +726,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		}else{
 
 			if (mTouchedPoi.isSelected() && mTouchedPoi == poiTouched) {
-				startActivity(new Intent(this,DetallesPIActivity.class));
+				startActivity(new Intent(this,DetallesPoiActivity.class));
 			}else{
 				mTouchedPoi = poiTouched;
 			}
@@ -843,70 +743,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				ARDataSource.SelectedPoi = null;
 			}
 		}		
-	}
-
-
-
-
-	/**
-	 * El Loader se usa para obtener los datos del Content Provider, que a su vez hace de 
-	 * intermediario entre el Loader y la Base de Datos. A continuación se implementan los 
-	 * métodos necesarios para manejarlo y poder obtener los PIs.
-	 */
-	@Override
-	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
-		// TODO Auto-generated method stub
-//		// This is called when a new Loader needs to be created.  This
-//        // fragment only uses one loader, so we don't care about checking the id.
-//
-//
-//        // Sort order:  Resultados ordenados por distancia (formato ORDER BY de SQL).
-//        //TODO: Aquí fórmula de la distancia....
-////        String sortOrder = PoiEntry.COLUMN_DISTANCE + " ASC";
-//
-//
-//        // Now create and return a CursorLoader that will take care of
-//        // creating a Cursor for the data being displayed.
-//        return new CursorLoader(
-//        		this,	//Context
-//                PoiEntry.CONTENT_URI,	//URI
-//                POI_COLUMNS,	//Proyección (SELECT)
-//                null,	//Selección (WHERE)
-//                null,	//Argumentos de la selección (Parámetros ? del WHERE)
-////                sortOrder	//(SORTED BY)
-//                null
-//        );
-		return null;
-	}
-
-
-
-
-	@Override
-	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-//		Log.d(CLASS_TAG,"onLoadFinished:1");
-//		if (data.getCount() == 0) {
-//			Log.d(CLASS_TAG,"onLoadFinished:2");
-//			NetworkDataProvider nd = new WikipediaDataProvider(this, true);
-//			Log.d(CLASS_TAG,"onLoadFinished:2.1");
-//            nd.syncImmediately(this);
-//            Log.d(CLASS_TAG,"onLoadFinished:2.2");
-//        }
-//		Log.d(CLASS_TAG,"onLoadFinished:3 con Count:"+data.getCount());
-//
-//
-//		for (int i=0; i<data.getColumnCount(); i++) {
-//			Log.d(CLASS_TAG,"onLoadFinished:4 columna "+i+" "+data.getColumnName(i));
-//		}
-	}
-
-
-
-
-	@Override
-	public void onLoaderReset(Loader<Cursor> arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 

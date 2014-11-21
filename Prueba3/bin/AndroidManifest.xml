@@ -54,7 +54,13 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            </intent-filter>            
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+        	</intent-filter>
+        	<meta-data 
+        	    android:name="android.app.searchable"
+        	    android:resource="@xml/searchable" />
         </activity>
 
         <activity
@@ -63,7 +69,7 @@
         </activity>
         
         <activity
-            android:name=".controlador.DetallesPIActivity"
+            android:name=".controlador.DetallesPoiActivity"
             android:label="@string/title_activity_detalles_pi" 
             android:parentActivityName=".controlador.MainActivity" >
             <meta-data

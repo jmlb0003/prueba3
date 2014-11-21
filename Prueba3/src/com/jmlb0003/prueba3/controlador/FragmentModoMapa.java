@@ -30,7 +30,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.jmlb0003.prueba3.R;
-import com.jmlb0003.prueba3.modelo.DetallesPI;
+import com.jmlb0003.prueba3.modelo.DetallesPoi;
 import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.vista.BasicDetailsView;
 
@@ -351,7 +351,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 							.position( new LatLng(poi.getLatitude(), poi.getLongitude()) )
 							.title( poi.getName() )
 							.icon( BitmapDescriptorFactory.fromBitmap(ARDataSource.sPoiIcons
-									.get(DetallesPI.DETALLESPI_ICON)) )  );
+									.get(DetallesPoi.DETALLESPI_ICON)) )  );
     		}
 	    		
 	    }
@@ -445,11 +445,11 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 		mCallback.onPoiTouched(poi);
 		
 		m.setIcon(BitmapDescriptorFactory.fromBitmap(
-				ARDataSource.sPoiIcons.get(DetallesPI.DETALLESPI_SELECTED_ICON)));
+				ARDataSource.sPoiIcons.get(DetallesPoi.DETALLESPI_SELECTED_ICON)));
 		
 		if (mSelectedMarker != null && mSelectedMarker != m) {
 			mSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(
-					ARDataSource.sPoiIcons.get(DetallesPI.DETALLESPI_ICON)));
+					ARDataSource.sPoiIcons.get(DetallesPoi.DETALLESPI_ICON)));
 		}
 		mSelectedMarker = m;
 		
@@ -461,7 +461,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 	private void deseleccionarMarker() {
 		mCallback.onPoiUnselected(ARDataSource.SelectedPoi);
 		mSelectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(
-				ARDataSource.sPoiIcons.get(DetallesPI.DETALLESPI_ICON)));
+				ARDataSource.sPoiIcons.get(DetallesPoi.DETALLESPI_ICON)));
 		mSelectedMarker = null;
 		
 		mBasicDetails.setVisibility(View.INVISIBLE);

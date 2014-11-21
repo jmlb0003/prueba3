@@ -22,6 +22,5 @@
         android:layout_alignParentBottom="true"
         android:visibility="invisible"
         android:background="#88222222" />
-    <!-- 
-        android:layout_height="200dp" -->
+
  </RelativeLayout>
