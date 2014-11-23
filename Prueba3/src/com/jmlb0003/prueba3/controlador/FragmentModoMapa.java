@@ -494,7 +494,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
                 
             
             case MotionEvent.ACTION_UP:
-            	if (ARDataSource.hasSelectededPoi() && view == mBasicDetails) {
+            	if (ARDataSource.hasSelectededPoi() && view == mBasicDetails && event.getY() > 0) {
             		mCallback.onPoiTouched(ARDataSource.SelectedPoi);
             		
             		return true;

@@ -11,4 +11,16 @@
         android:title="@string/action_search"
         android:icon="@android:drawable/ic_menu_search"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_description"
+        android:orderInCategory="20"
+        android:title="@string/action_description"
+        android:icon="@android:drawable/ic_dialog_alert"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_about"
+        android:orderInCategory="30"
+        android:title="@string/action_about"
+        android:icon="@android:drawable/ic_dialog_info"
+        app:showAsAction="never" />
 </menu>

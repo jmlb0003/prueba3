@@ -198,7 +198,16 @@ public class Poi implements Comparable<Poi> {
     }
     
     public synchronized String getTextDistance() {
-        return (String) mDetails.getDetalle(DetallesPoi.DETALLESPI_DISTANCE);
+    	String textStr = null;
+    	if (mDistance < 1000.0) {
+	        textStr = DECIMAL_FORMAT.format(mDistance) + " m";
+	        mDetails.actualizaDistancia(DECIMAL_FORMAT.format(mDistance) + " m");
+	    } else {
+	        double d = mDistance/1000.0;
+	        textStr = DECIMAL_FORMAT.format(d) + " km";
+	        mDetails.actualizaDistancia(DECIMAL_FORMAT.format(d) + " km");
+	    }
+        return textStr;
     }
     
     public synchronized String getImage() {
@@ -758,15 +767,7 @@ public class Poi implements Comparable<Poi> {
 			throw new NullPointerException();
 		}
 		
-	    String textStr = null;
-	    if (mDistance < 1000.0) {
-	        textStr = mName;// + " ("+ DECIMAL_FORMAT.format(mDistance) + "m)";
-	        mDetails.actualizaDistancia(DECIMAL_FORMAT.format(mDistance) + " m");
-	    } else {
-	        double d = mDistance/1000.0;
-	        textStr = mName;// + " (" + DECIMAL_FORMAT.format(d) + "km)";
-	        mDetails.actualizaDistancia(DECIMAL_FORMAT.format(d) + " km");
-	    }
+	    String textStr = mName;
 
 
 	    textXyzRelativeToCameraView.get(textArray);

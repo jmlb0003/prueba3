@@ -71,7 +71,8 @@
         
         <activity
             android:name=".controlador.PoiSearchActivity"
-            android:label="@string/title_activity_searchable" >
+            android:label="@string/title_activity_searchable"
+            android:parentActivityName=".controlador.MainActivity" >
             
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -80,6 +81,9 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.jmlb0003.prueba3.controlador.MainActivity" />
         </activity>
 
         <meta-data

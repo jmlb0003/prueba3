@@ -1,8 +1,11 @@
 package com.jmlb0003.prueba3.controlador;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -54,7 +57,6 @@ public class DetallesPoiActivity extends ActionBarActivity {
 	        } else {
 	        	Log.d(LOG_TAG,"4");
 	        	//Se añade el PI a la lista en memoria y después se asigna a mShowedPoi
-	        	Log.d(LOG_TAG, "El ID del poi que va a mshowed es:"+cursor.getLong(cursor.getColumnIndex(PoiEntry._ID)));
 	        	mShowedPoi = ARDataSource.getPoi(cursor.getLong(cursor.getColumnIndex(PoiEntry._ID)));
 	        	
 	        	/********************************************/
@@ -64,6 +66,7 @@ public class DetallesPoiActivity extends ActionBarActivity {
 	        		Log.d(LOG_TAG,"Mshowed Name: "+mShowedPoi.getName());
 	        		Log.d(LOG_TAG,"Mshowed id: "+mShowedPoi.getID());
 	        		Log.d(LOG_TAG,"Mshowed Distance: "+mShowedPoi.getDistance());
+	        		Log.d(LOG_TAG,"Mshowed Distance2: "+mShowedPoi.getTextDistance());
 	        	}
 	        }
 		}
@@ -124,17 +127,23 @@ public class DetallesPoiActivity extends ActionBarActivity {
 			/*case R.id.action_search:
 	            // search action
 	            return super.onOptionsItemSelected(item);
-	        case R.id.action_help:
-	            //helpAction();
-	            return super.onOptionsItemSelected(item);
+	        
 	        case R.id.action_settings:
 	        	// Settings action
 	        	startActivity(new Intent(this,SettingsActivity.class));
 	            return true;*/
+			
+			case R.id.action_about:
+				//aboutAction
+				showAbout();
+				return true;
+            
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
 	}
+	
+	
 	
 	
 	
@@ -182,4 +191,41 @@ public class DetallesPoiActivity extends ActionBarActivity {
 			Log.d("DetallesActivity","No hay description container...");
 		}
 	}
+	
+	
+	
+	
+	/**
+	    * Método para mostrar una ventana de diálogo con la descripción del funcionamiento de
+	    * las búsquedas en la app.
+	    */
+	   private void showAbout() {
+		   AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);
+
+	       ventanaAlerta.setTitle(getString(R.string.title_about));
+	       ventanaAlerta.setMessage(getString(R.string.message_about));
+
+
+	       //Si se pulsa el botón de cancelar, cerrar la ventana de diálogo
+	       ventanaAlerta.setNeutralButton(getString(R.string.close), 
+	    		   new DialogInterface.OnClickListener() {
+	    	   			public void onClick(DialogInterface dialog, int which) {
+	    	   				dialog.cancel();
+	    	   			}
+	       });
+	       ventanaAlerta.setPositiveButton(getString(R.string.developer_webSite),
+	    		   new DialogInterface.OnClickListener() {
+	    	   			public void onClick(DialogInterface dialog, int which) {
+	    	   				startActivity(new Intent(
+	    	   						Intent.ACTION_VIEW, Uri.parse(getString(R.string.my_website))));
+	    	   				
+	    	   				dialog.cancel();
+	    	   			}
+	       });
+	       
+	       ventanaAlerta.setIcon(android.R.drawable.ic_dialog_info);
+
+	       //Mostrar la ventana
+	       ventanaAlerta.show();
+	   }
 }

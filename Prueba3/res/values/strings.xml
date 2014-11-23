@@ -6,6 +6,7 @@
     <string name="title_section_modoMapa">Modo Mapa</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Ajustes</string>
+    <string name="action_about">Acerca de</string>
 
     <!-- Cadena "estás aquí" para el marcador del modo mapa -->
     <string name="you_are_here">Estás aquí</string>
@@ -24,20 +25,18 @@
     <string name="alert_location_title">Ajustes de ubicación</string>
     <string name="alert_location_message">No se puede ubicar su dispositivo. Por favor, active alguna opción de ubicación.</string>
     <string name="alert_location_positive_button">Ir a Ajustes</string>
-    <string name="alert_location_negative_button">Cerrar</string>
     <string name="alert_location_negative_message">Para que la app funcione tiene que activar alguna opción de ubicación en los ajustes.</string>
 
     <!-- Ventana de diálogo de ajustes de conexión a Internet -->
     <string name="alert_network_title">Ajustes de Internet</string>
     <string name="alert_network_message">No se pueden descargar Puntos de Interés. Por favor, active alguna conexión a Internet.</string>
     <string name="alert_network_positive_button">Ir a Ajustes</string>
-    <string name="alert_network_negative_button">Cerrar</string>
     <string name="alert_network_negative_message">Se necesita conexión a Internet para obtener los datos de Puntos de Interés y para mostrar el mapa.</string>
 
     <!-- Ventana de diálogo de ubicación -->
     <string name="alert_location2_title">Buscando ubicación</string>
     <string name="alert_location2_message">Afinando la ubicación&#8230;\nPaciencia. Al iniciar la app puede tardar un poco. Y recuerde que en interiores puede que no se encuentre una ubicación precisa.</string>
-    <string name="alert_location2_negative_button">Cerrar</string>
+    <string name="close">Cerrar</string>
     <string name="alert_location2_negative_message">¡Ya queda menos!</string>
 
     <!-- Vista de detalles básicos de los PI -->
@@ -50,9 +49,25 @@
     <!-- Strings de búsqueda -->
     <string name="search_hint">Buscar PIs</string>
     <string name="action_search">Búsqueda</string>
+    <string name="action_description">Léeme</string>
+    
 
     <!-- Search failure message. -->
     <string name="no_search_results">No se encontraron resultados para \"%s\"</string>
     <string name="title_activity_searchable">Búsqueda de PIs</string>
+    <string name="search_description_dialog_title">Aclaración sobre búsquedas</string>
+    <string name="search_description">La búsqueda se realiza sobre lugares que han sido visitados. Por ejemplo, si no has estado en Madrid, no puedes buscar lugares situados en Madrid.</string>
+
+    <plurals name="search_results">
+      <item quantity="one">%1$d resultado para \'%2$s\': </item>
+      <item quantity="other">%1$d resultados para \'%2$s\': </item>
+    </plurals>
+    
+    
+    <!-- Ventana de diálogo de Sobre mi -->
+    <string name="title_about">Sobre mí</string>
+    <string name="message_about">José Miguel López Bayona\njoselopez.hol.es</string>
+    <string name="developer_webSite">Web del desarrollador</string>
+    <string name="my_website">http://joselopez.hol.es</string>
 
 </resources>

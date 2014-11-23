@@ -359,7 +359,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
             	return true;
 
             case MotionEvent.ACTION_UP:
-            	
             	//Cuando el evento no es de la vista de detalles básicos se comprueban los PIs
             	if (view != mBasicDetails) {
                 	for (Poi poi : ARDataSource.getPois()) {
@@ -368,24 +367,21 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
             	            
             	            return true;
             	        }
-            	    }            		
+            	    }
             	}
 
-
-            	if (ARDataSource.hasSelectededPoi()) {            		
-            		if (view == mBasicDetails) {
+            	if (ARDataSource.hasSelectededPoi()) {
+            		if (view == mBasicDetails && event.getY() > 0) {
                 		mCallback.onPoiTouched(ARDataSource.SelectedPoi);
                 		
                 		return true;
             		}
-                	
             		mCallback.onPoiUnselected(ARDataSource.SelectedPoi);
 
-            		mBasicDetails.setVisibility(View.INVISIBLE);            		
+            		mBasicDetails.setVisibility(View.INVISIBLE);
             	}
             	
-            	return false;
-            	
+            	return false;            	
         }
         return false;
 	}

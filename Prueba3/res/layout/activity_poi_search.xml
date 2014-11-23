@@ -4,15 +4,12 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical" >
-    
-    <!--  android:textColor="?android:textColorPrimary"  -->
+  
     <TextView
         android:id="@+id/poi_search_text"
-        android:visibility="invisible"
-        android:textColor="@color/orange"
+        android:textColor="@color/text_primary"
         android:textSize="17sp"
         android:background="@android:drawable/title_bar"
-        android:text="Este es poi_searchText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     

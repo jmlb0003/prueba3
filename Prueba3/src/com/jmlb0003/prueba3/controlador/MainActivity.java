@@ -18,6 +18,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -25,7 +26,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.format.Time;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -52,7 +57,7 @@ import com.jmlb0003.prueba3.utilidades.LocationUtility;
  */
 
 /**
- * 
+ * Actividad principal de la app. Es el punto de entrada.
  * @author Jose
  *
  */
@@ -288,10 +293,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		switch (item.getItemId()) {
-			/*
 	        case R.id.action_help:
 	            //helpAction();
-	            return super.onOptionsItemSelected(item);*/
+	            showAbout();
+	            return true;
+	            
 			case R.id.action_search:
 				// search action
 	            return onSearchRequested();
@@ -410,31 +416,16 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	 */
 	private void searchManager() {
 		Intent intent = getIntent();
-		Intent destinyIntent = null;
 
-        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-        	// handles a click on a search suggestion; launches activity to show word
-        	destinyIntent = new Intent(this, DetallesPoiActivity.class);
-            
-        	Bundle b = intent.getExtras();
-        	if (b.containsKey(SearchManager.USER_QUERY)) {
-        		Log.d(LOG_TAG,"el userQuery es:"+b.get(SearchManager.USER_QUERY).toString());
-        		Log.d(LOG_TAG," y getData es:"+intent.getDataString());
-        		destinyIntent.setData(PoiContract.PoiEntry.
-        				buildPoiByNameUri(b.get(SearchManager.USER_QUERY).toString()));
-        	}
-            
-        } else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             // handles a search query
-        	destinyIntent = new Intent(getApplicationContext(), PoiSearchActivity.class);
-        	destinyIntent.putExtra(SearchManager.QUERY, intent.getStringExtra(SearchManager.QUERY));
-        }
-        
-        if(destinyIntent != null) {
-        	destinyIntent.setAction(Intent.ACTION_SEARCH);
-        	startActivity(destinyIntent);
+        	Intent poiSearchIntent = new Intent(getApplicationContext(), PoiSearchActivity.class);
+        	poiSearchIntent.putExtra(SearchManager.QUERY, intent.getStringExtra(SearchManager.QUERY));
+        	poiSearchIntent.setAction(Intent.ACTION_SEARCH);
+        	
+        	startActivity(poiSearchIntent);
         	//Esta actividad debe eliminarse de la pila porque ya ha cumplido su cometido
-            finish();
+        	finish();
         }        
 	}
 
@@ -600,7 +591,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
        });
 
        //Si se pulsa el botón de cancelar, cerrar la ventana de diálogo
-       ventanaAlerta.setNegativeButton(getString(R.string.alert_location_negative_button), 
+       ventanaAlerta.setNegativeButton(getString(R.string.close), 
     		   											new DialogInterface.OnClickListener() {
            public void onClick(DialogInterface dialog, int which) {
         	   Toast toast = Toast.makeText(getApplicationContext(), 
@@ -640,7 +631,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
        });
 
        //Si se pulsa el botón de cancelar, cerrar la ventana de diálogo
-       ventanaAlerta.setNegativeButton(getString(R.string.alert_network_negative_button), 
+       ventanaAlerta.setNegativeButton(getString(R.string.close), 
     		   											new DialogInterface.OnClickListener() {
            public void onClick(DialogInterface dialog, int which) {
         	   Toast toast = Toast.makeText(getApplicationContext(), 
@@ -669,7 +660,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
 
        //Si se pulsa el botón de cancelar, cerrar la ventana de diálogo
-       ventanaAlerta.setNegativeButton(getString(R.string.alert_location2_negative_button), 
+       ventanaAlerta.setNegativeButton(getString(R.string.close), 
     		   											new DialogInterface.OnClickListener() {
            public void onClick(DialogInterface dialog, int which) {
         	   Toast toast = Toast.makeText(getApplicationContext(), 
@@ -680,6 +671,41 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         	   toast.show();
            }
        });
+
+       //Mostrar la ventana
+       ventanaAlerta.show();
+   }
+   
+   
+   /**
+    * Método para mostrar una ventana de diálogo con la descripción del funcionamiento de
+    * las búsquedas en la app.
+    */
+   private void showAbout() {
+	   AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);
+
+       ventanaAlerta.setTitle(getString(R.string.title_about));
+       ventanaAlerta.setMessage(getString(R.string.message_about));
+
+
+       //Si se pulsa el botón de cancelar, cerrar la ventana de diálogo
+       ventanaAlerta.setNeutralButton(getString(R.string.close), 
+    		   new DialogInterface.OnClickListener() {
+    	   			public void onClick(DialogInterface dialog, int which) {
+    	   				dialog.cancel();
+    	   			}
+       });
+       ventanaAlerta.setPositiveButton(getString(R.string.developer_webSite),
+    		   new DialogInterface.OnClickListener() {
+    	   			public void onClick(DialogInterface dialog, int which) {
+    	   				startActivity(new Intent(
+    	   						Intent.ACTION_VIEW, Uri.parse(getString(R.string.my_website))));
+    	   				
+    	   				dialog.cancel();
+    	   			}
+       });
+       
+       ventanaAlerta.setIcon(android.R.drawable.ic_dialog_info);
 
        //Mostrar la ventana
        ventanaAlerta.show();
