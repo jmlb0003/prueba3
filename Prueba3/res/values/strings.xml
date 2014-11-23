@@ -6,22 +6,19 @@
     <string name="title_section_modoMapa">Modo Mapa</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Ajustes</string>
-    
+
     <!-- Cadena "estás aquí" para el marcador del modo mapa -->
     <string name="you_are_here">Estás aquí</string>
     <!-- Clave para usar Google Maps en la app -->
     <string name="maps_key">AIzaSyAPWQlnZICVmAePBokkdXf4ic8ahjycq84</string>
-    
+
     <!-- Content Provider -->
     <string name="sync_account_type">prueba3.jmlb0003.com</string>
     <string name="content_authority">"com.jmlb0003.prueba3"</string>
-    
+
     <!-- Ventana de diálogo de descarga de PIs -->
     <string name="downloading">Descargando&#8230;</string>
-    <string name="downloading_pois_description">Estamos descargando los Puntos de Interés. Pronto estarán listos.</string>
-    
-    <!-- Tarea de descarga de imágenes -->
-    <string name="downloading_images_de"></string>
+    <string name="downloading_pois_description">Descargando los Puntos de Interés. Pronto estarán listos.</string>
 
     <!-- Ventana de diálogo de ajustes de ubicación -->
     <string name="alert_location_title">Ajustes de ubicación</string>
@@ -29,7 +26,7 @@
     <string name="alert_location_positive_button">Ir a Ajustes</string>
     <string name="alert_location_negative_button">Cerrar</string>
     <string name="alert_location_negative_message">Para que la app funcione tiene que activar alguna opción de ubicación en los ajustes.</string>
-    
+
     <!-- Ventana de diálogo de ajustes de conexión a Internet -->
     <string name="alert_network_title">Ajustes de Internet</string>
     <string name="alert_network_message">No se pueden descargar Puntos de Interés. Por favor, active alguna conexión a Internet.</string>
@@ -39,7 +36,7 @@
 
     <!-- Ventana de diálogo de ubicación -->
     <string name="alert_location2_title">Buscando ubicación</string>
-    <string name="alert_location2_message">Afinando la ubicación&#8230;\nPaciencia. Al iniciar la app puede tardar un poco.</string>
+    <string name="alert_location2_message">Afinando la ubicación&#8230;\nPaciencia. Al iniciar la app puede tardar un poco. Y recuerde que en interiores puede que no se encuentre una ubicación precisa.</string>
     <string name="alert_location2_negative_button">Cerrar</string>
     <string name="alert_location2_negative_message">¡Ya queda menos!</string>
 
@@ -49,21 +46,13 @@
     <string name="pi_description">Descripción</string>
     <string name="pi_content_description">Fotografía del PI</string>
     <string name="title_activity_detalles_pi">DetallesPIActivity</string>
-    
+
     <!-- Strings de búsqueda -->
     <string name="search_hint">Buscar PIs</string>
     <string name="action_search">Búsqueda</string>
-    
-    <!-- Número de resultados encontrados -->
-    <plurals name="search_results">
-      <item quantity="one">%1$d resultado para \"%2$s\": </item>
-      <item quantity="other">%1$d resultados para \"%2$s\": </item>
-    </plurals>
 
     <!-- Search failure message. -->
     <string name="no_search_results">No se encontraron resultados para \"%s\"</string>
+    <string name="title_activity_searchable">Búsqueda de PIs</string>
 
-    
-    
 </resources>
-

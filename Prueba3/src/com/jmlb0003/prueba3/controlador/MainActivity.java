@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import android.app.AlertDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,7 +18,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -31,9 +31,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.DetallesPoi;
@@ -178,30 +176,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		setPoiIcons();
 		aplicarValoresDeAjustes();
 		
-		Log.d(LOG_TAG,"\nEsto es por lo que se crea el mainActivity:"+getIntent().getAction()+"\n");
-		/*************************************************************************
-		Uri uri = getIntent().getData();
-        Cursor cursor = managedQuery(uri, null, null, null, null);
-
-        if (cursor == null) {
-            finish();
-        } else {
-            cursor.moveToFirst();
-
-            TextView word = (TextView) findViewById(R.id.word);
-            TextView definition = (TextView) findViewById(R.id.definition);
-
-            int wIndex = cursor.getColumnIndexOrThrow(DictionaryDatabase.KEY_WORD);
-            int dIndex = cursor.getColumnIndexOrThrow(DictionaryDatabase.KEY_DEFINITION);
-
-            word.setText(cursor.getString(wIndex));
-            definition.setText(cursor.getString(dIndex));
-        }
-        *************************************************************************/
+		searchManager();
 		
 	}// Fin de onCreate()
 	
-
+	
+	
 
 	
 	/**
@@ -229,8 +209,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         }
         
     }// Fin de onResume()
-	
-	
 	
 	
 	
@@ -272,8 +250,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 		if(savedInstanceState.containsKey(STATE_SELECTED_POI_ID)) {
 			Log.d(LOG_TAG,"Se guarda la pestaña:"+getSupportActionBar().getSelectedNavigationIndex());
-			mTouchedPoi = ARDataSource
-					.getPoi(Long.toString(savedInstanceState.getLong(STATE_SELECTED_POI_ID)));
+			mTouchedPoi = ARDataSource.getPoi(savedInstanceState.getLong(STATE_SELECTED_POI_ID));
 		}
 	}
 	
@@ -298,7 +275,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.main_menu, menu);
 		
 		return true;
 	}
@@ -323,6 +300,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	        	// Settings action
 	        	startActivity( new Intent(this,SettingsActivity.class) );
 	            return true;
+	            
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
@@ -424,6 +402,41 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 		//Función de onLocationListener - No se utiliza		
 	}
+	
+	
+	
+	/**
+	 * Método que gestiona las búsquedas que se realicen desde esta activity
+	 */
+	private void searchManager() {
+		Intent intent = getIntent();
+		Intent destinyIntent = null;
+
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+        	// handles a click on a search suggestion; launches activity to show word
+        	destinyIntent = new Intent(this, DetallesPoiActivity.class);
+            
+        	Bundle b = intent.getExtras();
+        	if (b.containsKey(SearchManager.USER_QUERY)) {
+        		Log.d(LOG_TAG,"el userQuery es:"+b.get(SearchManager.USER_QUERY).toString());
+        		Log.d(LOG_TAG," y getData es:"+intent.getDataString());
+        		destinyIntent.setData(PoiContract.PoiEntry.
+        				buildPoiByNameUri(b.get(SearchManager.USER_QUERY).toString()));
+        	}
+            
+        } else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            // handles a search query
+        	destinyIntent = new Intent(getApplicationContext(), PoiSearchActivity.class);
+        	destinyIntent.putExtra(SearchManager.QUERY, intent.getStringExtra(SearchManager.QUERY));
+        }
+        
+        if(destinyIntent != null) {
+        	destinyIntent.setAction(Intent.ACTION_SEARCH);
+        	startActivity(destinyIntent);
+        	//Esta actividad debe eliminarse de la pila porque ya ha cumplido su cometido
+            finish();
+        }        
+	}
 
 
 	
@@ -444,14 +457,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				   null);
 		   
 		   if (poisByLocation != null && poisByLocation.moveToFirst()) {
-			   Log.d(LOG_TAG,"poisfrom LOCATION");
 			   ARDataSource.addPoisFromCursor(poisByLocation);
 		   }else{
 			   NetworkInfo ni = ((ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE))
 					   	.getActiveNetworkInfo();			   
 			   
 			   if (ni != null && ni.isConnected()) {
-				   Log.d(LOG_TAG,"1poisfrom TASK");
 				   new PoiDownloaderTask(this, NETWORK_POI_SOURCES).execute();
 				   new LocalPoiLoaderTask(this, LOCAL_POI_SOURCES).execute();
 			   }else{
@@ -512,14 +523,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		try {
        	
 			if (sLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-				Log.d(LOG_TAG,"1GetLocation");
 				isGPSEnabled = true;
 				sLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 						MIN_TIME, MIN_DISTANCE, this);
 			}
 			
 			if (sLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-				Log.d(LOG_TAG,"2GetLocation");
 				isNetworkEnabled = true;
 				sLocationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
 						MIN_TIME, MIN_DISTANCE, this);
@@ -559,7 +568,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
    
    
    private void setLocationProviders(long toMinTime) {
-	   Log.d(LOG_TAG,"haylocation:"+hayLocation+" y toMinTime:"+toMinTime);
 	   if (toMinTime == MIN_TIME) {
 		   hayLocation = true;
 	   }
@@ -613,7 +621,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     * Método para avisar de que no hay conexión a Internet para descargar datos.
     */
    private void mostrarNetworkAlert () {
-	   Log.d(LOG_TAG,"MostrarNetworkAlert: ha entrado ahora y iscreated es "+isCreated);
 	   if (!isCreated) {
 		   return;
 	   }

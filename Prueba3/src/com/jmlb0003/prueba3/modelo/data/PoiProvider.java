@@ -41,6 +41,7 @@ public class PoiProvider extends ContentProvider {
     private static final int POI_BY_ID = 101;
     private static final int POIS_BY_NAME = 102;
     private static final int POIS_BY_COORDS = 103;
+//    private static final int SEARCH_SUGGEST = 104;
     
     private static final int LOCATIONS = 200;
     private static final int LOCATION_BY_ID = 201;
@@ -276,12 +277,13 @@ public class PoiProvider extends ContentProvider {
         matcher.addURI(authority, PoiContract.PATH_POIS, POIS);
         // PIs por ID  ---> content://com.jmlb0003.prueba3/poi/12312
         matcher.addURI(authority, PoiContract.PATH_POIS + "/#", POI_BY_ID);
-        // PIs por nombre  ---> content://com.jmlb0003.prueba3/poi/by-name
-        matcher.addURI(authority, PoiContract.PATH_POIS + "/" + PoiContract.POIS_BY_NAME,
+        // PIs por nombre  ---> content://com.jmlb0003.prueba3/poi/by-name/asds
+        matcher.addURI(authority, PoiContract.PATH_POIS + "/" + PoiContract.POIS_BY_NAME + "/*",
         														POIS_BY_NAME);
         // Location por Coordenadas --> content://com.jmlb0003.prueba3/poi/by-coords?location_sadasd
         matcher.addURI(authority, PoiContract.PATH_POIS + "/" + PoiContract.POIS_BY_COORDS, 
         														POIS_BY_COORDS);
+//        matcher.addURI(authority, SearchManager.SUGGEST_URI_PATH_QUERY, SEARCH_SUGGEST);
         
 
         // Locations en general --> content://com.jmlb0003.prueba3/location
@@ -357,11 +359,11 @@ public class PoiProvider extends ContentProvider {
             	
                 break;
             }            
-            // "poi/*"
+            // "/poi/by-name/*"
             case POIS_BY_NAME: {
             	//Seleccionar la entrada cuyo nombre sea de la forma %parametroURI%, es decir, que contenga la cadena de la URI
-            	selection = PoiContract.PoiEntry.COLUMN_POI_NAME + " LIKE '%" + ContentUris.parseId(uri) + "%'";
-
+            	selection = PoiContract.PoiEntry.COLUMN_POI_NAME + " LIKE '%" + uri.getLastPathSegment() + "%'";
+            	
             	retCursor = mOpenHelper.getReadableDatabase().query(
                         PoiContract.PoiEntry.TABLE_NAME,
                         projection,
@@ -379,7 +381,36 @@ public class PoiProvider extends ContentProvider {
             	retCursor = getAllPoisByLocation(uri, projection, sortOrder);
             	
             	break;
-            }            
+            }
+//            // "search_suggest_query=?limit=50"
+//            case SEARCH_SUGGEST: {
+//            	if(selectionArgs != null && selectionArgs.length > 0 && 
+//            			!selectionArgs[0].equals("")) {
+//            		
+//	            	selection = PoiContract.PoiEntry.COLUMN_POI_NAME + " LIKE '%" + 
+//            			selectionArgs[0] + "%'";
+//	            	String[] columns = {
+//	            			BaseColumns._ID,
+//	            			PoiContract.PoiEntry._ID,
+//	            			PoiContract.PoiEntry.COLUMN_POI_NAME };
+//	            	
+//	            	
+//	            	Log.d(LOG_TAG,"el selection es:\n"+selection+"selectionArgs:"+selectionArgs.length+" son:"+selectionArgs[0]);
+//	            	retCursor = mOpenHelper.getReadableDatabase().query(
+//	                        PoiContract.PoiEntry.TABLE_NAME,
+//	                        columns,
+//	                        selection,
+//	                        null, null, null, null );
+//            	}else{
+//            		Log.d(LOG_TAG,"En el otro, projection tiene:\n"+projection);
+//            		retCursor = mOpenHelper.getReadableDatabase().query(
+//	                        PoiContract.PoiEntry.TABLE_NAME,
+//	                        projection,
+//	                        null, null, null, null, null );
+//            	}
+//            	
+//            	break;
+//            }
             // "location"
             case LOCATIONS: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
@@ -467,6 +498,8 @@ public class PoiProvider extends ContentProvider {
                 return PoiContract.PoiEntry.CONTENT_TYPE;
             case POIS_BY_COORDS:
                 return PoiContract.LocationEntry.CONTENT_TYPE;
+//            case SEARCH_SUGGEST:
+//                return SearchManager.SUGGEST_MIME_TYPE;
             case LOCATIONS:
                 return PoiContract.LocationEntry.CONTENT_TYPE;
             case LOCATION_BY_ID:

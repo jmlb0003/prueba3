@@ -6,6 +6,7 @@ import java.util.Date;
 
 import com.jmlb0003.prueba3.R;
 
+import android.app.SearchManager;
 import android.content.ContentUris;
 import android.graphics.Color;
 import android.net.Uri;
@@ -204,7 +205,8 @@ public class PoiContract {
         public static final String COLUMN_POI_USER_ID = "usuario_ID_usuario";        
 
         /** Nombre del PI **/
-        public static final String COLUMN_POI_NAME = "poi_name";
+        public static final String COLUMN_POI_NAME = SearchManager.SUGGEST_COLUMN_TEXT_1;//"poi_name";
+        //Para que funcionen las sugerencias de las búsquedas, es necesario ponerle ese nombre
         
         /** Color del PI en el Radar **/
         public static final String COLUMN_POI_COLOR = "poi_color";
@@ -276,18 +278,25 @@ public class PoiContract {
          */
         public static Uri buildLocationUriWithCoords(String lat, String lon) {
         	
-        	return CONTENT_URI.buildUpon()
-        			.appendPath(POIS_BY_COORDS)
+        	return CONTENT_URI.buildUpon().appendPath(POIS_BY_COORDS)
                     .appendQueryParameter(LocationEntry.COLUMN_LOCATION_LATITUDE, lat)
                     .appendQueryParameter(LocationEntry.COLUMN_LOCATION_LONGITUDE, lon)
                     .build();
         }
         
         
-//
-//        public static Uri buildPoiLocationWithDate(String locationSetting, String date) {
-//            return CONTENT_URI.buildUpon().appendPath(locationSetting).appendPath(date).build();
-//        }
+
+        /**
+         * Método que genera la URI de consulta de PIs del Content Provider dadas un nombre (o una
+         * parte). Será de la forma: 
+         * <pre>content://< paquete >/poi/by-name/name</pre>
+         * @param name	Cadena que debe contener el nombre de los PIs que se devuelvan con esta URI
+         * @return URI para consultar en el Content Provider los PIs que contienen la cadena dada.
+         */
+        public static Uri buildPoiByNameUri(String name) {
+            return CONTENT_URI.buildUpon().appendPath(POIS_BY_NAME)
+            		.appendPath(name).build();
+        }
 //
         
 //

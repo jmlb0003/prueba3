@@ -4,7 +4,6 @@ import java.util.List;
 
 import android.location.Location;
 import android.location.LocationManager;
-import android.util.Log;
 
 public abstract class LocationUtility {
 	
@@ -24,19 +23,18 @@ public abstract class LocationUtility {
 			return true;
 		}
 
-		String log = "beterlocation";
 		//Comprobar si la nueva ubicación es más o menos reciente que la anterior
 		long timeDelta = location.getTime() - anotherLocation.getTime();
 		boolean isNewer = timeDelta > 0;
-		Log.d(log,"1.1: "+location.getLatitude() + ","+location.getLongitude()+" AC:"+location.getAccuracy()+" aLT:"+location.getAltitude()+"\n");
-		Log.d(log,"1.2: "+anotherLocation.getLatitude() + ","+anotherLocation.getLongitude()+" AC:"+anotherLocation.getAccuracy()+" aLT:"+anotherLocation.getAltitude()+"\n");
+//		Log.d(log,"1.1: "+location.getLatitude() + ","+location.getLongitude()+" AC:"+location.getAccuracy()+" aLT:"+location.getAltitude()+"\n");
+//		Log.d(log,"1.2: "+anotherLocation.getLatitude() + ","+anotherLocation.getLongitude()+" AC:"+anotherLocation.getAccuracy()+" aLT:"+anotherLocation.getAltitude()+"\n");
         // Si hace más de dos minutos de la última ubicación ->nueva es mejor
 		if (timeDelta > TWO_MINUTES) {
-			Log.d(log,"2");
+//			Log.d(log,"2");
 			return true;
 			//Si la nueva ubicación es antigua -> nueva es peor
 		} else if (timeDelta < -TWO_MINUTES) {
-			Log.d(log,"3");
+//			Log.d(log,"3");
 			return false;
 		}
 
@@ -49,19 +47,19 @@ public abstract class LocationUtility {
        
 		boolean isFromSameProvider = isSameProvider(location.getProvider(),
 				anotherLocation.getProvider());
-		Log.d(log,"4");
+//		Log.d(log,"4");
 		// Determinar la mejor localización según las variables calculadas
 		if (isMoreAccurate) {
-			Log.d(log,"5");
+//			Log.d(log,"5");
 			return true;
 		} else if (isNewer && !isLessAccurate) {
-			Log.d(log,"6");
+//			Log.d(log,"6");
 			return true;
 		} else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
-			Log.d(log,"7");
+//			Log.d(log,"7");
 			return true;
 		}
-		Log.d(log,"8");
+//		Log.d(log,"8");
 		return false;
 	}
 	

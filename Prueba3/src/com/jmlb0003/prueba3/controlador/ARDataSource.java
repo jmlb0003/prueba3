@@ -385,7 +385,7 @@ public abstract class ARDataSource {
      * @param idPoi ID del PI que se está buscando
      * @return PoI de la lista con el ID dado o null si no hay ninguno.
      */
-    public static Poi getPoi(String idPoi) {
+    public static Poi getPoi(long idPoi) {
     	return POI_LIST.get(idPoi);
     }
     

@@ -1,6 +1,8 @@
 package com.jmlb0003.prueba3.controlador;
 
+
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -13,8 +15,14 @@ import android.widget.TextView;
 
 import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.Poi;
+import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
 import com.jmlb0003.prueba3.modelo.sync.LoadPoisImagesTask;
 
+
+/**
+ * Clase que controla la vista que muestra los detalles de un PI.
+ * @author Jose
+ */
 public class DetallesPoiActivity extends ActionBarActivity {
 	private static final String LOG_TAG = "DetallesPoiActivity";
 	
@@ -27,26 +35,75 @@ public class DetallesPoiActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_detalles_pi);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		Log.d(LOG_TAG,"a ver si hay poi o no con intent:"+getIntent().getAction());
+		if (getIntent().getAction() != null && 
+				getIntent().getAction().equals(Intent.ACTION_SEARCH) && 
+				getIntent().getData() != null) {
+			Log.d(LOG_TAG,"1");
+	        Cursor cursor = getContentResolver().query(
+	        		//PoiContract.PoiEntry.CONTENT_URI,
+	        		getIntent().getData(),	//Aquí va la URI del PI concreto que se mostrará
+	        		null,
+	        		null,
+	        		null, 
+	        		null);
+	        Log.d(LOG_TAG,"2");
+	        if (cursor == null || !cursor.moveToFirst()) {
+	        	Log.d(LOG_TAG,"3");
+	            finish();
+	        } else {
+	        	Log.d(LOG_TAG,"4");
+	        	//Se añade el PI a la lista en memoria y después se asigna a mShowedPoi
+	        	Log.d(LOG_TAG, "El ID del poi que va a mshowed es:"+cursor.getLong(cursor.getColumnIndex(PoiEntry._ID)));
+	        	mShowedPoi = ARDataSource.getPoi(cursor.getLong(cursor.getColumnIndex(PoiEntry._ID)));
+	        	
+	        	/********************************************/
+	        	if (mShowedPoi == null) {
+	        		Log.d(LOG_TAG,"ES NULL mshowed...");
+	        	}else{
+	        		Log.d(LOG_TAG,"Mshowed Name: "+mShowedPoi.getName());
+	        		Log.d(LOG_TAG,"Mshowed id: "+mShowedPoi.getID());
+	        		Log.d(LOG_TAG,"Mshowed Distance: "+mShowedPoi.getDistance());
+	        	}
+	        }
+		}
 	}
 	
 	@Override
 	protected void onStart() {
 		super.onStart();
 		
-		if (ARDataSource.hasSelectededPoi()) {
+		if (mShowedPoi == null && !ARDataSource.hasSelectededPoi()) {
+			finish();
+			return;
+		}
+		
+		if (mShowedPoi == null && ARDataSource.hasSelectededPoi()) {
+			Log.d(LOG_TAG,"5");
 			mShowedPoi = ARDataSource.SelectedPoi;
-			
-			setTitle(mShowedPoi.getName());
-			
-			mContainer = (RelativeLayout) findViewById(R.id.pi_details_id);
-			
-			if (mContainer != null) {
-				setImage();
-				setName();
-				setDistance();
-				setDescription();
-				
+		}
+		
+		if (mShowedPoi == null) {
+			Log.d(LOG_TAG,"mshowed es null");
+		}else{
+			if (mShowedPoi.getName() == null) {
+				Log.d(LOG_TAG,"y el getname tambien es null");
 			}
+		}
+		
+		if (ARDataSource.hasSelectededPoi()){
+			Log.d(LOG_TAG,"Hay un poiSeleccionado");
+		}
+		
+		setTitle(mShowedPoi.getName());
+		
+		mContainer = (RelativeLayout) findViewById(R.id.pi_details_id);
+		
+		if (mContainer != null) {
+			setImage();
+			setName();
+			setDistance();
+			setDescription();
 		}
 		
 	}
@@ -54,7 +111,7 @@ public class DetallesPoiActivity extends ActionBarActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.detalles_poi_menu, menu);
 		return true;
 	}
 
@@ -69,11 +126,11 @@ public class DetallesPoiActivity extends ActionBarActivity {
 	            return super.onOptionsItemSelected(item);
 	        case R.id.action_help:
 	            //helpAction();
-	            return super.onOptionsItemSelected(item);*/
+	            return super.onOptionsItemSelected(item);
 	        case R.id.action_settings:
 	        	// Settings action
 	        	startActivity(new Intent(this,SettingsActivity.class));
-	            return true;
+	            return true;*/
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }

@@ -103,7 +103,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
 
-    	Log.d("FragmentCamara","EV onCreate");
+    	Log.d(LOG_TAG,"EV onCreate");
 
     	List<Sensor> sensors;
 
@@ -142,7 +142,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		Log.d("FragmentCamara","EV onCreateView");
+		Log.d(LOG_TAG,"EV onCreateView");
 		//Para obtener el layout donde se construye la vista en modo Realidad Aumentada:
 		// 1- Obtener la vista principal del fragment
 		// 2- Obtener el layout donde se colocan las vistas de camara e información de aumento
@@ -179,7 +179,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	@Override
 	public void onResume() {
 		super.onResume();
-		Log.d("FragmentCamara","EV onResume");
+		Log.d(LOG_TAG,"EV onResume");
 
         sSensorMgr.registerListener(this, sSensorGrav, SensorManager.SENSOR_DELAY_NORMAL);
         sSensorMgr.registerListener(this, sSensorMag, SensorManager.SENSOR_DELAY_NORMAL);
@@ -199,7 +199,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	 */
     public void onPause() {
         super.onPause();
-        Log.d("FragmentCamara","EV onpause");
+        Log.d(LOG_TAG,"EV onpause");
         sSensorMgr.unregisterListener(this);
     }// Fin de onPause
 
@@ -207,7 +207,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     @Override
     public void onDestroy() {
     	super.onDestroy();
-    	Log.d("FragmentCamara","EV onDestroy");
+    	Log.d(LOG_TAG,"EV onDestroy");
     }
 
     /**
@@ -224,7 +224,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 		
         if (sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD 
         		&& accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE) {
-        	Log.e("FragmentModoCamara", "Compass data unreliable");
+        	Log.e(LOG_TAG, "Compass data unreliable");
         }
 		
 	}// Fin de onAccuracyChanged
@@ -343,7 +343,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouch(View view, MotionEvent event) {
-		Log.d("FragmentCamara","EV onTouc");
+		Log.d(LOG_TAG,"EV onTouc");
 		view.performClick();
 
         // Listening for the down and up touch events
@@ -362,7 +362,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
             	
             	//Cuando el evento no es de la vista de detalles básicos se comprueban los PIs
             	if (view != mBasicDetails) {
-            		Log.d(LOG_TAG,"1 A revisar pois con...X: "+event.getX()+" Y: "+event.getY());
                 	for (Poi poi : ARDataSource.getPois()) {
             	        if (poi.handleClick(event.getX(), event.getY())) {
             	            poiTouched(poi);
@@ -375,7 +374,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 
             	if (ARDataSource.hasSelectededPoi()) {            		
             		if (view == mBasicDetails) {
-            			Log.d(LOG_TAG,"4 SE HA PULSADO");
                 		mCallback.onPoiTouched(ARDataSource.SelectedPoi);
                 		
                 		return true;
