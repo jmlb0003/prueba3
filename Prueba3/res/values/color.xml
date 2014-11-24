@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="primary">@color/md_indigo_500</color>
+    <color name="primary_dark">@color/md_indigo_700</color>
+    <color name="accent">@color/md_blue_A200</color>
+    <color name="text_primary">#DEFFFFFF</color>
+    <color name="text_secondary">#DE000000</color>
+   
+    <color name="text_title">#DE3F51B5</color>	<!--DE_Indigo_500 -->
+    
+    <!-- ************************************************** -->
     <color name="black_overlay">#66000000</color>
     <color name="blue">#FF33B5E5</color>
     <color name="purple">#FFAA66CC</color>
@@ -43,12 +52,5 @@
     <color name="md_blue_A200">#6889ff</color>
     <color name="md_blue_A400">#4d73ff</color>
     <color name="md_blue_A700">#4d69ff</color>
-    
-    <color name="primary">@color/md_indigo_500</color>
-    <color name="primary_dark">@color/md_indigo_700</color>
-    <color name="accent">@color/md_blue_A200</color>
-    <color name="text_primary">#DEFFFFFF</color>
-    <color name="text_secondary">#DE000000</color>
-   
-    <color name="text_title">#DE3F51B5</color>
+
 </resources>

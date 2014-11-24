@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -19,6 +20,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -26,11 +28,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.text.Html;
-import android.text.SpannableString;
-import android.text.Spanned;
+import android.support.v7.widget.SearchView;
 import android.text.format.Time;
-import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -181,8 +180,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		setPoiIcons();
 		aplicarValoresDeAjustes();
 		
-		searchManager();
-		
 	}// Fin de onCreate()
 	
 	
@@ -277,12 +274,21 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	
 	
 
+	@SuppressLint("NewApi")
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main_menu, menu);
 		
-		return true;
+		// Associate searchable configuration with the SearchView
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+	        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+	        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+	        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+	        searchView.setIconifiedByDefault(false);
+	    }
+		
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	
@@ -292,6 +298,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
+
 		switch (item.getItemId()) {
 	        case R.id.action_help:
 	            //helpAction();
@@ -300,7 +307,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	            
 			case R.id.action_search:
 				// search action
-	            return onSearchRequested();
+	            return true;
 	            
 	        case R.id.action_settings:
 	        	// Settings action
@@ -308,7 +315,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	            return true;
 	            
 	        default:
-	            return super.onOptionsItemSelected(item);
+	            return false;
 	    }
 	}
 	
@@ -408,26 +415,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 		//Función de onLocationListener - No se utiliza		
 	}
-	
-	
-	
-	/**
-	 * Método que gestiona las búsquedas que se realicen desde esta activity
-	 */
-	private void searchManager() {
-		Intent intent = getIntent();
 
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            // handles a search query
-        	Intent poiSearchIntent = new Intent(getApplicationContext(), PoiSearchActivity.class);
-        	poiSearchIntent.putExtra(SearchManager.QUERY, intent.getStringExtra(SearchManager.QUERY));
-        	poiSearchIntent.setAction(Intent.ACTION_SEARCH);
-        	
-        	startActivity(poiSearchIntent);
-        	//Esta actividad debe eliminarse de la pila porque ya ha cumplido su cometido
-        	finish();
-        }        
-	}
 
 
 	

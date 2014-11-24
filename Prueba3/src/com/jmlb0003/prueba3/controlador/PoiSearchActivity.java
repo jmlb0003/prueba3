@@ -39,7 +39,6 @@ public class PoiSearchActivity extends ActionBarActivity {
         mListView = (ListView) findViewById(android.R.id.list);
 
         Intent intent = getIntent();
-        
     	if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             // handles a search query
             String query = intent.getStringExtra(SearchManager.QUERY);
@@ -47,8 +46,7 @@ public class PoiSearchActivity extends ActionBarActivity {
       
         }
     }
-	
-	
+
 	
 	/**
      * Searches the dictionary and displays results for the given query.
@@ -108,7 +106,7 @@ public class PoiSearchActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_search:
-                onSearchRequested();
+                //Search action
                 return true;
             case R.id.action_description:
             	showDescription();
@@ -118,7 +116,7 @@ public class PoiSearchActivity extends ActionBarActivity {
             	return true;
             
             default:
-	            return super.onOptionsItemSelected(item);
+	            return false;
         }
     }
     

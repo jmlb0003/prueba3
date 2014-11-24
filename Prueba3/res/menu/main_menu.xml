@@ -4,12 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.jmlb0003.prueba3.MainActivity" >
 
+    <!-- 	android:actionViewClass="android.support.v7.widget.SearchView"
+    Es como si no hubiera nada...
+    Funciona pero es una barra distinta
+    
+    		app:actionViewClass="@android:support.v7.widget.SearchView"
+    Error... no hay actionViewClass
+    		
+    		app:actionViewClass="android:support.v7.widget.SearchView"
+   	Funciona como el primero...como en otra barra y como si no hubiera nada 
+   			
+   			app:actionViewClass="android.widget.SearchView"
+   	Asi no funciona la busqueda, aparentemente se ve bien...-->
+    
     <item
         android:id="@+id/action_search"
         android:orderInCategory="10"
         android:title="@string/action_search"
         android:icon="@android:drawable/ic_menu_search"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="collapseActionView|ifRoom"
+        app:actionViewClass="android.support.v7.widget.SearchView" />
     
     <item
         android:id="@+id/action_settings"
