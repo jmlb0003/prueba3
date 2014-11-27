@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ventana de diálogo de descarga de PIs -->
+    <string name="downloading">Descargando&#8230;</string>
+    <string name="downloading_pois_description">Descargando los Puntos de Interés. Pronto estarán listos.</string>
+
+    <!-- Ventana de diálogo de ajustes de ubicación -->
+    <string name="alert_location_title">Ajustes de ubicación</string>
+    <string name="alert_location_message">No se puede ubicar su dispositivo. Por favor, active alguna opción de ubicación.</string>
+    <string name="alert_location_positive_button">Ir a Ajustes</string>
+    <string name="alert_location_negative_message">Para que la app funcione tiene que activar alguna opción de ubicación en los ajustes.</string>
+
+    <!-- Ventana de diálogo de ajustes de conexión a Internet -->
+    <string name="alert_network_title">Ajustes de Internet</string>
+    <string name="alert_network_message">No se pueden descargar Puntos de Interés. Por favor, active alguna conexión a Internet.</string>
+    <string name="alert_network_positive_button">Ir a Ajustes</string>
+    <string name="alert_network_negative_message">Se necesita conexión a Internet para obtener los datos de Puntos de Interés y para mostrar el mapa.</string>
+
+    <!-- Ventana de diálogo de ubicación -->
+    <string name="alert_location2_title">Buscando ubicación</string>
+    <string name="alert_location2_message">Afinando la ubicación&#8230;\nPaciencia. Al iniciar la app puede tardar un poco. Y recuerde que en interiores puede que no se encuentre una ubicación precisa.</string>
+    <string name="close">Cerrar</string>
+    <string name="alert_location2_negative_message">¡Ya queda menos!</string>
+    
+    <!-- Ventana de diálogo de Sobre mi -->
+    <string name="title_about">Sobre mí</string>
+    <string name="message_about">José Miguel López Bayona\njoselopez.hol.es</string>
+    <string name="developer_webSite">Web del desarrollador</string>
+    <string name="my_website" >http://joselopez.hol.es</string>
+    
+</resources>

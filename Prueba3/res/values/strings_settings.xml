@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="title_activity_settings">Ajustes generales</string>
+    <string name="title_general_prefs">Ajustes generales</string>
     <string name="activity_settings_key" translatable="false">preferencias_principal</string>
     <string name="filter_settings_key" translatable="false">preferencias_filtros</string>
     
     
-    <!-- Strings del seekbar de selección de distancia -->
-    
+    <!-- Strings del seekbar de selección de distancia -->    
     <string name="radar_preferences">Ajustes del Radar</string>
         
     <!-- Key para almacenar la preferencia de distancia máxima [CHAR LIMIT=NONE] -->
@@ -21,8 +20,8 @@
     
     
     <!-- Strings de filtrado -->
-    <string name="action_filter">Filtrar</string>
-    <string name="title_activity_filter">Filtrado de PIs</string>
+    <string name="action_filter_title">Filtrar</string>
+    <string name="title_filter_prefs">Filtrado de PIs</string>
     
     <string name="ft_open_key" translatable="false">ft_open_key</string>
     <string name="ft_open">Solo PIs abiertos</string>

@@ -28,7 +28,7 @@
     <item
         android:id="@+id/action_filter"
         android:orderInCategory="11"
-        android:title="@string/action_filter"
+        android:title="@string/action_filter_title"
         android:icon="@drawable/ic_filter"
         app:showAsAction="ifRoom" />
     

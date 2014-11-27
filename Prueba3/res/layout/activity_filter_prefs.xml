@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:key="@string/filter_settings_key"
+    tools:context=".MainActivity" >
+
+    <PreferenceCategory
+         android:title="@string/title_filter_prefs" >
+         
+	    <CheckBoxPreference
+			android:key="@string/ft_open_key"
+			android:title="@string/ft_open"
+		   	android:summary="@string/ft_open_sum"
+		   	android:defaultValue="false" />
+    </PreferenceCategory>
+</PreferenceScreen>

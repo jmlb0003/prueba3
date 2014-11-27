@@ -55,10 +55,6 @@
                 android:value=".controlador.PoiSearchActivity" />
         </activity>
         <activity
-            android:name=".controlador.SettingsActivity"
-            android:label="@string/title_activity_settings" >
-        </activity>
-        <activity
             android:name=".controlador.DetallesPoiActivity"
             android:parentActivityName=".controlador.MainActivity" >
             <meta-data
@@ -81,16 +77,20 @@
                 android:value="com.jmlb0003.prueba3.controlador.MainActivity" />
         </activity>
         
+        <!-- AJUSTES -->
         <activity
             android:name=".controlador.FilterActivity"
-            android:label="@string/title_activity_filter"
+            android:label="@string/title_filter_prefs"
             android:parentActivityName=".controlador.MainActivity" >
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jmlb0003.prueba3.controlador.MainActivity" />
         </activity>
-        
+        <activity
+            android:name=".controlador.SettingsActivity"
+            android:label="@string/title_general_prefs" >
+        </activity>
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"

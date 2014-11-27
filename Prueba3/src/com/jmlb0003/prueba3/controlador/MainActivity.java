@@ -466,7 +466,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     * refleje en la aplicación
     */
    private void aplicarValoresDeAjustes() {	   
-	   PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+	   PreferenceManager.setDefaultValues(this, R.layout.activity_general_prefs, false);
 	   //Obtenemos la distancia hasta la que se buscan PI en los ajustes
 	   SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	   mRadarSearch = prefs.getInt(getString(R.string.pref_seekBar_distance_key),0);	//TODO: Esta variable sobra

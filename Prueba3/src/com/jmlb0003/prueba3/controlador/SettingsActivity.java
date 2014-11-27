@@ -26,7 +26,7 @@ public class SettingsActivity extends PreferenceActivity {
 		super.onCreate(savedInstanceState);
 		
 		Log.d("SettingsActivity","Va a leer el xml de los ajustes");
-		addPreferencesFromResource(R.xml.pref_general);
+		addPreferencesFromResource(R.layout.activity_general_prefs);
 	}
 
 }
