@@ -33,6 +33,7 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -300,18 +301,23 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		// as you specify a parent activity in AndroidManifest.xml.
 
 		switch (item.getItemId()) {
-	        case R.id.action_help:
-	            //helpAction();
-	            showAbout();
+			case R.id.action_filter:
+				// filter action
+				startActivity(new Intent(this, FilterActivity.class));
 	            return true;
 	            
 			case R.id.action_search:
-				// search action
+				// search action	(funciona sola mediante SearchView)
 	            return true;
 	            
 	        case R.id.action_settings:
 	        	// Settings action
 	        	startActivity( new Intent(this,SettingsActivity.class) );
+	            return true;
+	        
+	        case R.id.action_help:
+	            //helpAction();
+	            showAbout();
 	            return true;
 	            
 	        default:
@@ -379,7 +385,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     		mLocation = newLocation;
 
 	        mFragmentModoCamara.calculateMagneticNorthCompensation();
-	        //TODO: Esto está para que se actualice el mapa si cambia la posición...habría que probar si funciona o no...
 	        mFragmentModoMapa.setUpMapIfNeeded();
 	        //////////////////////////////////////////////////////////
 
@@ -460,16 +465,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     * Método con el que se lee cada ajuste que pueda haber aplicado el usuario para que se 
     * refleje en la aplicación
     */
-   private void aplicarValoresDeAjustes() {
-	   //Se construyen las preferencias con los valores por defecto de la definición del XML si
-	   //no hay preferencias anteriores guardadas. Si las hay, se salta este paso.
+   private void aplicarValoresDeAjustes() {	   
 	   PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
 	   //Obtenemos la distancia hasta la que se buscan PI en los ajustes
 	   SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-	   mRadarSearch = prefs.getInt(getString(R.string.pref_seekBar_distance_key),0);
+	   mRadarSearch = prefs.getInt(getString(R.string.pref_seekBar_distance_key),0);	//TODO: Esta variable sobra
 	   ARDataSource.updateRadarDistance(mRadarSearch);
 	   
-	   
+	   ARDataSource.setHoursFilter(prefs.getBoolean(getString(R.string.ft_open_key), false));
 	   
 	   /***********Recorriendo todas las preferencias almacenadas******************
 	   Map<String,?> keys = prefs.getAll();
@@ -764,6 +767,16 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				ARDataSource.SelectedPoi = null;
 			}
 		}		
+	}
+	
+	
+	/**
+	 * Método que gestiona las acciones a realizar cuando se pulsa la vista de detalles básicos
+	 * @param v
+	 */
+	public void basicDetailsViewTouched(View v){
+		Log.d(LOG_TAG,"logque hay que hacer!");
+		onPoiTouched(ARDataSource.SelectedPoi);
 	}
 
 

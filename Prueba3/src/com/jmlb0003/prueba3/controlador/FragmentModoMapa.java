@@ -10,9 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
@@ -39,7 +37,7 @@ import com.jmlb0003.prueba3.vista.BasicDetailsView;
 
 
 public class FragmentModoMapa extends Fragment implements OnMarkerClickListener, 
-				OnMapClickListener, OnInfoWindowClickListener, OnTouchListener {
+				OnMapClickListener, OnInfoWindowClickListener {
 	
 	/**Constante con el tag representativo de la clase para el logcat**/
 	private static final String LOG_TAG = "FragmentModoMapa";
@@ -177,7 +175,6 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 
 		//Por último se obtiene el BasicDetailsView de rootView
 		mBasicDetails = (BasicDetailsView) rootView.findViewById(R.id.basic_details2_id);
-		mBasicDetails.setOnTouchListener(this);
 
 		
 		//Se establece que el alto conserve el ratio 1:1 (aproximado) para seguir las líneas de diseño
@@ -243,16 +240,16 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
         // Do a null check to confirm that we have not already instantiated the map.
     	Log.d(LOG_TAG, "SetupIfNeeded:Entra");
         if (mMap == null && mMapFragment != null) {
-        	Log.d(LOG_TAG, "Setup:mMap=null");
             // Try to obtain the map from the SupportMapFragment.
         	mMap = mMapFragment.getMap();
-        	Log.d(LOG_TAG, "Setup:mMap=iniciado");
-
 
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
             }
+        }else if (mMap != null){
+        	mMap.clear();
+        	setUpMap();
         }
         Log.d(LOG_TAG, "Setup:termina");
     }
@@ -479,31 +476,6 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 	private int calculateMapZoomLevel(float maxDistance) {
         //@see: http://stackoverflow.com/questions/5939983/how-does-this-google-maps-zoom-level-calculation-work
         return (int) (16 - Math.log(maxDistance/500) / Math.log(2));
-	}
-
-
-
-	@Override
-	public boolean onTouch(View view, MotionEvent event) {
-		view.performClick();
-		
-		switch (event.getAction()) {
-			case MotionEvent.ACTION_DOWN:
-				
-                return true;
-                
-            
-            case MotionEvent.ACTION_UP:
-            	if (ARDataSource.hasSelectededPoi() && view == mBasicDetails && event.getY() > 0) {
-            		mCallback.onPoiTouched(ARDataSource.SelectedPoi);
-            		
-            		return true;
-            	}
-            	
-            	return false;
-		}
-		
-		return false;
 	}
 
 

@@ -156,7 +156,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         mAugmentedView.setOnTouchListener(this);
         
         mBasicDetails = (BasicDetailsView) preview.findViewById(R.id.basic_details_id);
-        mBasicDetails.setOnTouchListener(this);
         
         //Se establece que el alto conserve el ratio 1:1 (aproximado) para seguir las líneas de diseño
         //https://www.google.com/design/spec/layout/metrics-and-keylines.html#metrics-and-keylines-ratio-keylines
@@ -356,6 +355,15 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
             	//TODO: Posible solucion a las colisiones...Los que colisionan, se meten en una lista y haciendo mover de izquierda a derecha y viceversa para cambiar de PI seleccionado
             	//TODO: Marcial propone que los solapados, al pinchar en el grupo, se abra un abanico para seleccionar uno dentro del conjunto...(descartado por ahora)
             	//TODO: En wikitude, agrupa los marcadores y al pinchar, muestra una lista en otra ventana.
+            	
+            	/********************************************************************************
+            	 * 
+            	 * Cuando se solapen, meterlos en una lista de solapados. (y no mover su posición)
+            	 * Si el usuario pincha en alguno de la lista, se muestra la lista en la pantalla 
+            	 * de búsqueda y que se mire el que quiera
+            	 * 
+            	 * 
+            	 */
             	return true;
 
             case MotionEvent.ACTION_UP:
@@ -371,11 +379,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
             	}
 
             	if (ARDataSource.hasSelectededPoi()) {
-            		if (view == mBasicDetails && event.getY() > 0) {
-                		mCallback.onPoiTouched(ARDataSource.SelectedPoi);
-                		
-                		return true;
-            		}
             		mCallback.onPoiUnselected(ARDataSource.SelectedPoi);
 
             		mBasicDetails.setVisibility(View.INVISIBLE);

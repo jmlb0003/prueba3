@@ -79,20 +79,21 @@ public class AugmentedView extends View {
     		return;
     	}
 
-        if (sDrawing.compareAndSet(false, true)) { 
+        if (sDrawing.compareAndSet(false, true)) {
 	        List<Poi> collection = ARDataSource.getPois();
 
 	        COLLECTION_CACHE.clear();
             for (Poi m : collection) {
                 m.update(canvas, 0, 0);
                 if (m.isOnRadar() && m.isInView()) {
-                	//TODO: Poner el icono y después añadirlo para que se muestre
                 	COLLECTION_CACHE.add(m);
                 }
 	        }
+          
             collection = COLLECTION_CACHE;
 
-	        adjustForCollisions(canvas,collection);
+            //TODO: Comentada la resolucion de colisiones por ahora
+//	        adjustForCollisions(canvas,collection);
 	        
 	        
 	        ListIterator<Poi> iter = collection.listIterator(collection.size());

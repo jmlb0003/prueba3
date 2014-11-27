@@ -46,12 +46,13 @@
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-        	<meta-data 
-        	    android:name="android.app.default_searchable"
-        	    android:value=".controlador.PoiSearchActivity" />
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".controlador.PoiSearchActivity" />
         </activity>
         <activity
             android:name=".controlador.SettingsActivity"
@@ -59,18 +60,15 @@
         </activity>
         <activity
             android:name=".controlador.DetallesPoiActivity"
-            android:label="@string/title_activity_detalles_pi"
             android:parentActivityName=".controlador.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jmlb0003.prueba3.controlador.MainActivity" />
         </activity>
-        
         <activity
             android:name=".controlador.PoiSearchActivity"
             android:label="@string/title_activity_searchable"
             android:parentActivityName=".controlador.MainActivity" >
-            
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -82,6 +80,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jmlb0003.prueba3.controlador.MainActivity" />
         </activity>
+        
+        <activity
+            android:name=".controlador.FilterActivity"
+            android:label="@string/title_activity_filter"
+            android:parentActivityName=".controlador.MainActivity" >
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.jmlb0003.prueba3.controlador.MainActivity" />
+        </activity>
+        
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
@@ -97,11 +106,7 @@
             android:syncable="true" />
 
         <uses-library android:name="android.test.runner" />
-
-        <activity
-            android:name=".SearchableActivity"
-            android:label="@string/title_activity_searchable" >
-        </activity>
+        
     </application>
 
 </manifest>

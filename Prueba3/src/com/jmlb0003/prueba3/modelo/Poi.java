@@ -2,6 +2,11 @@ package com.jmlb0003.prueba3.modelo;
 
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -31,8 +36,11 @@ import com.jmlb0003.prueba3.vista.Radar;
  */
 public class Poi implements Comparable<Poi> {
 	
+	private static final String LOG_TAG = "POI";
+	
 	/****Constante para formatear el texto de la distancia hasta el marcador******/
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("@#");
+    private static final long FIVE_MINUTES = 5 * 60 * 1000; 
     
     /**Vectores para ubicar el icono de cada PI**/
     private static final Vector SYMBOL_VECTOR = new Vector(0, 0, 0);
@@ -119,7 +127,9 @@ public class Poi implements Comparable<Poi> {
     private volatile PosicionPI mPoiPhysicalLocation = new PosicionPI();
     /**Distancia en metros hasta el PI desde la posición del usuario **/
     private volatile double mDistance = 0.0;
-
+    
+    private Date mLastTime = null;
+    private boolean isOpen = true;
 
     /**Variable que contiene otros atributos del PI**/    
     private DetallesPoi mDetails = new DetallesPoi(null);
@@ -256,6 +266,39 @@ public class Poi implements Comparable<Poi> {
 
     public synchronized boolean isInView() {
         return isInView;
+    }
+    
+    public synchronized boolean isOpen() {
+    	if (!getOpenHours().equals(getCloseHours())) {
+    		
+    		if ( mLastTime != null && 
+    				((new Date()).getTime() - mLastTime.getTime() < FIVE_MINUTES) ) {
+    			return isOpen;
+        	}else{
+        		mLastTime = new Date();
+        	}    		
+    		
+    		Calendar calendar = Calendar.getInstance();
+    		
+    		calendar.setTime(new Date());
+    		int now = calendar.get(Calendar.HOUR_OF_DAY)*100 + calendar.get(Calendar.MINUTE);
+			try {
+				calendar.setTime(new SimpleDateFormat("HH:mm", Locale.ENGLISH).parse(getOpenHours()));
+				int open = calendar.get(Calendar.HOUR_OF_DAY)*100 + calendar.get(Calendar.MINUTE);
+				
+				calendar.setTime(new SimpleDateFormat("HH:mm", Locale.ENGLISH).parse(getCloseHours()));
+				int close = calendar.get(Calendar.HOUR_OF_DAY)*100 + calendar.get(Calendar.MINUTE);
+
+		        isOpen = 
+        		(close > open) && (now >= open) && (now <= close) || //Horario diurno
+        		(close < open) && (now >= open) || (now <= close);	//Horario nocturno
+		        
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+    	}
+    	
+    	return isOpen;
     }
 
     

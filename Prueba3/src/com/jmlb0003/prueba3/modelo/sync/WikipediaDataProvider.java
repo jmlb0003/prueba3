@@ -101,7 +101,7 @@ public class WikipediaDataProvider extends NetworkDataProvider {
 				String webSite;
 				double lat,lon,alt;
 				float price;
-				int openTime, closeTime;
+				String openTime, closeTime;
 				int maxAge, minAge;
 				
 				
@@ -120,8 +120,8 @@ public class WikipediaDataProvider extends NetworkDataProvider {
 		        				.setScale(6,BigDecimal.ROUND_FLOOR).doubleValue();
 		        	alt = jo.getDouble(WIKI_ALTITUDE);
 		        	price = 0;
-		        	openTime = 0;
-		        	closeTime = 0;
+		        	openTime = "00:00";
+		        	closeTime = "00:00";
 		        	maxAge = 0;
 		        	minAge = 0;
 		        	

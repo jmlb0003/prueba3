@@ -26,9 +26,16 @@
         app:actionViewClass="android.support.v7.widget.SearchView" />
     
     <item
+        android:id="@+id/action_filter"
+        android:orderInCategory="11"
+        android:title="@string/action_filter"
+        android:icon="@drawable/ic_filter"
+        app:showAsAction="ifRoom" />
+    
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="20"
-        android:title="@string/action_settings"
+        android:title="@string/settings"
         app:showAsAction="never" />
     
     <item

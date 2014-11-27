@@ -42,6 +42,8 @@ public abstract class ARDataSource {
     public static final Location HARD_FIX = new Location("ATL");
     public static final int MAX_RADIUS = 50;
     
+    
+    
     private static final String LOG_TAG = "ARDataSource";
     
     static {
@@ -84,6 +86,11 @@ public abstract class ARDataSource {
      * inicializar en cuanto arranca la app
      */
     public static HashMap<String, Bitmap> sPoiIcons = new HashMap<>();
+    
+    /** FILTROS DE LOS PIs MOSTRADOS **/
+    
+    private static boolean mPriceFilter = false;
+    private static boolean mOpenFilter = false;
 
     /**
      * Método para obtener el actual radio del radar
@@ -127,11 +134,48 @@ public abstract class ARDataSource {
         }
     }
     
+    
+    /**
+     * Método para establecer un filtro de PIs a mostrar por horas de apertura. Esto servirá
+     * para que la app muestre solamente los PIs que están abiertos en el momento en que se está
+     * usando.
+     * @param poisFilteredByHours Indica si se quiere filtrar los PIs según si están abierts o 
+     * 	cerrados
+     */
+    public static void setHoursFilter(boolean poisFilteredByHours) {
+    	mOpenFilter = poisFilteredByHours;
+    }
+    
+  
+    /**
+     * Método para eliminar de los PIs que hay actualmente en memoria los que no estén abiertos
+     * actualmente.
+     * @return Lista inmodificable con los PIs susceptibles de ser mostrados en pantalla o
+     * null si ningún PI ha pasado los filtros
+     */
+    private static void filterByOpenHours() {
+    	if (mOpenFilter) {
+            for(Poi ma : POI_LIST.values()) {
+            	if (ma.isOpen()) {
+                	ma.getLocation().get(LOCATION_ARRAY);
+	                LOCATION_ARRAY[1] = ma.getInitialY();
+	                ma.getLocation().set(LOCATION_ARRAY);
+                }else{
+                	POI_LIST.remove(ma.getID());
+                }
+            }
+    	}
+    }
+    
+    
     /**
      * Método para obtener todos los PIs que hay actualmente en memoria
      * @return Lista inmodificable con los PIs que hay en memoria
      */
     public static List<Poi> getPois() {
+    	if (mOpenFilter) {
+    		filterByOpenHours();
+    	}
     	//Si COMPUTING vale true, se le asigna false
         if (COMPUTING.compareAndSet(true, false)) {
             for(Poi ma : POI_LIST.values()) {
@@ -275,9 +319,9 @@ public abstract class ARDataSource {
     		cv.put(DetallesPoi.DETALLESPI_PRICE,
     				c.getFloat(c.getColumnIndex(PoiEntry.COLUMN_POI_PRICE)));
     		cv.put(DetallesPoi.DETALLESPI_OPEN_HOURS,
-    				c.getFloat(c.getColumnIndex(PoiEntry.COLUMN_POI_OPEN_HOURS)));
+    				c.getString(c.getColumnIndex(PoiEntry.COLUMN_POI_OPEN_HOURS)));
     		cv.put(DetallesPoi.DETALLESPI_CLOSE_HOURS,
-    				c.getFloat(c.getColumnIndex(PoiEntry.COLUMN_POI_CLOSE_HOURS)));
+    				c.getString(c.getColumnIndex(PoiEntry.COLUMN_POI_CLOSE_HOURS)));
     		cv.put(DetallesPoi.DETALLESPI_MAX_AGE,
     				c.getFloat(c.getColumnIndex(PoiEntry.COLUMN_POI_MAX_AGE)));
     		cv.put(DetallesPoi.DETALLESPI_MIN_AGE,
@@ -317,9 +361,9 @@ public abstract class ARDataSource {
     		details.put(DetallesPoi.DETALLESPI_PRICE,
     				pv.getAsFloat(DetallesPoi.DETALLESPI_PRICE));
     		details.put(DetallesPoi.DETALLESPI_OPEN_HOURS,
-    				pv.getAsFloat(DetallesPoi.DETALLESPI_OPEN_HOURS));
+    				pv.getAsString(DetallesPoi.DETALLESPI_OPEN_HOURS));
     		details.put(DetallesPoi.DETALLESPI_CLOSE_HOURS,
-    				pv.getAsFloat(DetallesPoi.DETALLESPI_CLOSE_HOURS));
+    				pv.getAsString(DetallesPoi.DETALLESPI_CLOSE_HOURS));
     		details.put(DetallesPoi.DETALLESPI_MAX_AGE,
     				pv.getAsFloat(DetallesPoi.DETALLESPI_MAX_AGE));
     		details.put(DetallesPoi.DETALLESPI_MIN_AGE,

@@ -88,8 +88,8 @@ public class PoiDbHelper extends SQLiteOpenHelper {
                 PoiEntry.COLUMN_POI_WEBSITE + " TEXT, " +
                 PoiEntry.COLUMN_POI_PRICE + " REAL DEFAULT 0, " +
                 
-				PoiEntry.COLUMN_POI_OPEN_HOURS + " REAL DEFAULT 0, " +
-				PoiEntry.COLUMN_POI_CLOSE_HOURS + " REAL DEFAULT 0, " +
+				PoiEntry.COLUMN_POI_OPEN_HOURS + " TEXT DEFAULT '00:00', " +
+				PoiEntry.COLUMN_POI_CLOSE_HOURS + " TEXT DEFAULT '00:00', " +
 				
 				PoiEntry.COLUMN_POI_MAX_AGE + " INTEGER DEFAULT 0, " +
 				PoiEntry.COLUMN_POI_MIN_AGE + " INTEGER DEFAULT 0, " +
