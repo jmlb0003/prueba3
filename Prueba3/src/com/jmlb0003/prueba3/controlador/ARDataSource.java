@@ -17,6 +17,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.util.Log;
 
 import com.jmlb0003.prueba3.modelo.DetallesPoi;
 import com.jmlb0003.prueba3.modelo.Poi;
@@ -88,8 +89,7 @@ public abstract class ARDataSource {
     public static HashMap<String, Bitmap> sPoiIcons = new HashMap<>();
     
     /** FILTROS DE LOS PIs MOSTRADOS **/
-    
-    private static boolean mPriceFilter = false;
+
     private static boolean mOpenFilter = false;
 
     /**
@@ -142,40 +142,65 @@ public abstract class ARDataSource {
      * @param poisFilteredByHours Indica si se quiere filtrar los PIs según si están abierts o 
      * 	cerrados
      */
-    public static void setHoursFilter(boolean poisFilteredByHours) {
+    public static void setFilterByHours(boolean poisFilteredByHours) {
     	mOpenFilter = poisFilteredByHours;
+    	if(mOpenFilter) {
+    		filterByOpenHours();
+    	}
     }
+   
     
   
     /**
      * Método para eliminar de los PIs que hay actualmente en memoria los que no estén abiertos
      * actualmente.
-     * @return Lista inmodificable con los PIs susceptibles de ser mostrados en pantalla o
-     * null si ningún PI ha pasado los filtros
      */
     private static void filterByOpenHours() {
-    	if (mOpenFilter) {
-            for(Poi ma : POI_LIST.values()) {
-            	if (ma.isOpen()) {
-                	ma.getLocation().get(LOCATION_ARRAY);
-	                LOCATION_ARRAY[1] = ma.getInitialY();
-	                ma.getLocation().set(LOCATION_ARRAY);
-                }else{
-                	POI_LIST.remove(ma.getID());
-                }
+    	Log.d(LOG_TAG,"filtrando...De "+POI_LIST.size()+" que hay...");
+        for(Poi ma : POI_LIST.values()) {
+        	if (ma.isOpen()) {
+            	ma.getLocation().get(LOCATION_ARRAY);
+                LOCATION_ARRAY[1] = ma.getInitialY();
+                ma.getLocation().set(LOCATION_ARRAY);
+            }else{
+            	POI_LIST.remove(ma.getID());
             }
-    	}
+        }
+        Log.d(LOG_TAG,"A "+POI_LIST.size()+" que quedan...");
     }
     
+    
+    /**
+     * Método para establecer filtrar los PIs que corresponden a un proveedor dado.
+     * @param providerID ID del proveedor de PIs
+     */
+    public static void setFilterByProvider(int providerID) {
+    	removeProvider(providerID);
+    }
+    
+    
+    /**
+     * Método para eliminar de los PIs que hay actualmente en memoria los que provienen de un
+     * proveedor descartado en los ajustes.
+     * @param providerId	ID del proveedor de PIs
+     */
+    private static void removeProvider(int providerId) {
+    	for(Poi ma : POI_LIST.values()) {
+        	if (ma.getUserId() != providerId) {
+            	ma.getLocation().get(LOCATION_ARRAY);
+                LOCATION_ARRAY[1] = ma.getInitialY();
+                ma.getLocation().set(LOCATION_ARRAY);
+            }else{
+            	POI_LIST.remove(ma.getID());
+            }
+        }
+    }
     
     /**
      * Método para obtener todos los PIs que hay actualmente en memoria
      * @return Lista inmodificable con los PIs que hay en memoria
      */
     public static List<Poi> getPois() {
-    	if (mOpenFilter) {
-    		filterByOpenHours();
-    	}
     	//Si COMPUTING vale true, se le asigna false
         if (COMPUTING.compareAndSet(true, false)) {
             for(Poi ma : POI_LIST.values()) {
@@ -333,12 +358,10 @@ public abstract class ARDataSource {
     	if (!toRet.isEmpty()) {
     		ARDataSource.addPoisFromValues(toRet);
     	}
-    	
-    	
     }
     
     
-    public static void addPoisFromValues(Collection<ContentValues> poiList) {
+    private static void addPoisFromValues(Collection<ContentValues> poiList) {
     	if (poiList == null || poiList.size() <= 0) {
     		return;
     	}

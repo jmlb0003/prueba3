@@ -22,10 +22,19 @@
     <!-- Strings de filtrado -->
     <string name="action_filter_title">Filtrar</string>
     <string name="title_filter_prefs">Filtrado de PIs</string>
-    
+    <string name="title_source_filter">Filtrar por Proveedor</string>
+    <!-- Filtro por horario de apertura -->
     <string name="ft_open_key" translatable="false">ft_open_key</string>
-    <string name="ft_open">Solo PIs abiertos</string>
-    <string name="ft_open_sum">Activa esta opción si quieres que se muestren solamente los PIs que estén abiertos en este momento\ .</string>
+    <string name="ft_open_label">Solo PIs abiertos</string>
+    <string name="ft_open_sum">Activa esta opción si quieres que se muestren solamente los PIs que estén abiertos en este momento\</string>
+    <!-- Filtro por proveedor (Wikipedia) -->
+    <string name="ft_wiki_key" translatable="false">ft_wiki_key</string>
+    <string name="ft_wiki_label">Incluir PIs de Wikipedia</string>
+    <string name="ft_wiki_sum">Desactiva para que no se muestren los PIs de Wikipedia</string>
+    <!-- Filtro por horario de apertura -->
+    <string name="ft_local_key" translatable="false">ft_local_key</string>
+    <string name="ft_local_label">Incluir PIs creados a mano</string>
+    <string name="ft_local_sum">Desactiva para que no se muestren los PIs creados a mano</string>
 
 
 </resources>

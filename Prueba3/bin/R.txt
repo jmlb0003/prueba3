@@ -704,9 +704,15 @@ int string developer_webSite 0x7f0b0057
 int string downloading 0x7f0b0047
 int string downloading_pois_description 0x7f0b0048
 int string filter_settings_key 0x7f0b005b
-int string ft_open 0x7f0b0063
-int string ft_open_key 0x7f0b0062
-int string ft_open_sum 0x7f0b0064
+int string ft_local_key 0x7f0b0069
+int string ft_local_label 0x7f0b006a
+int string ft_local_sum 0x7f0b006b
+int string ft_open_key 0x7f0b0063
+int string ft_open_label 0x7f0b0064
+int string ft_open_sum 0x7f0b0065
+int string ft_wiki_key 0x7f0b0066
+int string ft_wiki_label 0x7f0b0067
+int string ft_wiki_sum 0x7f0b0068
 int string hello_world 0x7f0b0035
 int string maps_key 0x7f0b0039
 int string message_about 0x7f0b0056
@@ -733,6 +739,7 @@ int string title_filter_prefs 0x7f0b0061
 int string title_general_prefs 0x7f0b0059
 int string title_section_modoCamara 0x7f0b0033
 int string title_section_modoMapa 0x7f0b0034
+int string title_source_filter 0x7f0b0062
 int string wallet_buy_button_place_holder 0x7f0b0031
 int string you_are_here 0x7f0b0038
 int style AppBaseTheme 0x7f0c00f0

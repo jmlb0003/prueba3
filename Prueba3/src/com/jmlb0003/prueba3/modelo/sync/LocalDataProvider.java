@@ -94,7 +94,32 @@ public class LocalDataProvider extends DataProvider {
     	
     	toRet.add(poiValues);
 
-    	Log.d(LOG_TAG,"3 y fin");
+    	Log.d(LOG_TAG,"3");
+    	
+    	
+    	poiValues = new ContentValues();
+    	poiValues.put(PoiEntry.COLUMN_POI_NAME, "Mágina");
+    	poiValues.put(PoiEntry.COLUMN_POI_LATITUDE, 
+    			new BigDecimal(37.725685).setScale(6,BigDecimal.ROUND_FLOOR).doubleValue());
+        poiValues.put(PoiEntry.COLUMN_POI_LONGITUDE,
+        		new BigDecimal(-3.467162).setScale(6,BigDecimal.ROUND_FLOOR).doubleValue());
+        poiValues.put(PoiEntry.COLUMN_POI_ALTITUDE, 2139.0);
+        
+        poiValues.put(PoiEntry.COLUMN_POI_USER_ID, PoiContract.PoiEntry.LOCAL_PROVIDER);
+    	poiValues.put(PoiEntry.COLUMN_POI_COLOR, PoiContract.PoiEntry.LOCAL_COLOR);
+    	poiValues.put(PoiEntry.COLUMN_POI_IMAGE, PoiContract.PoiEntry.LOCAL_DEFAULT_IMAGE);
+    	poiValues.put(PoiEntry.COLUMN_POI_DESCRIPTION, "Pico de Mágina");
+    	poiValues.put(PoiEntry.COLUMN_POI_WEBSITE, "");
+    	poiValues.put(PoiEntry.COLUMN_POI_PRICE, 123);
+    	poiValues.put(PoiEntry.COLUMN_POI_OPEN_HOURS, "22:00");
+    	poiValues.put(PoiEntry.COLUMN_POI_CLOSE_HOURS, "08:00");
+    	poiValues.put(PoiEntry.COLUMN_POI_MAX_AGE, 34);
+    	poiValues.put(PoiEntry.COLUMN_POI_MIN_AGE, 10);
+    	
+    	
+    	toRet.add(poiValues);
+
+    	Log.d(LOG_TAG,"4 y fin");
         
         return toRet;
 	}

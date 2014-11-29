@@ -10,8 +10,24 @@
          
 	    <CheckBoxPreference
 			android:key="@string/ft_open_key"
-			android:title="@string/ft_open"
+			android:title="@string/ft_open_label"
 		   	android:summary="@string/ft_open_sum"
 		   	android:defaultValue="false" />
+    </PreferenceCategory>
+    
+    <PreferenceCategory
+         android:title="@string/title_source_filter" >
+         
+	    <CheckBoxPreference
+			android:key="@string/ft_wiki_key"
+			android:title="@string/ft_wiki_label"
+		   	android:summary="@string/ft_wiki_sum"
+		   	android:defaultValue="true" />
+	    <CheckBoxPreference
+			android:key="@string/ft_local_key"
+			android:title="@string/ft_local_label"
+		   	android:summary="@string/ft_local_sum"
+		   	android:defaultValue="true" />
+
     </PreferenceCategory>
 </PreferenceScreen>

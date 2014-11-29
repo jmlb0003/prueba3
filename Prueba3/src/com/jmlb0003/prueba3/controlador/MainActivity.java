@@ -91,8 +91,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     /**Distancia máxima en metros entre dos posiciones para que se actualicen/descarguen PIs (1700 metros)**/
     private static final int MAX_DISTANCE = 1700;
     /**Constante con el tiempo en milisegundos para descartar una lectura de posición anterior**/
-    //TODO:Esta modificado para que no incordie con las posiciones. Volver a dejarlo en 30 minutos
-    private static final int THIRTY_MINUTES = 30*60*1000    *2*24;
+    private static final int THIRTY_MINUTES = 30*60*1000;
     
     
     /***************CONSTANTES DESCARGAS DE PIs DE LAS DISTINTAS APIs***********************/
@@ -110,8 +109,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     private Location mLastUpdateDataLocation = null;
     //Variable que controla si se ha encontrado alguna ubicación válida
     private boolean hayLocation;
-    //Variable con el radio de búsqueda de PI del radar
-    private float mRadarSearch;
     
     /**Variable que almacena un Poi pulsado**/
     private Poi mTouchedPoi = null;
@@ -179,7 +176,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 		setPoiProviders();
 		setPoiIcons();
-		aplicarValoresDeAjustes();
+//		aplicarValoresDeAjustes();
 		
 	}// Fin de onCreate()
 	
@@ -199,7 +196,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         //Con esto se mantiene la pantalla encendida mientras se use la app en esta activity
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         
-        aplicarValoresDeAjustes();
+        
   
         
         getLocation();
@@ -210,7 +207,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
         	updateData(mLocation);
         }
-        
+        aplicarValoresDeAjustes();
     }// Fin de onResume()
 	
 	
@@ -469,10 +466,20 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	   PreferenceManager.setDefaultValues(this, R.layout.activity_general_prefs, false);
 	   //Obtenemos la distancia hasta la que se buscan PI en los ajustes
 	   SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-	   mRadarSearch = prefs.getInt(getString(R.string.pref_seekBar_distance_key),0);	//TODO: Esta variable sobra
-	   ARDataSource.updateRadarDistance(mRadarSearch);
+	   ARDataSource.updateRadarDistance(prefs.getInt(getString(R.string.pref_seekBar_distance_key),0));
 	   
-	   ARDataSource.setHoursFilter(prefs.getBoolean(getString(R.string.ft_open_key), false));
+	   //Aplicar filtros:
+	   //Por horario
+	   ARDataSource.setFilterByHours(prefs.getBoolean(getString(R.string.ft_open_key), false));
+	   //Filtros por proveedor (wikipedia)
+	   if (!prefs.getBoolean(getString(R.string.ft_wiki_key), true)) {
+		   ARDataSource.setFilterByProvider(PoiContract.PoiEntry.WIKIPEDIA_PROVIDER);
+	   }
+	   //Filtros por proveedor (local)
+	   if (!prefs.getBoolean(getString(R.string.ft_local_key), true)) {
+		   ARDataSource.setFilterByProvider(PoiContract.PoiEntry.LOCAL_PROVIDER);
+	   }
+	   
 	   
 	   /***********Recorriendo todas las preferencias almacenadas******************
 	   Map<String,?> keys = prefs.getAll();
