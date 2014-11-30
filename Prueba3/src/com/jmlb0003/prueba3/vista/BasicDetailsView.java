@@ -14,7 +14,7 @@ import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.modelo.sync.LoadPoisImagesTask;
 
-//TODO: Al pulsar los detalles básicos que se vaya a los detalles completos tambien
+
 /**
  * Clase utilizada para mostrar los detalles básicos de un PI que ha sido pulsado.
  * @author Jose

@@ -58,16 +58,6 @@ public class DetallesPoiActivity extends ActionBarActivity {
 	        	Log.d(LOG_TAG,"4");
 	        	//Se añade el PI a la lista en memoria y después se asigna a mShowedPoi
 	        	mShowedPoi = ARDataSource.getPoi(cursor.getLong(cursor.getColumnIndex(PoiEntry._ID)));
-	        	
-	        	/********************************************/
-	        	if (mShowedPoi == null) {
-	        		Log.d(LOG_TAG,"ES NULL mshowed...");
-	        	}else{
-	        		Log.d(LOG_TAG,"Mshowed Name: "+mShowedPoi.getName());
-	        		Log.d(LOG_TAG,"Mshowed id: "+mShowedPoi.getID());
-	        		Log.d(LOG_TAG,"Mshowed Distance: "+mShowedPoi.getDistance());
-	        		Log.d(LOG_TAG,"Mshowed Distance2: "+mShowedPoi.getTextDistance());
-	        	}
 	        }
 		}
 	}
@@ -82,21 +72,9 @@ public class DetallesPoiActivity extends ActionBarActivity {
 		}
 		
 		if (mShowedPoi == null && ARDataSource.hasSelectededPoi()) {
-			Log.d(LOG_TAG,"5");
 			mShowedPoi = ARDataSource.SelectedPoi;
 		}
 		
-		if (mShowedPoi == null) {
-			Log.d(LOG_TAG,"mshowed es null");
-		}else{
-			if (mShowedPoi.getName() == null) {
-				Log.d(LOG_TAG,"y el getname tambien es null");
-			}
-		}
-		
-		if (ARDataSource.hasSelectededPoi()){
-			Log.d(LOG_TAG,"Hay un poiSeleccionado");
-		}
 		
 		setTitle(mShowedPoi.getName());
 		

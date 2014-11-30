@@ -104,6 +104,8 @@ public class Poi implements Comparable<Poi> {
     protected volatile boolean isSelected = false;
     /**Indica si el PI ha sido recolocado al estar en colisión con otro PI**/
     protected volatile boolean isAdjusted = false;
+    protected volatile int dx = 0;
+    protected volatile int dy = 0;
     
     /**VARIABLES PARA CONTROLAR LA POSICIÓN EN LA QUE SE DIBUJA EL PI EN PANTALLA
      * X define si está más arriba o más abajo
@@ -320,7 +322,7 @@ public class Poi implements Comparable<Poi> {
      * donde se dibuja el PI en pantalla. 
      * @return Vector con las coordenadas donde se ubicará el PI.
      */
-    public synchronized Vector getScreenPosition() {
+    private synchronized Vector getScreenPosition() {
         symbolXyzRelativeToCameraView.get(symbolArray);
         textXyzRelativeToCameraView.get(textArray);
         
@@ -698,10 +700,10 @@ public class Poi implements Comparable<Poi> {
         float x4 = x2;
         float y4 = y3;
 
-        Log.w("collisionBox", "ul (x="+x1+" y="+y1+")");
-        Log.w("collisionBox", "ur (x="+x2+" y="+y2+")");
-        Log.w("collisionBox", "ll (x="+x3+" y="+y3+")");
-        Log.w("collisionBox", "lr (x="+x4+" y="+y4+")");
+//        Log.w("collisionBox", "ul (x="+x1+" y="+y1+")");
+//        Log.w("collisionBox", "ur (x="+x2+" y="+y2+")");
+//        Log.w("collisionBox", "ll (x="+x3+" y="+y3+")");
+//        Log.w("collisionBox", "lr (x="+x4+" y="+y4+")");
         
         if (sCollisionBox == null) {
         	sCollisionBox = new PaintableBox(width,height,Color.WHITE,Color.RED);
@@ -709,7 +711,8 @@ public class Poi implements Comparable<Poi> {
         	sCollisionBox.set(width,height);
         }
 
-        float currentAngle = Utilities.getAngle(symbolArray[0], symbolArray[1], textArray[0], textArray[1])+90;
+        float currentAngle = Utilities
+        		.getAngle(symbolArray[0], symbolArray[1], textArray[0], textArray[1]) + 90;
         
         if (sCollisionPosition == null) {
         	sCollisionPosition = new PaintablePosition(sCollisionBox, x1, y1, currentAngle, 1);
@@ -738,7 +741,8 @@ public class Poi implements Comparable<Poi> {
         float height = getHeight();
         float adjX = (x1 + x2)/2;
         float adjY = (y1 + y2)/2;
-        float currentAngle = Utilities.getAngle(symbolArray[0], symbolArray[1], textArray[0], textArray[1])+90;
+        float currentAngle = Utilities
+        		.getAngle(symbolArray[0], symbolArray[1], textArray[0], textArray[1]) + 90;
         adjX -= (width/2);
         adjY -= (gpsSymbol.getHeight()/2);
         
@@ -847,6 +851,7 @@ public class Poi implements Comparable<Poi> {
      * @returns Un entero negativo si este PI tiene una distancia menor que another; un entero
      * 		positivo si este PI tiene una distancia mayor que another; 0 si están a la misma distancia.
      */
+    @Override
     public synchronized int compareTo(Poi another) {
         if (another == null) {
         	throw new NullPointerException();
@@ -859,23 +864,24 @@ public class Poi implements Comparable<Poi> {
     
     @Override
     public synchronized boolean equals(Object poi) {
-        if(poi == null || mName == null) {
-        	throw new NullPointerException();
-        }
-        
-        if (((Poi)poi).getID() != getID()) {
+        if(poi == null || mName == null || poi.getClass() != getClass()) {
         	return false;
         }
         
-        if (!mName.equals(((Poi)poi).getName())) {
+        final Poi other = (Poi)poi;
+        if (other.getID() != getID()) {
         	return false;
         }
         
-        if (((Poi)poi).getLatitude() != getLatitude()) {
+        if (!mName.equals(other.getName())) {
         	return false;
         }
         
-        if (((Poi)poi).getLongitude() != getLongitude()) {
+        if (other.getLatitude() != getLatitude()) {
+        	return false;
+        }
+        
+        if (other.getLongitude() != getLongitude()) {
         	return false;
         }
         

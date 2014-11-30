@@ -1,6 +1,7 @@
 package com.jmlb0003.prueba3.controlador;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -75,6 +76,9 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     private Activity mActivity;
     private BasicDetailsView mBasicDetails;
     
+    private float dX;
+    private int i;
+    private List<Poi> mGroupedPois = new ArrayList<>();
     
 
 	/** Interfaz para indicar a MainActivity que se ha pulsado un PI **/
@@ -348,6 +352,24 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         // Listening for the down and up touch events
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+            	for (Poi poi : ARDataSource.getPois()) {
+        	        if (poi.handleClick(event.getX(), event.getY())) {
+        	        	//Si se pincha en un PI que está en un grupo
+        	        	if (poi.isAdjusted()) {
+        	        		dX = event.getX();
+        	        		//Si es la primera vez, obtener el PI para obtener el grupo despues
+        	        		if (mGroupedPois.isEmpty()) {
+        	        			i = 0;
+        	        			mGroupedPois = mAugmentedView.getPoiGroup(poi);
+        	        		}
+        	        	}        	        	        	            
+        	            return true;
+        	        }
+        	    }
+            	dX = -1;
+        		i = -1;
+        		mGroupedPois.clear();
+            	
                 return true;
                 
             
@@ -362,23 +384,34 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
             	 * Si el usuario pincha en alguno de la lista, se muestra la lista en la pantalla 
             	 * de búsqueda y que se mire el que quiera
             	 * 
-            	 * 
+            	 * Estan en una lista de listas de PIs en AugmentedView... sGroupedPois...
             	 */
+            	if ( (dX > 0) && (Math.abs(event.getX() - dX) > 150) ){
+            		Log.d(LOG_TAG,"i:move...con getX:"+event.getX()+" dx:"+dX);
+            		if ((event.getX() - dX) < 0) {
+            			moveToLeft();
+                	}
+                	if ((event.getX() - dX) > 0) {
+                		moveToRight();
+                	}
+                	dX = -1;
+            	}
+            	
+            	
             	return true;
 
             case MotionEvent.ACTION_UP:
             	//Cuando el evento no es de la vista de detalles básicos se comprueban los PIs
-            	if (view != mBasicDetails) {
-                	for (Poi poi : ARDataSource.getPois()) {
-            	        if (poi.handleClick(event.getX(), event.getY())) {
-            	            poiTouched(poi);
-            	            
-            	            return true;
-            	        }
-            	    }
-            	}
-
-            	if (ARDataSource.hasSelectededPoi()) {
+            	for (Poi poi : ARDataSource.getPois()) {
+        	        if (poi.handleClick(event.getX(), event.getY())) {
+        	        	poiTouched(poi);
+        	            
+        	            return true;
+        	        }
+        	    }
+            	
+            	//Si se levanta el dedo fuera de un PI y no está mostrándose alguno de los grupos...
+            	if (ARDataSource.hasSelectededPoi() && i < 0) {
             		mCallback.onPoiUnselected(ARDataSource.SelectedPoi);
 
             		mBasicDetails.setVisibility(View.INVISIBLE);
@@ -387,6 +420,42 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
             	return false;            	
         }
         return false;
+	}
+	
+	
+	
+	
+	private void moveToLeft() {
+		if (i < 0) {
+			return;
+		}else{			
+			if (i == 0) {
+				i = mGroupedPois.size()-1;
+			}else{
+				i--;
+			}
+		}
+		Log.d(LOG_TAG,"i:"+i+" Size:"+mGroupedPois.size());
+		poiTouched(mGroupedPois.get(i));
+	}
+	
+	
+	private void moveToRight() {
+		Log.d(LOG_TAG,"i:1");
+		if(i < 0) {
+			Log.d(LOG_TAG,"i:2");
+			return;
+		}else{
+			if (i == mGroupedPois.size()-1) {
+				Log.d(LOG_TAG,"i:3");
+				i = 0;
+			}else{
+				Log.d(LOG_TAG,"i:4");
+				i++;
+			}
+		}
+		Log.d(LOG_TAG,"i:"+i+" Size:"+mGroupedPois.size());
+		poiTouched(mGroupedPois.get(i));
 	}
 	
 	
@@ -400,7 +469,9 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 			return;
 		}
 
-		mCallback.onPoiTouched(poi);
+		if (!poi.isAdjusted() || !poi.isSelected()) {
+			mCallback.onPoiTouched(poi);
+		}
 		
 		mBasicDetails.setVisibility(View.VISIBLE);
 		mBasicDetails.initView(poi);		

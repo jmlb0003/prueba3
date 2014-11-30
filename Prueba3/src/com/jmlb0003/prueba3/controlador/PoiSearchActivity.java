@@ -43,7 +43,6 @@ public class PoiSearchActivity extends ActionBarActivity {
             // handles a search query
             String query = intent.getStringExtra(SearchManager.QUERY);
             showResults(query);
-      
         }
     }
 

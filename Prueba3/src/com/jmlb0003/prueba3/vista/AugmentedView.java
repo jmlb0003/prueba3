@@ -1,8 +1,9 @@
 package com.jmlb0003.prueba3.vista;
 
 
-
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.TreeSet;
@@ -26,13 +27,16 @@ import com.jmlb0003.prueba3.modelo.Poi;
  */
 public class AugmentedView extends View {
 	
+	private static final String LOG_CAT = "AugmentedView";
+	
 	/**Se usa para modificar las posiciones en pantalla de los PIs que aparecen superpuestos**/
     private static final float[] LOCATION_ARRAY = new float[3];
-    private static final List<Poi> COLLECTION_CACHE = new ArrayList<Poi>();
+    private static final List<Poi> POIS_ON_SCREEN = new ArrayList<Poi>();
     /**Se usa para ajustar la altura de un Poi que colisiona con otro**/
-    private static final int COLLISION_ADJUSTMENT = 100;//= 100;
+    private static final int COLLISION_ADJUSTMENT = 5;//= 100;
     
-    private static TreeSet<Poi> sUpdatedPois = new TreeSet<Poi>();
+    private static HashMap<Long,Poi> sUpdatedPois = new HashMap<Long,Poi>();
+    public static List<List<Poi>> sGroupedPois = new ArrayList<>();
     private static AtomicBoolean sDrawing = new AtomicBoolean(false);
     private static float sPixelDensity;
     private static Radar sRadar;
@@ -44,11 +48,8 @@ public class AugmentedView extends View {
 	 */
 	public AugmentedView(Context context) {
 		super(context);
-
-		sPixelDensity = context.getResources().getDisplayMetrics().density;
-		ARDataSource.PixelsDensity = sPixelDensity;
 		
-		sRadar  = new Radar(sPixelDensity);
+		initView(context);
 	}// Fin del constructor dinámico
 	
 	
@@ -59,13 +60,18 @@ public class AugmentedView extends View {
 	 */
 	public AugmentedView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-
+		
+		initView(context);
+		
+	}// Fin del constructor con XML
+	
+	
+	private void initView(Context context) {
 		sPixelDensity = context.getResources().getDisplayMetrics().density;
 		ARDataSource.PixelsDensity = sPixelDensity;
 		
 		sRadar  = new Radar(sPixelDensity);
-	}// Fin del constructor con XML
-	
+	}
 	
 	/**
 	 * Recorre la lista de marcadores disponibles para dibujar en la pantalla los que 
@@ -80,23 +86,40 @@ public class AugmentedView extends View {
     	}
 
         if (sDrawing.compareAndSet(false, true)) {
-	        List<Poi> collection = ARDataSource.getPois();
-
-	        COLLECTION_CACHE.clear();
-            for (Poi m : collection) {
+        	POIS_ON_SCREEN.clear();
+            for (Poi m : ARDataSource.getPois()) {
                 m.update(canvas, 0, 0);
                 if (m.isOnRadar() && m.isInView()) {
-                	COLLECTION_CACHE.add(m);
+                	POIS_ON_SCREEN.add(m);
                 }
 	        }
           
-            collection = COLLECTION_CACHE;
 
-            //TODO: Comentada la resolucion de colisiones por ahora
-//	        adjustForCollisions(canvas,collection);
+	        adjustForCollisions(canvas, POIS_ON_SCREEN);
 	        
 	        
-	        ListIterator<Poi> iter = collection.listIterator(collection.size());
+	        /***********************************************************
+	        if (sGroupedPois.size() > 0) {
+	        ListIterator<List<Poi>> iter1 = sGroupedPois.listIterator();
+	        Log.d("iterando...", "Size total:"+sGroupedPois.size());
+	        Log.d("iterando...", "////////////////////////");
+	        while (iter1.hasNext()) {
+	            List<Poi> l = iter1.next();
+	            ListIterator<Poi> iter2 = l.listIterator();
+	            Log.d("iterando...", "Size de l:"+l.size());
+	            while (iter2.hasNext()) {
+		            Poi p = iter2.next();
+		            Log.d("iterando...", "*"+p.getName()+ " - "+p.getDistance());
+		        }
+	            
+	            Log.d("iterando...", "////////////////////////");
+	        }
+	        Log.d("iterando...", "////////////////////////");
+	        }
+	        ***********************************************************/
+	        
+	        
+	        ListIterator<Poi> iter = POIS_ON_SCREEN.listIterator(POIS_ON_SCREEN.size());
 	        while (iter.hasPrevious()) {
 	            Poi poi = iter.previous();
 	            poi.draw(canvas);
@@ -117,120 +140,138 @@ public class AugmentedView extends View {
 	 * @param collection Conjunto de PIs dentro del rango actual que se van a comprobar
 	 */
 	private static void adjustForCollisions(Canvas canvas, List<Poi> collection) {
-		
+
+		Collections.sort(collection);
 		sUpdatedPois.clear();
-		
+		sGroupedPois.clear();
+
         for (Poi poi1 : collection) {
-            if (sUpdatedPois.contains(poi1) || !poi1.isInView()) {
+            if (sUpdatedPois.containsKey(poi1.getID()) || !poi1.isInView()) {
             	continue;
             }
-
+            ArrayList<Poi> poisWithpoi1 = new ArrayList<>();	//Nuevo item para la lista de pois
+            poisWithpoi1.add(poi1);
+            poi1.getLocation().get(LOCATION_ARRAY);
             int collisions = 1;
             for (Poi poi2 : collection) {
-                if (poi1.equals(poi2) || sUpdatedPois.contains(poi2) || !poi2.isInView()) {
+                if (poi1.equals(poi2) || sUpdatedPois.containsKey(poi2.getID()) || !poi2.isInView()) {
                 	continue;
                 }
-
-                //Si los marcadores se solapan, se corrige la altura (en coordenadas de pantalla)
+                //Si los marcadores se solapan, se corrige la posicion
                 if (poi1.isPoiOnPoi(poi2)) {
-                	Log.d("AugmentedView","El poi "+poi1.getName()+" se solapa con "+poi2.getName());
-                    poi2.getLocation().get(LOCATION_ARRAY);
-                    float y = LOCATION_ARRAY[1];
-                    float h = collisions * COLLISION_ADJUSTMENT;
-                    LOCATION_ARRAY[1] = y+h;
-                    poi2.getLocation().set(LOCATION_ARRAY);
-                    poi2.update(canvas, 0, 0);
+                	poi2.getLocation().set(LOCATION_ARRAY);
+                	
+                	float f = collisions * COLLISION_ADJUSTMENT * sPixelDensity;
+                    poi2.update(canvas, f, f);
                     collisions++;
-                    sUpdatedPois.add(poi2);
+                    sUpdatedPois.put(poi2.getID(), poi2);
+                    poisWithpoi1.add(poi2);	//Lo añadimos al grupo de poi1
+                    
+                    poi1.setAdjusted(true);
+                    poi2.setAdjusted(true);
                 }
             }
-            sUpdatedPois.add(poi1);
+            sUpdatedPois.put(poi1.getID(), poi1);
+            sGroupedPois.add(poisWithpoi1);
         }
 	}
 	
+	
+	public List<Poi> getPoiGroup(Poi p) {
+		ListIterator<List<Poi>> l = sGroupedPois.listIterator();
+		while(l.hasNext()) {
+			List<Poi> toRet = l.next();
+			if (toRet.contains(p)) {
+				return toRet;
+			}
+		}
+		return null;
+	}
+	
+	/*
 	private static void adjustForCollisions2(Canvas canvas, List<Poi> collection) {
 		sUpdatedPois.clear();
 		
         for (Poi poi1 : collection) {
             if (sUpdatedPois.contains(poi1) || !poi1.isInView()) {
-            	Log.d("AugmentedView","1 con El poi "+poi1.getName());
+            	Log.d(LOG_CAT,"1 con El poi "+poi1.getName());
             	continue;
             }
 
             int collisions = 1;
             for (Poi poi2 : collection) {
                 if (poi1.equals(poi2) || sUpdatedPois.contains(poi2) || !poi2.isInView()) {
-                	Log.d("AugmentedView","2 con El poi "+poi2.getName());
+                	Log.d(LOG_CAT,"2 con El poi "+poi2.getName());
                 	continue;
                 }
                 
-                Log.d("AugmentedView","3 con El poi "+poi1.getName()+" y el poi2 "+poi2.getName());
+                Log.d(LOG_CAT,"3 con El poi "+poi1.getName()+" y el poi2 "+poi2.getName());
                 //Si los marcadores se solapan, se corrige la altura (en coordenadas de pantalla)
                 if (poi1.isPoiOnPoi(poi2)) {
-                	Log.d("AugmentedView","4El poi "+poi1.getName()+" se solapa con "+poi2.getName());
+                	Log.d(LOG_CAT,"4El poi "+poi1.getName()+" se solapa con "+poi2.getName());
                     poi2.getScreenPosition().get(LOCATION_ARRAY);
                     float y = LOCATION_ARRAY[1];
                     float h = collisions * COLLISION_ADJUSTMENT;
-                    Log.d("AugmentedView","4El y es "+y+" y se le suma "+h);
-                    Log.d("AugmentedView","4De LOCATION_ARRAY[0]"+LOCATION_ARRAY[0]+" LOCATION_ARRAY[1]"+LOCATION_ARRAY[1]);
+                    Log.d(LOG_CAT,"4El y es "+y+" y se le suma "+h);
+                    Log.d(LOG_CAT,"4De LOCATION_ARRAY[0]"+LOCATION_ARRAY[0]+" LOCATION_ARRAY[1]"+LOCATION_ARRAY[1]);
                     LOCATION_ARRAY[1] = y+h;
-                    Log.d("AugmentedView","4De "+poi1.getName()+" X"+poi1.getScreenPosition().getX()+" Y"+poi1.getScreenPosition().getY()+" Z"+poi1.getScreenPosition().getZ());
+                    Log.d(LOG_CAT,"4De "+poi1.getName()+" X"+poi1.getScreenPosition().getX()+" Y"+poi1.getScreenPosition().getY()+" Z"+poi1.getScreenPosition().getZ());
                     LOCATION_ARRAY[0] = poi1.getScreenPosition().getX()-100;
-                    Log.d("AugmentedView","4 y SE METE____ LOCATION_ARRAY[0]"+LOCATION_ARRAY[0]+" LOCATION_ARRAY[1]"+LOCATION_ARRAY[1]);
+                    Log.d(LOG_CAT,"4 y SE METE____ LOCATION_ARRAY[0]"+LOCATION_ARRAY[0]+" LOCATION_ARRAY[1]"+LOCATION_ARRAY[1]);
                     poi2.getScreenPosition().set(LOCATION_ARRAY);
                     
                     poi2.update(canvas, 0, 0);
                     collisions++;
                     sUpdatedPois.add(poi2);
                 }
-                Log.d("AugmentedView","5 con El poi "+poi2.getName());
+                Log.d(LOG_CAT,"5 con El poi "+poi2.getName());
             }
             sUpdatedPois.add(poi1);
-            Log.d("AugmentedView","6 con El poi "+poi1.getName());
+            Log.d(LOG_CAT,"6 con El poi "+poi1.getName());
         }
 	}
-	
-private static void adjustForCollisions_FUNCIONA_(Canvas canvas, List<Poi> collection) {
+	*/
+private static void adjustForCollisions_ORIGINAL_(Canvas canvas, List<Poi> collection) {
 		
 		sUpdatedPois.clear();
 		
         for (Poi poi1 : collection) {
-            if (sUpdatedPois.contains(poi1) || !poi1.isInView()) {
-            	Log.d("AugmentedView","1 con El poi "+poi1.getName());
+            if (sUpdatedPois.containsKey(poi1.getID()) || !poi1.isInView()) {
+            	Log.d(LOG_CAT,"1 con El poi "+poi1.getName());
             	continue;
             }
 
             int collisions = 1;
             for (Poi poi2 : collection) {
-                if (poi1.equals(poi2) || sUpdatedPois.contains(poi2) || !poi2.isInView()) {
-                	Log.d("AugmentedView","2 con El poi "+poi2.getName());
+                if (poi1.equals(poi2) || sUpdatedPois.containsKey(poi2.getID()) || !poi2.isInView()) {
+                	Log.d(LOG_CAT,"2 con El poi "+poi2.getName());
                 	continue;
                 }
                 
-                Log.d("AugmentedView","3 con El poi "+poi1.getName()+" y el poi2 "+poi2.getName());
+                Log.d(LOG_CAT,"3 con El poi "+poi1.getName()+" y el poi2 "+poi2.getName());
                 //Si los marcadores se solapan, se corrige la altura (en coordenadas de pantalla)
                 if (poi1.isPoiOnPoi(poi2)) {
-                	Log.d("AugmentedView","4El poi "+poi1.getName()+" se solapa con "+poi2.getName());
+                	Log.d(LOG_CAT,"4El poi "+poi1.getName()+" se solapa con "+poi2.getName());
                     poi2.getLocation().get(LOCATION_ARRAY);
                     float y = LOCATION_ARRAY[1];
                     float h = collisions * COLLISION_ADJUSTMENT;
-                    Log.d("AugmentedView","4El y es "+y+" y se le suma "+h);
-                    Log.d("AugmentedView","4De LOCATION_ARRAY[0]"+LOCATION_ARRAY[0]+" LOCATION_ARRAY[1]"+LOCATION_ARRAY[1]+" LOCATION_ARRAY[2]"+LOCATION_ARRAY[2]);
+                    Log.d(LOG_CAT,"4El y es "+y+" y se le suma "+h);
+                    Log.d(LOG_CAT,"4De LOCATION_ARRAY[0]"+LOCATION_ARRAY[0]+" LOCATION_ARRAY[1]"+LOCATION_ARRAY[1]+" LOCATION_ARRAY[2]"+LOCATION_ARRAY[2]);
                     LOCATION_ARRAY[1] = y+h;
-                    Log.d("AugmentedView","4De "+poi1.getName()+" X"+poi1.getLocation().getX()+" Y"+poi1.getLocation().getY()+" Z"+poi1.getLocation().getZ());
+                    Log.d(LOG_CAT,"4De "+poi1.getName()+" X"+poi1.getLocation().getX()+" Y"+poi1.getLocation().getY()+" Z"+poi1.getLocation().getZ());
                     LOCATION_ARRAY[0] = poi1.getLocation().getX();
                     LOCATION_ARRAY[2] = poi1.getLocation().getZ();
-                    Log.d("AugmentedView","4 y SE METE____ LOCATION_ARRAY[0]"+LOCATION_ARRAY[0]+" LOCATION_ARRAY[1]"+LOCATION_ARRAY[1]+" LOCATION_ARRAY[2]"+LOCATION_ARRAY[2]);
+                    Log.d(LOG_CAT,"4 y SE METE____ LOCATION_ARRAY[0]"+LOCATION_ARRAY[0]+" LOCATION_ARRAY[1]"+LOCATION_ARRAY[1]+" LOCATION_ARRAY[2]"+LOCATION_ARRAY[2]);
                     poi2.getLocation().set(LOCATION_ARRAY);
                     
                     poi2.update(canvas, 0, 0);
                     collisions++;
-                    sUpdatedPois.add(poi2);
+                    sUpdatedPois.put(poi2.getID(), poi2);
                 }
-                Log.d("AugmentedView","5 con El poi "+poi2.getName());
+                Log.d(LOG_CAT,"5 con El poi "+poi2.getName());
             }
-            sUpdatedPois.add(poi1);
-            Log.d("AugmentedView","6 con El poi "+poi1.getName());
+            sUpdatedPois.put(poi1.getID(), poi1);
+            Log.d(LOG_CAT,"6 con El poi "+poi1.getName());
         }
 	}
 	
