@@ -1,9 +1,11 @@
 package com.jmlb0003.prueba3.vista;
 
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 
+import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.controlador.ARDataSource;
 import com.jmlb0003.prueba3.utilidades.CameraModel;
 import com.jmlb0003.prueba3.utilidades.PitchAzimuthCalculator;
@@ -16,17 +18,15 @@ import com.jmlb0003.prueba3.utilidades.Paintables.PaintableText;
 
 
 
-
 /**
- * Esta clase sirve para manejar todos los eventos y operaciones relacionados con el radar que se 
- * dibuja en pantalla.
+ * Esta clase sirve para manejar todos los eventos y operaciones relacionados con el radar
+ * que se dibuja en pantalla.
  * @author Jose
  *
  */
 public class Radar {
     
     private static final int LINE_COLOR = Color.argb(150,0,220,220);
-    private static final int RADAR_COLOR = Color.argb(100, 0, 0, 200);
     private static final int TEXT_COLOR = Color.rgb(255,255,255);
     private static final int TEXT_SIZE = 10;
 
@@ -48,23 +48,20 @@ public class Radar {
     private static float sPixelsDensity = 0.0f;	//Esta es la densidad de píxeles de la pantalla
     private static float sRadarRadius = 40;
     private static int sTextSize = TEXT_SIZE;
+    
+    /********Color del Radar*************************/
+    private static int sRadarColor;
+    
+    
+    private Context mContext;
 
     
     /**
-     * Constructor de las instancias de la clase Radar. Para dibujar los elementos contenidos 
-     * en el radar (puntos, líneas, texto, etc.) es necesario adjuntar un valor de densidad de 
-     * píxeles de pantalla para mantener la homogeneidad de la interfaz en distintos tamaños de
-     * pantalla.
-     * @param PixelDensity Valor de la densidad de píxeles de la pantalla del dispositivo. Las 
-     * medidas en píxeles usadas para dibujar componentes visuales se multiplican por este valor. 
-     * Para obtenerlo desde el contexto de una vista se puede usar:
-     *  	context.getResources().getDisplayMetrics().density
-     * También se pueden usar las siguientes instrucciones desde una actividad:
-     *  	DisplayMetrics dm = new DisplayMetrics();
-     *  	getWindowManager().getDefaultDisplay().getMetrics(dm);
-     *  	float density = dm.density;
+     * Constructor de las instancias de la clase Radar.
      */
-    public Radar(float pixelDensity) {
+    public Radar(Context c) {
+    	mContext = c;
+    	
     	/**
     	 * De esta forma nos podemos asegurar de que la primera vez se realizan los cálculos 
     	 * para adaptar las variables en píxeles a unidades proporcionales a la densidad de 
@@ -72,9 +69,8 @@ public class Radar {
     	 * ya iniciadas. Por tanto, estas variables solamente se calcularán la primera vez
     	 * porque si no, se descuadran los puntos del radar.
     	 */
-    	if (pixelDensity != sPixelsDensity) {
-    		sPixelsDensity = pixelDensity;
-
+    	if (mContext.getResources().getDisplayMetrics().density != sPixelsDensity) {
+    		sPixelsDensity = mContext.getResources().getDisplayMetrics().density;
 
             if (sLeftRadarLine == null) {
             	sLeftRadarLine = new ScreenPositionUtility();
@@ -83,14 +79,13 @@ public class Radar {
             	sRightRadarLine = new ScreenPositionUtility();
             }
             
-        	
-        	
             sRadarRadius = 40 * sPixelsDensity;
             sPad_X = 10 * sPixelsDensity;
             sPad_Y = 20 * sPixelsDensity;
             sTextSize = Math.round(TEXT_SIZE * sPixelsDensity);
         }
-        
+    	
+    	sRadarColor = mContext.getResources().getColor(R.color.primary_transparent);
     }
 
     
@@ -101,12 +96,11 @@ public class Radar {
      */
     public void draw(Canvas canvas) {
     	if (canvas == null) {
-    		throw new NullPointerException();
+    		return;
     	}
 
     	PitchAzimuthCalculator.calcPitchBearing(ARDataSource.getRotationMatrix());
     	ARDataSource.setAzimuth(PitchAzimuthCalculator.getAzimuth());
-        ARDataSource.setPitch(PitchAzimuthCalculator.getPitch());
         
         drawRadarCircle(canvas);
         drawRadarPoints(canvas);
@@ -121,17 +115,7 @@ public class Radar {
      */
     public static float getRadius() {
     	return sRadarRadius;
-    }
-    
-    
-    /**
-     * Método para obtener la densidad de píxeles por pulgada de la pantalla
-     * @return Valor de la densidad de píxeles por pulgada de la pantalla
-     */
-    public static float getPixelsDensity() {
-    	return sPixelsDensity;
-    }
-    
+    }    
     
     
     /**
@@ -140,11 +124,11 @@ public class Radar {
      */
     private void drawRadarCircle(Canvas canvas) {
     	if (canvas == null) {
-    		throw new NullPointerException();
+    		return;
     	}
     	
         if (sCircleContainer == null) {
-            PaintableCircle paintableCircle = new PaintableCircle(RADAR_COLOR,sRadarRadius,true);
+            PaintableCircle paintableCircle = new PaintableCircle(sRadarColor,sRadarRadius,true);
             sCircleContainer = new PaintablePosition(paintableCircle,sPad_X+sRadarRadius,sPad_Y+sRadarRadius,0,1);
         }
         sCircleContainer.paint(canvas);
@@ -152,7 +136,7 @@ public class Radar {
     
     private void drawRadarPoints(Canvas canvas) {
     	if (canvas == null) {
-    		throw new NullPointerException();
+    		return;
     	}
     	
         if (sRadarPoints == null) {
@@ -178,7 +162,7 @@ public class Radar {
     
     private void drawRadarLines(Canvas canvas) {
     	if (canvas == null) {
-    		throw new NullPointerException();
+    		return;
     	}
     	
         if (sLeftLineContainer == null) {
@@ -189,11 +173,12 @@ public class Radar {
             float leftX = sLeftRadarLine.getX()-(sPad_X+sRadarRadius);
             float leftY = sLeftRadarLine.getY()-(sPad_Y+sRadarRadius);
             PaintableLine leftLine = new PaintableLine(LINE_COLOR, leftX, leftY);
-            sLeftLineContainer = new PaintablePosition(  leftLine, 
+            sLeftLineContainer = new PaintablePosition(  
+            		leftLine,
             		sPad_X+sRadarRadius, 
             		sPad_Y+sRadarRadius, 
-                                                        0, 
-                                                        1);
+            		0,
+            		1);
         }
         sLeftLineContainer.paint(canvas);
         
@@ -205,11 +190,12 @@ public class Radar {
             float rightX = sRightRadarLine.getX()-(sPad_X+sRadarRadius);
             float rightY = sRightRadarLine.getY()-(sPad_Y+sRadarRadius);
             PaintableLine rightLine = new PaintableLine(LINE_COLOR, rightX, rightY);
-            sRightLineContainer = new PaintablePosition( rightLine, 
+            sRightLineContainer = new PaintablePosition( 
+            		rightLine, 
             		sPad_X+sRadarRadius, 
             		sPad_Y+sRadarRadius, 
-                                                        0, 
-                                                        1);
+            		0,
+            		1);
         }
         
         sRightLineContainer.paint(canvas);
@@ -217,8 +203,9 @@ public class Radar {
 
     private void drawRadarText(Canvas canvas) {
     	if (canvas == null) {
-    		throw new NullPointerException();
+    		return;
     	}
+    	
         int range = (int) (ARDataSource.getAzimuth() / (360f / 16f)); 
         String  dirTxt = "";
         if (range == 15 || range == 0) dirTxt = "N"; 
@@ -247,7 +234,7 @@ public class Radar {
     
     private void radarText(Canvas canvas, String txt, float x, float y, boolean bg) {
     	if (canvas== null || txt == null) {
-    		throw new NullPointerException();
+    		return;
     	}
     	
         if (sPaintableText == null) {

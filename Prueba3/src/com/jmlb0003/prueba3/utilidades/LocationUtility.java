@@ -21,6 +21,8 @@ public abstract class LocationUtility {
 		
 		if (anotherLocation == null) {
 			return true;
+		}else if (anotherLocation.getAltitude() <= 0){
+			return true;
 		}
 
 		//Comprobar si la nueva ubicación es más o menos reciente que la anterior
@@ -88,7 +90,7 @@ public abstract class LocationUtility {
 		for (String provider: matchingProviders) {
 			Location location = lm.getLastKnownLocation(provider);
 	 
-			if (location != null) {
+			if (location != null && location.hasAltitude()) {
 				float accuracy = location.getAccuracy();
 				long time = location.getTime();
 	     

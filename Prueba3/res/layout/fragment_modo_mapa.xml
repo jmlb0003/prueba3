@@ -18,6 +18,6 @@
         android:layout_width="match_parent"
         android:layout_alignParentBottom="true"
         android:visibility="invisible"
-        android:background="#88222222" />
+        android:background="@color/basic_details_background" />
 
 </RelativeLayout>

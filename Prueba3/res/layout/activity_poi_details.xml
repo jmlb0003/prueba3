@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+	<RelativeLayout 
+	    android:id="@+id/pi_details_id"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:padding="@dimen/activity_horizontal_margin" >
+	    
+	    <FrameLayout 
+	        android:id="@+id/pi_details_image_layout"
+	        android:layout_width="200dp"
+	        android:layout_height="200dp"
+	        android:layout_alignParentTop="true"
+	        android:layout_centerHorizontal="true"
+	        android:layout_centerInParent="true" >
+	        
+	        <ImageView 
+		        android:id="@+id/pi_details_image_container"
+		        android:visibility="invisible"
+		        android:contentDescription="@string/pi_content_description"
+		        android:clickable="true"
+		        android:layout_width="200dp"
+		        android:layout_height="200dp"
+		        android:layout_gravity="center" />
+	
+	        <ProgressBar
+	            android:id="@+id/pi_details_progressBar"
+	            android:visibility="invisible"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="center" />
+	        
+	    </FrameLayout>
+	      
+	  
+	    <TextView 
+	        android:id="@+id/pi_details_pi_name_title"
+	        android:text="@string/pi_name"
+	        android:textSize="@dimen/title_text_size"
+	        android:textColor="@color/text_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="@dimen/two_line_between_item_padding"
+	        android:layout_marginBottom="@dimen/two_line_title_padding"
+	        android:layout_below="@id/pi_details_image_layout" />
+	    <TextView 
+	        android:id="@+id/pi_details_pi_name"
+	        android:text="@string/hello_world"
+	        android:textSize="@dimen/text_size"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/pi_details_pi_name_title" />
+	    
+	    <TextView
+	        android:id="@+id/pi_details_distance_title"
+	        android:text="@string/distance"
+	        android:textSize="@dimen/title_text_size"
+	        android:textColor="@color/text_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="@dimen/two_line_between_item_padding"
+	        android:layout_marginBottom="@dimen/two_line_title_padding"
+	        android:layout_below="@id/pi_details_pi_name" />
+	    <TextView 
+	        android:id="@+id/pi_details_distance"
+	        android:text="@string/hello_world"
+	        android:textSize="@dimen/text_size"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/pi_details_distance_title" />
+	
+	    <TextView 
+	        android:id="@+id/pi_details_description_title"
+	        android:text="@string/description"
+	        android:textSize="@dimen/title_text_size"
+	        android:textColor="@color/text_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="@dimen/two_line_between_item_padding"
+	        android:layout_marginBottom="@dimen/two_line_title_padding"
+	        android:layout_below="@id/pi_details_distance" />
+	    <TextView 
+	        android:id="@+id/pi_details_description"
+	        android:text="@string/hello_world"
+	        android:textSize="@dimen/text_size"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/pi_details_description_title"
+	        android:clickable="true"
+	        android:onClick="seeMore"/>
+	    <Button
+	        android:id="@+id/pi_details_see_more_button"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentRight="true"
+	        android:layout_alignParentEnd="true" 
+	        android:layout_below="@id/pi_details_description"
+	        android:text="@string/see_more"
+	        android:onClick="seeMore" />
+	    
+	    <TextView 
+	        android:id="@+id/pi_details_timetable_title"
+	        android:text="@string/timetable"
+	        android:textSize="@dimen/title_text_size"
+	        android:textColor="@color/text_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="@dimen/two_line_between_item_padding"
+	        android:layout_marginBottom="@dimen/two_line_title_padding"
+	        android:layout_below="@id/pi_details_see_more_button" />
+	    <TextView 
+	        android:id="@+id/pi_details_timetable"
+	        android:text="@string/hello_world"
+	        android:textSize="@dimen/text_size"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/pi_details_timetable_title" />
+	    
+	    <TextView 
+	        android:id="@+id/pi_details_price_title"
+	        android:text="@string/price"
+	        android:textSize="@dimen/title_text_size"
+	        android:textColor="@color/text_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="@dimen/two_line_between_item_padding"
+	        android:layout_marginBottom="@dimen/two_line_title_padding"
+	        android:layout_marginLeft="@dimen/price_title_margin"
+	        android:layout_marginStart="@dimen/price_title_margin"
+	        android:layout_toRightOf="@id/pi_details_timetable_title"
+	        android:layout_toEndOf="@id/pi_details_timetable_title"
+	        android:layout_below="@id/pi_details_see_more_button" />
+	    <TextView 
+	        android:id="@+id/pi_details_price"
+	        android:text="@string/hello_world"
+	        android:textSize="@dimen/text_size"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignLeft="@id/pi_details_price_title"
+	        android:layout_alignStart="@id/pi_details_price_title"
+	        android:layout_below="@id/pi_details_price_title" />	
+	</RelativeLayout>
+</ScrollView>

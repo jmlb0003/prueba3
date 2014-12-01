@@ -83,7 +83,7 @@ public class PoiSearchActivity extends ActionBarActivity {
             mListView.setOnItemClickListener(new OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     // Build the Intent used to open WordActivity with a specific word Uri
-                    Intent detailIntent = new Intent(getApplicationContext(), DetallesPoiActivity.class);
+                    Intent detailIntent = new Intent(getApplicationContext(), PoiDetailsActivity.class);
                     Uri data = Uri.withAppendedPath(PoiContract.PoiEntry.CONTENT_URI,
                                                     String.valueOf(id));
                     detailIntent.setData(data);

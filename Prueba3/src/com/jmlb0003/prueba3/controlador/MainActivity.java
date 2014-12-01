@@ -1,10 +1,6 @@
 package com.jmlb0003.prueba3.controlador;
 
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.SearchManager;
@@ -38,6 +34,7 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.google.android.gms.internal.ms;
 import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.DetallesPoi;
 import com.jmlb0003.prueba3.modelo.Poi;
@@ -48,6 +45,11 @@ import com.jmlb0003.prueba3.modelo.sync.NetworkDataProvider;
 import com.jmlb0003.prueba3.modelo.sync.PoiDownloaderTask;
 import com.jmlb0003.prueba3.modelo.sync.WikipediaDataProvider;
 import com.jmlb0003.prueba3.utilidades.LocationUtility;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
  * //TODO Orden de los imports CODE GUIDELINES
@@ -119,6 +121,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     /**Indica si la app está inicializada**/
     private boolean isCreated = false;
     
+    private boolean isShowedAlert = false;
+    
     
 	private FragmentModoCamara mFragmentModoCamara;
 	private FragmentModoMapa mFragmentModoMapa;
@@ -153,7 +157,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 //		// Set up the action bar to show a dropdown list.
 		final ActionBar actionBar = getSupportActionBar();
-		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
 		// Set up the dropdown list navigation in the action bar.
@@ -176,8 +179,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 		setPoiProviders();
 		setPoiIcons();
-//		aplicarValoresDeAjustes();
-		
 	}// Fin de onCreate()
 	
 	
@@ -360,10 +361,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	 */
 	@Override
 	public void onLocationChanged(Location newLocation) {
-		
+		Log.d("MAINACTIVITY","haylocation:"+hayLocation+" latitude y longitude:"+newLocation.getLatitude()+" "+newLocation.getLongitude()+"-"+newLocation.getAltitude());
 		//Si hayLocation es false y la posición es distinta de la default, es una posición
 		//válida y se vuelve a los intervalos de tiempo normales
-		if (!hayLocation && ((newLocation.getLatitude() != 0) || (newLocation.getLongitude() != 0)) ) {
+		if (!hayLocation && 
+				((newLocation.getLatitude() != 0) || (newLocation.getLongitude() != 0)) &&
+				newLocation.getAltitude() > 0) {
 			Log.d("MAINACTIVITY","Se restablece el intervalo de los providers");
 			setLocationProviders(MIN_TIME);
 		}else{
@@ -376,22 +379,23 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		// Solo se tiene en cuenta la nueva ubicación si es mejor que la anterior 
 		// (más precisa y reciente)
 		if (LocationUtility.isBetterLocation(newLocation, ARDataSource.getCurrentLocation())) {
-    		Log.d(LOG_TAG,"la posicion nueva es mejor: La:"+newLocation.getLatitude()+" lo:"+newLocation.getLongitude()+" Precision:"+newLocation.getAccuracy()+"\nEl anterior tenia precision: "+ARDataSource.getCurrentLocation().getAccuracy());    		
-    		float locationsDistance = newLocation.distanceTo(mLastUpdateDataLocation);
+    		Log.d(LOG_TAG,"la posicion nueva es mejor: La:"+newLocation.getLatitude()+" lo:"+newLocation.getLongitude()+" Precision:"+newLocation.getAccuracy()+"\nEl anterior tenia precision: "+ARDataSource.getCurrentLocation().getAccuracy());
+    		Log.d(LOG_TAG,"Latitude:"+mLocation.getLatitude()+" longitude:"+mLocation.getLongitude()+
+        			" altitude:"+mLocation.getAltitude()+" Precision:"+mLocation.getAccuracy());
     		ARDataSource.setCurrentLocation(newLocation);
     		mLocation = newLocation;
 
 	        mFragmentModoCamara.calculateMagneticNorthCompensation();
 	        mFragmentModoMapa.setUpMapIfNeeded();
-	        //////////////////////////////////////////////////////////
+	    
 
-	        if ( (locationsDistance > MAX_DISTANCE) && (hayLocation) ) {
+	        if ( (newLocation.distanceTo(mLastUpdateDataLocation) > MAX_DISTANCE) 
+	        		&& (hayLocation) ) {
 	        	Log.d(LOG_TAG,"UPDATEDATA: Hay que llamar a updateData");
 		        //Se actualizan/descargan los PIs según la posición obtenida
 		        updateData(newLocation);
-	        }
-		}		
-		
+	        }	        
+		}
 	}
 
 
@@ -403,7 +407,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			
 			mostrarLocationSettingsAlert();
 		}
-		
 	}
 
 
@@ -529,19 +532,13 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     	   
 			if ( mLocation == null ) {
 				hayLocation = false;
-				//Si no hay localización ninguna, por defecto se pone la de la biblioteca de la UJA
-				Log.e(LOG_TAG,"GetLocation_No hay ubicación, se pone la de la biblioteca");
 				
-				setLocationProviders(5*1000);
+				setLocationProviders(1*1000);
 				
-				//Ubicación de la biblioteca de la UJA
-				mLocation.setLatitude(37.789);
-				mLocation.setLongitude(-3.779);
-				mLocation.setAltitude(700);
-//				mLocation.setLatitude(0);
-//				mLocation.setLongitude(0);
-//				mLocation.setAltitude(0);
-//				mLocation.setAccuracy(0);				
+				mLocation.setLatitude(0);
+				mLocation.setLongitude(0);
+				mLocation.setAltitude(0);
+				mLocation.setAccuracy(Float.MAX_VALUE);				
 			}
 			//Inicializamos la variable para cuando se compruebe la distancia en onLocationChanged
 			mLastUpdateDataLocation = mLocation;
@@ -557,9 +554,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
    
    
    private void setLocationProviders(long toMinTime) {
-	   if (toMinTime == MIN_TIME) {
-		   hayLocation = true;
-	   }
+	   hayLocation = (toMinTime == MIN_TIME)?true:false;
 	   
 	   List<String> providers = sLocationMgr.getAllProviders();
 	   for (String provider: providers) {
@@ -592,12 +587,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
        ventanaAlerta.setNegativeButton(getString(R.string.close), 
     		   											new DialogInterface.OnClickListener() {
            public void onClick(DialogInterface dialog, int which) {
-        	   Toast toast = Toast.makeText(getApplicationContext(), 
-        			   				getString(R.string.alert_location_negative_message), 
-        			   				Toast.LENGTH_LONG);
-        	   
         	   dialog.cancel();
-        	   toast.show();
+        	   Toast.makeText(
+        			   getApplicationContext(),
+        			   getString(R.string.alert_location_negative_message),
+        			   Toast.LENGTH_LONG)
+        			   .show();
            }
        });
 
@@ -632,12 +627,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
        ventanaAlerta.setNegativeButton(getString(R.string.close), 
     		   											new DialogInterface.OnClickListener() {
            public void onClick(DialogInterface dialog, int which) {
-        	   Toast toast = Toast.makeText(getApplicationContext(), 
-        			   				getString(R.string.alert_network_negative_message), 
-        			   				Toast.LENGTH_LONG);
-        	   
         	   dialog.cancel();
-        	   toast.show();
+        	   Toast.makeText(
+        			   getApplicationContext(),
+        			   getString(R.string.alert_network_negative_message),
+        			   Toast.LENGTH_LONG)
+        			   .show();
            }
        });
 
@@ -651,27 +646,30 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     * Método para avisar de que se está buscando una ubicación válida.
     */
    private void mostrarLocationAlert () {
-	   AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);
-
-       ventanaAlerta.setTitle(getString(R.string.alert_location2_title));
-       ventanaAlerta.setMessage(getString(R.string.alert_location2_message));
-
-
-       //Si se pulsa el botón de cancelar, cerrar la ventana de diálogo
-       ventanaAlerta.setNegativeButton(getString(R.string.close), 
-    		   											new DialogInterface.OnClickListener() {
-           public void onClick(DialogInterface dialog, int which) {
-        	   Toast toast = Toast.makeText(getApplicationContext(), 
-        			   				getString(R.string.alert_location2_negative_message), 
-        			   				Toast.LENGTH_SHORT);
-        	   
-        	   dialog.cancel();
-        	   toast.show();
-           }
-       });
-
-       //Mostrar la ventana
-       ventanaAlerta.show();
+	   if (!isShowedAlert) {
+		   AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);
+	
+	       ventanaAlerta.setTitle(getString(R.string.alert_location2_title));
+	       ventanaAlerta.setMessage(getString(R.string.alert_location2_message));
+	
+	
+	       //Si se pulsa el botón de cancelar, cerrar la ventana de diálogo
+	       ventanaAlerta.setNegativeButton(getString(R.string.close), 
+	    		   											new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int which) {
+	        	   dialog.cancel();
+	        	   Toast.makeText(
+	        			   getApplicationContext(), 
+	        			   getString(R.string.alert_location2_negative_message),
+	        			   Toast.LENGTH_SHORT)
+	        			   .show();
+	           }
+	       });
+	
+	       //Mostrar la ventana
+	       ventanaAlerta.show();
+	       isShowedAlert = true;
+	   }
    }
    
    
@@ -757,7 +755,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		}else{
 
 			if (mTouchedPoi.isSelected() && mTouchedPoi == poiTouched) {
-				startActivity(new Intent(this,DetallesPoiActivity.class));
+				startActivity(new Intent(this,PoiDetailsActivity.class));
 			}else{
 				mTouchedPoi = poiTouched;
 			}

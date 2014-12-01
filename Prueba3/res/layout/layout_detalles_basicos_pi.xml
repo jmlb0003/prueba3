@@ -6,7 +6,7 @@
         android:id="@+id/basic_details_view_container"
     	android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:padding="16dp"
+	    android:layout_margin="@dimen/activity_horizontal_margin"
 	    android:onClick="basicDetailsViewTouched" >
 
         
@@ -14,6 +14,8 @@
             android:id="@+id/pi_image_layout"
             android:layout_width="120dp"
             android:layout_height="120dp"
+            android:background="@color/basic_details_image_background"
+            android:layout_margin="@dimen/activity_horizontal_margin"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" >
@@ -45,19 +47,17 @@
 	        android:layout_width="wrap_content"
 	        android:layout_toRightOf="@id/pi_image_layout"
 	        android:layout_toEndOf="@id/pi_image_layout"
-	        android:layout_marginLeft="16dp"
-	        android:layout_marginStart="16dp" >
+	        android:layout_alignTop="@id/pi_image_layout" >
 	        <TextView 
 	            android:text="@string/pi_name"
-	            android:textSize="14sp"
-	            android:textColor="#5677fc"
+	            android:textSize="@dimen/title_text_size"
+	            android:textColor="@color/accent"
 	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_marginBottom="8dp" />
+	            android:layout_height="wrap_content" />
 	        <TextView 
 	            android:id="@+id/pi_name"
-	            android:textSize="12sp"
-	            android:textColor="#eeeeee"
+	            android:textSize="@dimen/text_size"
+	            android:textColor="@color/text_primary"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content" />
 	    </LinearLayout>
@@ -68,25 +68,21 @@
 	        android:layout_height="72dp"
 	        android:layout_below="@id/name_container"
 	        android:layout_toRightOf="@id/pi_image_layout"
-	        android:layout_toEndOf="@id/pi_image_layout"
-	        android:layout_marginLeft="16dp"
-	        android:layout_marginStart="16dp" >
+	        android:layout_toEndOf="@id/pi_image_layout" >
 	        <TextView 
-	            android:text="@string/pi_distance"
-	            android:textSize="14sp"
-	            android:textColor="#5677fc"
+	            android:text="@string/distance"
+	            android:textSize="@dimen/title_text_size"
+	            android:textColor="@color/accent"
 	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_marginBottom="8dp" />
+	            android:layout_height="wrap_content" />
 	        <TextView 
 	            android:id="@+id/pi_distance"
-	            android:textSize="12sp"
-	            android:textColor="#eeeeee"
+	            android:textSize="@dimen/text_size"
+	            android:textColor="@color/text_primary"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content" />
 	    </LinearLayout>
 	 
-	    
 	        
 	    <!-- Contiene la descripción del PI -->
 	    <LinearLayout
@@ -97,18 +93,17 @@
 	        android:layout_below="@id/pi_image_layout"
 	        android:layout_alignParentLeft="true"
 	        android:layout_alignParentStart="true"
-	        android:layout_marginTop="16dp" >
+	        android:layout_marginTop="@dimen/one_line_between_item_padding" >
 	        <TextView
-	            android:text="@string/pi_description"
-	            android:textSize="14sp"
-	            android:textColor="#5677fc"
+	            android:text="@string/description"
+	            android:textSize="@dimen/title_text_size"
+	            android:textColor="@color/accent"
 	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_marginBottom="8dp" />
+	            android:layout_height="wrap_content" />
 	        <TextView 
 	            android:id="@+id/pi_description"
-	            android:textSize="12sp"
-	            android:textColor="#eeeeee"
+				android:textSize="@dimen/text_size"
+	            android:textColor="@color/text_primary"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content" />
 	    </LinearLayout>

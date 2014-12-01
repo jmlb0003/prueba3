@@ -700,10 +700,10 @@ public class Poi implements Comparable<Poi> {
         float x4 = x2;
         float y4 = y3;
 
-//        Log.w("collisionBox", "ul (x="+x1+" y="+y1+")");
-//        Log.w("collisionBox", "ur (x="+x2+" y="+y2+")");
-//        Log.w("collisionBox", "ll (x="+x3+" y="+y3+")");
-//        Log.w("collisionBox", "lr (x="+x4+" y="+y4+")");
+        Log.w("collisionBox", "ul (x="+x1+" y="+y1+")");
+        Log.w("collisionBox", "ur (x="+x2+" y="+y2+")");
+        Log.w("collisionBox", "ll (x="+x3+" y="+y3+")");
+        Log.w("collisionBox", "lr (x="+x4+" y="+y4+")");
         
         if (sCollisionBox == null) {
         	sCollisionBox = new PaintableBox(width,height,Color.WHITE,Color.RED);

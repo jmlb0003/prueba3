@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primary">@color/md_indigo_500</color>
+    <color name="primary_transparent">#DE3F51B5</color> <!--DE_Indigo_500 -->
     <color name="primary_dark">@color/md_indigo_700</color>
-    <color name="accent">@color/md_blue_A200</color>
+    <color name="accent">@color/md_light_blue_A200</color>
     <color name="text_primary">#DEFFFFFF</color>
     <color name="text_secondary">#DE000000</color>
-   
     <color name="text_title">#DE3F51B5</color>	<!--DE_Indigo_500 -->
+    <color name="basic_details_background">#88222222</color>
+    <color name="basic_details_image_background">#88eeeeee</color>
     
     <!-- ************************************************** -->
     <color name="black_overlay">#66000000</color>
@@ -37,20 +39,37 @@
     <color name="md_indigo_A400">#3d5afe</color>
     <color name="md_indigo_A700">#304ffe</color>
  
-    <!--blue-->
-    <color name="md_blue_50">#e7e9fd</color>
-    <color name="md_blue_100">#d0d9ff</color>
-    <color name="md_blue_200">#afbfff</color>
-    <color name="md_blue_300">#91a7ff</color>
-    <color name="md_blue_400">#738ffe</color>
-    <color name="md_blue_500">#5677fc</color>
-    <color name="md_blue_600">#4e6cef</color>
-    <color name="md_blue_700">#455ede</color>
-    <color name="md_blue_800">#3b50ce</color>
-    <color name="md_blue_900">#2a36b1</color>
-    <color name="md_blue_A100">#a6baff</color>
-    <color name="md_blue_A200">#6889ff</color>
-    <color name="md_blue_A400">#4d73ff</color>
-    <color name="md_blue_A700">#4d69ff</color>
-
+    <!--old_blue-->
+    <color name="md_old_blue_50">#e7e9fd</color>
+    <color name="md_old_blue_100">#d0d9ff</color>
+    <color name="md_old_blue_200">#afbfff</color>
+    <color name="md_old_blue_300">#91a7ff</color>
+    <color name="md_old_blue_400">#738ffe</color>
+    <color name="md_old_blue_500">#5677fc</color>
+    <color name="md_old_blue_600">#4e6cef</color>
+    <color name="md_old_blue_700">#455ede</color>
+    <color name="md_old_blue_800">#3b50ce</color>
+    <color name="md_old_blue_900">#2a36b1</color>
+    <color name="md_old_blue_A100">#a6baff</color>
+    <color name="md_old_blue_A200">#6889ff</color>
+    <color name="md_old_blue_A400">#4d73ff</color>
+    <color name="md_old_blue_A700">#4d69ff</color>
+    
+    <!--light_blue-->
+    <color name="md_light_blue_50">#e1f5fe</color>
+    <color name="md_light_blue_100">#b3e5fc</color>
+    <color name="md_light_blue_200">#81d4fa</color>
+    <color name="md_light_blue_300">#4fc3f7</color>
+    <color name="md_light_blue_400">#29b6f6</color>
+    <color name="md_light_blue_500">#03a9f4</color>
+    <color name="md_light_blue_600">#039be5</color>
+    <color name="md_light_blue_700">#0288d1</color>
+    <color name="md_light_blue_800">#0277bd</color>
+    <color name="md_light_blue_900">#01579b</color>
+    <color name="md_light_blue_A100">#80d8ff</color>
+    <color name="md_light_blue_A200">#40c4ff</color>
+    <color name="md_light_blue_A400">#00b0ff</color>
+    <color name="md_light_blue_A700">#0091ea</color>
+   
+    
 </resources>

@@ -55,7 +55,7 @@
                 android:value=".controlador.PoiSearchActivity" />
         </activity>
         <activity
-            android:name=".controlador.DetallesPoiActivity"
+            android:name=".controlador.PoiDetailsActivity"
             android:parentActivityName=".controlador.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

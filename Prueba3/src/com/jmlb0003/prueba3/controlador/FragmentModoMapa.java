@@ -33,9 +33,12 @@ import com.jmlb0003.prueba3.modelo.Poi;
 import com.jmlb0003.prueba3.vista.BasicDetailsView;
 
 
-
-
-
+/**
+ * Clase que representa el Fragment que contiene y controla los componentes del modo mapa
+ * en la app.
+ * @author Jose
+ *
+ */
 public class FragmentModoMapa extends Fragment implements OnMarkerClickListener, 
 				OnMapClickListener, OnInfoWindowClickListener {
 	

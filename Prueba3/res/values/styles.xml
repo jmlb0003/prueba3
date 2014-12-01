@@ -1,21 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 <!--  Esto es de la página esta: http://antonioleiva.com/material-design-everywhere/ -->
-    <!--
-        Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
-    -->
-    <style name="AppBaseTheme" parent="Theme.AppCompat.Light">
-        <!--
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        -->
-    </style>
 
-    <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
-       <!--   your app branding color for the app bar -->
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light">
+        <!--   your app branding color for the app bar -->
 	    <item name="colorPrimary">@color/primary</item>
 	    <!--   darker variant for the status bar and contextual app bars -->
 	    <item name="colorPrimaryDark">@color/primary_dark</item>
@@ -24,7 +12,8 @@
 	    
 	    <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColor">@color/text_secondary</item>
-
     </style>
 
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppTheme.Base" />    
 </resources>

@@ -1,23 +1,21 @@
 package com.jmlb0003.prueba3.vista;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import com.jmlb0003.prueba3.controlador.ARDataSource;
 import com.jmlb0003.prueba3.modelo.Poi;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Clase que implementa la vista utilizada para incorporar todos los componentes de la interfaz
@@ -35,7 +33,8 @@ public class AugmentedView extends View {
     /**Se usa para ajustar la altura de un Poi que colisiona con otro**/
     private static final int COLLISION_ADJUSTMENT = 5;//= 100;
     
-    private static HashMap<Long,Poi> sUpdatedPois = new HashMap<Long,Poi>();
+    @SuppressLint("UseSparseArrays")
+	private static HashMap<Long,Poi> sUpdatedPois = new HashMap<Long,Poi>();
     public static List<List<Poi>> sGroupedPois = new ArrayList<>();
     private static AtomicBoolean sDrawing = new AtomicBoolean(false);
     private static float sPixelDensity;
@@ -70,7 +69,7 @@ public class AugmentedView extends View {
 		sPixelDensity = context.getResources().getDisplayMetrics().density;
 		ARDataSource.PixelsDensity = sPixelDensity;
 		
-		sRadar  = new Radar(sPixelDensity);
+		sRadar  = new Radar(context);
 	}
 	
 	/**
@@ -96,29 +95,7 @@ public class AugmentedView extends View {
           
 
 	        adjustForCollisions(canvas, POIS_ON_SCREEN);
-	        
-	        
-	        /***********************************************************
-	        if (sGroupedPois.size() > 0) {
-	        ListIterator<List<Poi>> iter1 = sGroupedPois.listIterator();
-	        Log.d("iterando...", "Size total:"+sGroupedPois.size());
-	        Log.d("iterando...", "////////////////////////");
-	        while (iter1.hasNext()) {
-	            List<Poi> l = iter1.next();
-	            ListIterator<Poi> iter2 = l.listIterator();
-	            Log.d("iterando...", "Size de l:"+l.size());
-	            while (iter2.hasNext()) {
-		            Poi p = iter2.next();
-		            Log.d("iterando...", "*"+p.getName()+ " - "+p.getDistance());
-		        }
-	            
-	            Log.d("iterando...", "////////////////////////");
-	        }
-	        Log.d("iterando...", "////////////////////////");
-	        }
-	        ***********************************************************/
-	        
-	        
+
 	        ListIterator<Poi> iter = POIS_ON_SCREEN.listIterator(POIS_ON_SCREEN.size());
 	        while (iter.hasPrevious()) {
 	            Poi poi = iter.previous();
@@ -133,7 +110,6 @@ public class AugmentedView extends View {
 	
 	
 	/**
-	 * TODO:Hay que cambiar la resolución de colisiones. Pensar en métodos para evitar los solapamientos
 	 * Método con el que se ajustan los marcadores para que no se superpongan los que se encuentran
 	 * muy cercanos en la pantalla.
 	 * @param canvas Canvas donde se va a dibujar
@@ -230,7 +206,7 @@ public class AugmentedView extends View {
             Log.d(LOG_CAT,"6 con El poi "+poi1.getName());
         }
 	}
-	*/
+	
 private static void adjustForCollisions_ORIGINAL_(Canvas canvas, List<Poi> collection) {
 		
 		sUpdatedPois.clear();
@@ -274,7 +250,7 @@ private static void adjustForCollisions_ORIGINAL_(Canvas canvas, List<Poi> colle
             Log.d(LOG_CAT,"6 con El poi "+poi1.getName());
         }
 	}
-	
+	*/
 	
 
 }

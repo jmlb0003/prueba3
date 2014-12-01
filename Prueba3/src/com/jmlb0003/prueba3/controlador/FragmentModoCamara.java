@@ -1,10 +1,6 @@
 package com.jmlb0003.prueba3.controlador;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -30,8 +26,17 @@ import com.jmlb0003.prueba3.utilidades.Matrix;
 import com.jmlb0003.prueba3.vista.AugmentedView;
 import com.jmlb0003.prueba3.vista.BasicDetailsView;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
+/**
+ * Clase que representa el Fragment que contiene y controla los componentes del modo Realidad
+ * Aumentada en la app.
+ * @author Jose
+ *
+ */
 public class FragmentModoCamara extends Fragment implements SensorEventListener, OnTouchListener {
 	private static final String LOG_TAG = "FragmentModoCamara";
 		
@@ -76,13 +81,13 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     private Activity mActivity;
     private BasicDetailsView mBasicDetails;
     
-    private float dX;
-    private int i;
+    private float mDx;
+    private int mPoiIndex;
     private List<Poi> mGroupedPois = new ArrayList<>();
     
 
 	/** Interfaz para indicar a MainActivity que se ha pulsado un PI **/
-    OnPoiTouchedListener mCallback;
+    private OnPoiTouchedListener mCallback;
     
     /***************FUNCIONES*******************************************/
     
@@ -106,7 +111,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
-
     	Log.d(LOG_TAG,"EV onCreate");
 
     	List<Sensor> sensors;
@@ -134,9 +138,6 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         if (sensors.size() > 0) {
         	sSensorMag = sensors.get(0);
         }
-
-        
-        
     }// Fin de onCreate()
     
     
@@ -166,12 +167,15 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         float d = getResources().getDisplayMetrics().density;
         int h = getResources().getDisplayMetrics().heightPixels;
         int w = getResources().getDisplayMetrics().widthPixels;
-        Log.d("BasicDetails","Al final esta es la altura:"+Math.round((h-(80/d)) -w));
-        mBasicDetails.getLayoutParams().height = (Math.round(h-w-(80/d)));
+        int f = (Math.round(h-w-(80/d)));
+        
+        if (f < 200) {
+        	f = 250;
+        }
+        mBasicDetails.getLayoutParams().height = f;
         
 
-	    return rootView;
-	    
+	    return rootView;	    
 	}// Fin de onCreateView
 	
 	
@@ -211,7 +215,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     public void onDestroy() {
     	super.onDestroy();
     	Log.d(LOG_TAG,"EV onDestroy");
-    }
+    }// Fin de onDestroy
 
     /**
 	 * Si hay algún cambio en la precisión de las lecturas de los sensores se llama a este
@@ -220,9 +224,8 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	 */
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		
 		if (sensor == null) {
-			throw new NullPointerException();
+			return;
 		}
 		
         if (sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD 
@@ -356,45 +359,38 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         	        if (poi.handleClick(event.getX(), event.getY())) {
         	        	//Si se pincha en un PI que está en un grupo
         	        	if (poi.isAdjusted()) {
-        	        		dX = event.getX();
+        	        		mDx = event.getX();
         	        		//Si es la primera vez, obtener el PI para obtener el grupo despues
         	        		if (mGroupedPois.isEmpty()) {
-        	        			i = 0;
+        	        			mPoiIndex = 0;
         	        			mGroupedPois = mAugmentedView.getPoiGroup(poi);
         	        		}
         	        	}        	        	        	            
         	            return true;
         	        }
         	    }
-            	dX = -1;
-        		i = -1;
+            	mDx = -1;
+        		mPoiIndex = -1;
         		mGroupedPois.clear();
+        		//Si se levanta el dedo fuera de un PI y no está mostrándose alguno de los grupos...
+            	if (ARDataSource.hasSelectededPoi() && mPoiIndex < 0) {
+            		mCallback.onPoiUnselected(ARDataSource.SelectedPoi);
+            		mBasicDetails.setVisibility(View.INVISIBLE);
+            	}
             	
                 return true;
                 
             
-            case MotionEvent.ACTION_MOVE:
-            	//TODO: Posible solucion a las colisiones...Los que colisionan, se meten en una lista y haciendo mover de izquierda a derecha y viceversa para cambiar de PI seleccionado
-            	//TODO: Marcial propone que los solapados, al pinchar en el grupo, se abra un abanico para seleccionar uno dentro del conjunto...(descartado por ahora)
-            	//TODO: En wikitude, agrupa los marcadores y al pinchar, muestra una lista en otra ventana.
-            	
-            	/********************************************************************************
-            	 * 
-            	 * Cuando se solapen, meterlos en una lista de solapados. (y no mover su posición)
-            	 * Si el usuario pincha en alguno de la lista, se muestra la lista en la pantalla 
-            	 * de búsqueda y que se mire el que quiera
-            	 * 
-            	 * Estan en una lista de listas de PIs en AugmentedView... sGroupedPois...
-            	 */
-            	if ( (dX > 0) && (Math.abs(event.getX() - dX) > 150) ){
-            		Log.d(LOG_TAG,"i:move...con getX:"+event.getX()+" dx:"+dX);
-            		if ((event.getX() - dX) < 0) {
+            case MotionEvent.ACTION_MOVE:            	
+
+            	if ( (mDx > 0) && (Math.abs(event.getX() - mDx) > 100) ){
+            		if ((event.getX() - mDx) < 0) {
             			moveToLeft();
                 	}
-                	if ((event.getX() - dX) > 0) {
+                	if ((event.getX() - mDx) > 0) {
                 		moveToRight();
                 	}
-                	dX = -1;
+                	mDx = -1;
             	}
             	
             	
@@ -411,7 +407,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         	    }
             	
             	//Si se levanta el dedo fuera de un PI y no está mostrándose alguno de los grupos...
-            	if (ARDataSource.hasSelectededPoi() && i < 0) {
+            	if (ARDataSource.hasSelectededPoi() && mPoiIndex < 0) {
             		mCallback.onPoiUnselected(ARDataSource.SelectedPoi);
 
             		mBasicDetails.setVisibility(View.INVISIBLE);
@@ -426,36 +422,32 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 	
 	
 	private void moveToLeft() {
-		if (i < 0) {
+		if (mPoiIndex < 0) {
 			return;
 		}else{			
-			if (i == 0) {
-				i = mGroupedPois.size()-1;
+			if (mPoiIndex == 0) {
+				mPoiIndex = mGroupedPois.size()-1;
 			}else{
-				i--;
+				mPoiIndex--;
 			}
 		}
-		Log.d(LOG_TAG,"i:"+i+" Size:"+mGroupedPois.size());
-		poiTouched(mGroupedPois.get(i));
+		Log.d(LOG_TAG,"mPoiIndex:"+mPoiIndex+" Size:"+mGroupedPois.size());
+		poiTouched(mGroupedPois.get(mPoiIndex));
 	}
 	
 	
 	private void moveToRight() {
-		Log.d(LOG_TAG,"i:1");
-		if(i < 0) {
-			Log.d(LOG_TAG,"i:2");
+		if(mPoiIndex < 0) {
 			return;
 		}else{
-			if (i == mGroupedPois.size()-1) {
-				Log.d(LOG_TAG,"i:3");
-				i = 0;
+			if (mPoiIndex == mGroupedPois.size()-1) {
+				mPoiIndex = 0;
 			}else{
-				Log.d(LOG_TAG,"i:4");
-				i++;
+				mPoiIndex++;
 			}
 		}
-		Log.d(LOG_TAG,"i:"+i+" Size:"+mGroupedPois.size());
-		poiTouched(mGroupedPois.get(i));
+		Log.d(LOG_TAG,"mPoiIndex:"+mPoiIndex+" Size:"+mGroupedPois.size());
+		poiTouched(mGroupedPois.get(mPoiIndex));
 	}
 	
 	
@@ -476,7 +468,4 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
 		mBasicDetails.setVisibility(View.VISIBLE);
 		mBasicDetails.initView(poi);		
 	}
-	
-
-
 }

@@ -119,7 +119,32 @@ public class LocalDataProvider extends DataProvider {
     	
     	toRet.add(poiValues);
 
-    	Log.d(LOG_TAG,"4 y fin");
+    	Log.d(LOG_TAG,"4");
+    	
+    	
+    	poiValues = new ContentValues();
+    	poiValues.put(PoiEntry.COLUMN_POI_NAME, "Iglesia de la Encarnación");
+    	poiValues.put(PoiEntry.COLUMN_POI_LATITUDE, 
+    			new BigDecimal(37.676975).setScale(6,BigDecimal.ROUND_FLOOR).doubleValue());
+        poiValues.put(PoiEntry.COLUMN_POI_LONGITUDE,
+        		new BigDecimal(-3.565406).setScale(6,BigDecimal.ROUND_FLOOR).doubleValue());
+        poiValues.put(PoiEntry.COLUMN_POI_ALTITUDE, 766.0);
+        
+        poiValues.put(PoiEntry.COLUMN_POI_USER_ID, PoiContract.PoiEntry.LOCAL_PROVIDER);
+    	poiValues.put(PoiEntry.COLUMN_POI_COLOR, PoiContract.PoiEntry.LOCAL_COLOR);
+    	poiValues.put(PoiEntry.COLUMN_POI_IMAGE, PoiContract.PoiEntry.LOCAL_DEFAULT_IMAGE);
+    	poiValues.put(PoiEntry.COLUMN_POI_DESCRIPTION, "Templo católico de finales del siglo XVI.");
+    	poiValues.put(PoiEntry.COLUMN_POI_WEBSITE, "");
+    	poiValues.put(PoiEntry.COLUMN_POI_PRICE, 0);
+    	poiValues.put(PoiEntry.COLUMN_POI_OPEN_HOURS, "22:00");
+    	poiValues.put(PoiEntry.COLUMN_POI_CLOSE_HOURS, "08:00");
+    	poiValues.put(PoiEntry.COLUMN_POI_MAX_AGE, 0);
+    	poiValues.put(PoiEntry.COLUMN_POI_MIN_AGE, 0);
+    	
+    	
+    	toRet.add(poiValues);
+
+    	Log.d(LOG_TAG,"5 y fin");
         
         return toRet;
 	}

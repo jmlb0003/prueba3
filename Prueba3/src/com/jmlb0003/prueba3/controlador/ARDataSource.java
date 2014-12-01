@@ -71,8 +71,6 @@ public abstract class ARDataSource {
     private static Matrix sRotationMatrix = new Matrix();
     
     private static float sAzimuth = 0;
-    private static float sPitch = 0;
-    private static float sRoll = 0;
     
     private static float sRadius;
     
@@ -257,31 +255,6 @@ public abstract class ARDataSource {
     }
     
     
-    public static void setPitch(float pitch) {
-        synchronized (PITCH_LOCK) {
-        	ARDataSource.sPitch = pitch;
-        }
-    }
-
-    public static float getPitch() {
-        synchronized (PITCH_LOCK) {
-            return ARDataSource.sPitch;
-        }
-    }
-
-    public static void setRoll(float roll) {
-        synchronized (ROLL_LOCK) {
-        	ARDataSource.sRoll = roll;
-        }
-    }
-
-    public static float getRoll() {
-        synchronized (ROLL_LOCK) {
-            return ARDataSource.sRoll;
-        }
-    }
-    
-    
     private static final Comparator<Poi> distanceComparator = new Comparator<Poi>() {
         public int compare(Poi m1, Poi m2) {
             return Double.compare(m1.getDistance(),m2.getDistance());
@@ -289,27 +262,12 @@ public abstract class ARDataSource {
     };
 
     
-    public static void addPois(Collection<Poi> pois) {
-    	if (pois == null) {
-    		throw new NullPointerException();
-    	}
-
-    	if (pois.size() <= 0) {
-    		return;
-    	}
-
-    	for(Poi poi : pois) {
-    	    if (!POI_LIST.containsKey(poi.getID())) {
-    	        poi.calcRelativePosition(ARDataSource.getCurrentLocation());
-    	        POI_LIST.put(poi.getID(),poi);
-    	    }
-    	}
-
-    	if (COMPUTING.compareAndSet(false, true)) {
-    	    CACHE.clear();
-    	}
-    }
     
+    /**
+     * Método para añadir a la lista de PIs en memoria un conjunto de PIs contenido en un cursor
+     * @param c Cursor que contiene los PIs. Deberá inicializarse y cerrarse desde donde se 
+     * llame a este método.
+     */
     public static void addPoisFromCursor(Cursor c) {
     	if (c == null || !c.moveToFirst() ) {
     		return;
