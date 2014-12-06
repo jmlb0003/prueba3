@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-	xmlns:android="http://schemas.android.com/apk/res/android"
+<PreferenceScreen 
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:key="@string/activity_settings_key"
     android:id="@+id/activity_settings_id"
-    tools:context=".MainActivity" >
-    
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:key="@string/activity_settings_key" >
+
     <PreferenceCategory
          android:title="@string/radar_preferences" >
      
@@ -17,7 +18,7 @@
 	        android:max="50"
 	        android:defaultValue="12"
 	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"  />
+	        android:layout_height="wrap_content" />
     </PreferenceCategory>
     
     <PreferenceCategory

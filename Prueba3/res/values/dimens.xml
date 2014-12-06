@@ -11,5 +11,6 @@
     <dimen name="text_size">16sp</dimen>
     
     <dimen name="price_title_margin">100dp</dimen>
+    <dimen name="item_height">72dp</dimen>
 
 </resources>

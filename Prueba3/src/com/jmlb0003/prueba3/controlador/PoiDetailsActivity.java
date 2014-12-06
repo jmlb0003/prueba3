@@ -59,7 +59,13 @@ public class PoiDetailsActivity extends ActionBarActivity {
 	        	Log.d(LOG_TAG,"4");
 	        	//Se añade el PI a la lista en memoria y después se asigna a mShowedPoi
 	        	mShowedPoi = ARDataSource.getPoi(cursor.getLong(cursor.getColumnIndex(PoiEntry._ID)));
+	        	if (mShowedPoi == null) {
+	        		ARDataSource.addPoisFromCursor(cursor);
+	        		mShowedPoi = ARDataSource
+	        				.getPoi(cursor.getLong(cursor.getColumnIndex(PoiEntry._ID)));
+	        	}
 	        }
+	        cursor.close();
 		}
 	}
 	

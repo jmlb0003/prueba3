@@ -12,7 +12,7 @@ public class FilterActivity extends PreferenceActivity {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
-        addPreferencesFromResource(R.layout.activity_filter_prefs);
+        addPreferencesFromResource(R.xml.activity_filter_prefs);
     }
 
 }

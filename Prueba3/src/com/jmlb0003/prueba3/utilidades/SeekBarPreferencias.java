@@ -95,13 +95,9 @@ public class SeekBarPreferencias extends Preference implements OnSeekBarChangeLi
 	    titleText.setId(0);
 	    titleText.setText(getTitle());
 	    titleText.setTextSize(18);
-	    titleText.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);
-	    titleText.setTextAppearance(getContext(), android.R.style.TextAppearance_Medium);
 	    
 	    TextView summaryText = new TextView(getContext());
 	    summaryText.setText(getSummary());
-	    summaryText.setTextSize(12);
-	    summaryText.setTextColor(getContext().getResources().getColor(android.R.color.secondary_text_dark));
 	    summaryText.setTextAppearance(getContext(), android.R.style.TextAppearance_Small);
 
 
