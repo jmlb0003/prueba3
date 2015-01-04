@@ -34,7 +34,6 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
-import com.google.android.gms.internal.ms;
 import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.modelo.DetallesPoi;
 import com.jmlb0003.prueba3.modelo.Poi;
@@ -42,6 +41,7 @@ import com.jmlb0003.prueba3.modelo.data.PoiContract;
 import com.jmlb0003.prueba3.modelo.sync.LocalDataProvider;
 import com.jmlb0003.prueba3.modelo.sync.LocalPoiLoaderTask;
 import com.jmlb0003.prueba3.modelo.sync.NetworkDataProvider;
+import com.jmlb0003.prueba3.modelo.sync.PfcDataProvider;
 import com.jmlb0003.prueba3.modelo.sync.PoiDownloaderTask;
 import com.jmlb0003.prueba3.modelo.sync.WikipediaDataProvider;
 import com.jmlb0003.prueba3.utilidades.LocationUtility;
@@ -107,7 +107,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     private static LocationManager sLocationMgr = null;
     //Variable que almacena la posición
     private Location mLocation = null;
-    //Variable donde se almacena la última posición que se utilizó para actualizar los datos
+    /**Variable donde se almacena la última posición que se utilizó para actualizar los datos**/
     private Location mLastUpdateDataLocation = null;
     //Variable que controla si se ha encontrado alguna ubicación válida
     private boolean hayLocation;
@@ -157,6 +157,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 //		// Set up the action bar to show a dropdown list.
 		final ActionBar actionBar = getSupportActionBar();
+
+		
+		actionBar.setDisplayShowTitleEnabled(false);
+		actionBar.setIcon(R.drawable.ic_launcher);
+		
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
 		// Set up the dropdown list navigation in the action bar.
@@ -195,10 +200,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         Log.d("MainActivity","EV onResume");
         
         //Con esto se mantiene la pantalla encendida mientras se use la app en esta activity
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        
-        
-  
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);  
         
         getLocation();
         
@@ -207,6 +209,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         	isCreated = true;
 
         	updateData(mLocation);
+        } else {
+        	isShowedAlert = false;
+        	mostrarLocationAlert();
         }
         aplicarValoresDeAjustes();
     }// Fin de onResume()
@@ -389,12 +394,13 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	        mFragmentModoMapa.setUpMapIfNeeded();
 	    
 
-	        if ( (newLocation.distanceTo(mLastUpdateDataLocation) > MAX_DISTANCE) 
+	        if ( ( mLastUpdateDataLocation != null && 
+	        		newLocation.distanceTo(mLastUpdateDataLocation) > MAX_DISTANCE) 
 	        		&& (hayLocation) ) {
 	        	Log.d(LOG_TAG,"UPDATEDATA: Hay que llamar a updateData");
 		        //Se actualizan/descargan los PIs según la posición obtenida
 		        updateData(newLocation);
-	        }	        
+	        }
 		}
 	}
 
@@ -420,7 +426,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 		//Función de onLocationListener - No se utiliza		
 	}
-
 
 
 	
@@ -482,15 +487,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	   if (!prefs.getBoolean(getString(R.string.ft_local_key), true)) {
 		   ARDataSource.setFilterByProvider(PoiContract.PoiEntry.LOCAL_PROVIDER);
 	   }
-	   
-	   
-	   /***********Recorriendo todas las preferencias almacenadas******************
-	   Map<String,?> keys = prefs.getAll();
-	   Log.d("map values!","En prefs hay: "+ keys.size()+ " valores");
-	   for(Map.Entry<String,?> entry : keys.entrySet()) {
-		   Log.d("map values!",entry.getKey() + ": " +  entry.getValue().toString());
+	   //Filtros por proveedor (pfc server)
+	   if (!prefs.getBoolean(getString(R.string.ft_pfc_server_key), true)) {
+		   ARDataSource.setFilterByProvider(PoiContract.PoiEntry.UJA_PROVIDER);
 	   }
-	   ************************************/
 	   
    }
    
@@ -506,11 +506,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		boolean isGPSEnabled = false;
 		boolean isNetworkEnabled = false;
 		Time now = new Time();
-		
-
-		now.setToNow();
-		mLocation = LocationUtility
-				.getBestLastKnownLocation(sLocationMgr, now.toMillis(true) - THIRTY_MINUTES);
 				
 		try {
        	
@@ -529,6 +524,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			if (!isGPSEnabled && !isNetworkEnabled) {
 				mostrarLocationSettingsAlert();
 			}
+			
+			now.setToNow();
+			mLocation = LocationUtility
+					.getBestLastKnownLocation(sLocationMgr, now.toMillis(true) - THIRTY_MINUTES);
     	   
 			if ( mLocation == null ) {
 				hayLocation = false;
@@ -540,8 +539,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				mLocation.setAltitude(0);
 				mLocation.setAccuracy(Float.MAX_VALUE);				
 			}
-			//Inicializamos la variable para cuando se compruebe la distancia en onLocationChanged
-			mLastUpdateDataLocation = mLocation;
     	   
 		} catch (Exception ex) {
 			if (sLocationMgr != null) {
@@ -729,6 +726,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		NetworkDataProvider wikipedia = new WikipediaDataProvider();
 		NETWORK_POI_SOURCES.put("wiki",wikipedia);
 		
+		NetworkDataProvider pfcServer = new PfcDataProvider();
+		NETWORK_POI_SOURCES.put("pfcServer",pfcServer);
+		
 		LocalDataProvider local = new LocalDataProvider();
 		LOCAL_POI_SOURCES.put("local",local);
 		
@@ -780,7 +780,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	 * @param v
 	 */
 	public void basicDetailsViewTouched(View v){
-		Log.d(LOG_TAG,"logque hay que hacer!");
 		onPoiTouched(ARDataSource.SelectedPoi);
 	}
 

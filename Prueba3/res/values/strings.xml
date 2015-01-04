@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Prueba3</string>
+    <string name="app_name" translatable="false">PFC</string>
     <string name="title_section_modoCamara">R.A.</string>
     <string name="title_section_modoMapa">Mapa</string>
     <string name="hello_world">Hello world!</string>

@@ -107,6 +107,30 @@ public abstract class LocationUtility {
 		}
 		
 		
+		if (bestLocation == null) {
+			bestAccuracy = Float.MAX_VALUE;
+		   	bestTime = Long.MIN_VALUE;
+			for (String provider: matchingProviders) {
+				Location location = lm.getLastKnownLocation(provider);
+		 
+				if (location != null) {
+					float accuracy = location.getAccuracy();
+					long time = location.getTime();
+		     
+					if ( (time > minTime) && (accuracy < bestAccuracy) ) {	//Tiempo y precisión mejores
+						bestLocation = location;
+						bestAccuracy = accuracy;
+						bestTime = time;
+					}else if ( (time < minTime) && (bestAccuracy == Float.MAX_VALUE) && (time > bestTime) ) {	
+						//Tiempo peor que el mínimo, pero no hay otro mejor -> se acepta la posición 
+						bestLocation = location;
+						bestTime = time;
+					}
+				}
+			}
+		}
+		
+		
 		return bestLocation;
 	}
 

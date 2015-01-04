@@ -516,7 +516,7 @@ public class Poi implements Comparable<Poi> {
 
     
     /**
-     * Manejador de las pulsaciones sobre el PI
+     * Manejador de las pulsaciones sobre el icono del PI
      * @param x Valor X de las coordenadas del evento de pulsación
      * @param y Valor Y de las coordenadas del evento de pulsación
      * @return Devuelve verdadero si el marcador se ha pulsado o falso si no se ha pulsado
@@ -525,8 +525,26 @@ public class Poi implements Comparable<Poi> {
     	if (!isOnRadar || !isInView) {
     		return false;
     	}
+
+    	float symbolWidth = (symbolContainer == null)? 0f : symbolContainer.getWidth();
+    	float symbolHeight = (symbolContainer == null)? 0f : symbolContainer.getHeight();
     	
-    	return isPointOnPoi(x,y,this);
+        getScreenPosition().get(mScreenPositionArray);
+        float myX = mScreenPositionArray[0];
+        float myY = mScreenPositionArray[1];
+        float adjWidth = symbolWidth/2;
+        float adjHeight = symbolHeight/2;
+
+        float x1 = myX-adjWidth;
+        float y1 = myY-adjHeight;
+        float x2 = myX+adjWidth;
+        float y2 = myY+adjHeight;
+
+        if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
+        	return true;
+        }
+        
+        return false;
     }
     
     
@@ -780,8 +798,7 @@ public class Poi implements Comparable<Poi> {
     		scaleDistance = 0.5f;
     	else if (mDistance > 30000)
     		scaleDistance = 0.4f;
-    		   	
-    	
+
 
         if (gpsSymbol == null && mCurrentBitmap == null) {
         	gpsSymbol = 

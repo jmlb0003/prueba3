@@ -175,7 +175,7 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
         mBasicDetails.getLayoutParams().height = f;
         
 
-	    return rootView;	    
+	    return rootView;
 	}// Fin de onCreateView
 	
 	

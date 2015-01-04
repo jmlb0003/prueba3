@@ -28,7 +28,7 @@ public class PoiProvider extends ContentProvider {
 //    TODO: En este enlace hay una posible solución a las consultas SQLite para las distancias
 //    http://goodenoughpractices.blogspot.com.es/2011/08/query-by-proximity-in-android.html
 //	  TODO: Aquí hay unas pruebas sobre las consultas con fórmula de Haversine 'mejorada'
-//	http://www.notaires.fr/sites/default/files/geo_searchjkkjkj_0.pdf
+//	  http://www.notaires.fr/sites/default/files/geo_searchjkkjkj_0.pdf
 	
 	// The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -41,7 +41,6 @@ public class PoiProvider extends ContentProvider {
     private static final int POI_BY_ID = 101;
     private static final int POIS_BY_NAME = 102;
     private static final int POIS_BY_COORDS = 103;
-//    private static final int SEARCH_SUGGEST = 104;
     
     private static final int LOCATIONS = 200;
     private static final int LOCATION_BY_ID = 201;
@@ -51,20 +50,11 @@ public class PoiProvider extends ContentProvider {
     
     
     /*************** CONSTANTES PARA DEFINIR LAS SELECCIONES (WHERE) PERMITIDAS *****************/
-    /** 
-     * Constante para añadir a las consultas variables de latitud y longitud.
-     * WHERE location.location_latitude = ? AND location.location_longitude = ?
-     */
-    private static final String sLocationSelection =
-            PoiContract.LocationEntry.TABLE_NAME +
-                    "." + PoiContract.LocationEntry.COLUMN_LOCATION_LATITUDE + " = ? AND " +
-		    PoiContract.LocationEntry.TABLE_NAME +
-		    		"." + PoiContract.LocationEntry.COLUMN_LOCATION_LONGITUDE + " = ? ";
     
     /**
      * Constante para calcular la distancia entre dos posiciones dadas las coordenadas GPS mediante
      * la fórmula de Haversine. Al utilizar la función arcocoseno, no es soportada por SQLite.
-     */
+     
     private static final String sHaversineDistance = 
 			"(6371 * acos( " + 
 			"cos((? * PI() / 180)) " + 
@@ -72,6 +62,8 @@ public class PoiProvider extends ContentProvider {
 			"* cos((" + PoiContract.LocationEntry.COLUMN_LOCATION_LONGITUDE + " * PI() / 180) " +
 			"- (? * PI() / 180)) + sin((? * PI() / 180)) " + 
 			"* sin((" + PoiContract.LocationEntry.COLUMN_LOCATION_LATITUDE + " * PI() / 180)) ) )";
+			
+			*/
     
     /**
      * Constante para calcular una aproximación de la distancia entre dos posiciones dadas las
@@ -81,6 +73,7 @@ public class PoiProvider extends ContentProvider {
     public static final String sManhattanDistance = 
     		"(abs( " + PoiContract.LocationEntry.COLUMN_LOCATION_LATITUDE + " - ( ? )) " +
         			"+ abs( " + PoiContract.LocationEntry.COLUMN_LOCATION_LONGITUDE + " - ( ? )))";
+    
     /** 
      * Constante para las consultas del ID de los PIs dadas como variables su nombre, latitud 
      * y longitud. Será:
@@ -89,18 +82,7 @@ public class PoiProvider extends ContentProvider {
     private static final String sIdPoiSearchSelection =
     		PoiContract.PoiEntry.COLUMN_POI_NAME + " = ? AND " +
 			PoiContract.PoiEntry.COLUMN_POI_LATITUDE + " = ? AND " +
-			PoiContract.PoiEntry.COLUMN_POI_LONGITUDE + " = ?";
-    
-    
-    /** 
-     * Constante para las consultas del ID de las entradas de la tabla location dadas como 
-     * variables su latitud y longitud. Será:
-     * WHERE latitude = ? AND longitude = ?
-     */
-    private static final String sLocationByCoords =
-			PoiContract.LocationEntry.COLUMN_LOCATION_LATITUDE + " = ? AND " +
-			PoiContract.LocationEntry.COLUMN_LOCATION_LONGITUDE + " = ?";
-    
+			PoiContract.PoiEntry.COLUMN_POI_LONGITUDE + " = ?";    
     
     /** 
      * Constante para las consultas del ID de las entradas de la tabla location_poi dadas como 
@@ -149,27 +131,6 @@ public class PoiProvider extends ContentProvider {
     //TODO: Buscar los cursores que no se cierran!
     
     /************* FUNCIONES DONDE SE CREAN LAS QUERYS CONTRA EL CONTENT PROVIDER *****************/
-    
-//  /**
-//  * Método que crea una consulta sobre la Base de Datos para obtener los IDs de las posiciones
-//  * cercanas a unas coordendas dadas como parámetros en una URI. Se considerarán cercanas las 
-//  * posiciones a una distancia menor de MAX_DISTANCE.
-//  * @return String con la consulta generada sin ';' al final con ?s para asignar los valores
-//  * de las coordenadas como selectionArgs en una consulta
-//  */
-// private String getIdsNearLocationsQuery() {
-// 	String[] columns = {PoiContract.LocationEntry._ID};
-// 	String where = MAX_DISTANCE + " > " + sHaversineDistance;
-// 	
-//     
-//     return SQLiteQueryBuilder.buildQueryString( true, PoiContract.LocationEntry.TABLE_NAME, columns, where,
-//             null, // group by
-//             null, // having
-//             null, // order by
-//             null);	// limit
-// }
-    
-    
     
     /**
      * Método para generar una consulta con la que se obtienen los IDs de las posiciones que están

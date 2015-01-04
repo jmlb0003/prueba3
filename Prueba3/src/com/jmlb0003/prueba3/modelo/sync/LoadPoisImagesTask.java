@@ -113,6 +113,11 @@ public class LoadPoisImagesTask extends AsyncTask<Void, Integer, Void> {
 
 				break;
 				
+			case PoiContract.PoiEntry.UJA_DEFAULT_IMAGE:
+				toRetBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.uja_data);
+				
+				break;
+				
 			case PoiContract.PoiEntry.LOCAL_DEFAULT_IMAGE:
 				toRetBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.local_data);
 				
@@ -123,7 +128,6 @@ public class LoadPoisImagesTask extends AsyncTask<Void, Integer, Void> {
 				
 			default:
 				try {
-
 					File f = new File(mContext.getDir(IMAGE_DIR, Context.MODE_PRIVATE), mImageName);
 
 					if (f != null && f.exists()) {
@@ -186,8 +190,7 @@ public class LoadPoisImagesTask extends AsyncTask<Void, Integer, Void> {
 	        return toRetBitmap;
 
 	    } catch (IOException e) {
-	        e.printStackTrace();
-	        Log.e(LOG_TAG, e.getMessage().toString());
+	        Log.e(LOG_TAG, e.getMessage());
 	        return null;
 	    }
 	}

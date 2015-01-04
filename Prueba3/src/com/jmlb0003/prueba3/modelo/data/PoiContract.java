@@ -244,13 +244,15 @@ public class PoiContract {
         public static final int WIKIPEDIA_PROVIDER = 1;
         public static final int WIKIPEDIA_COLOR = Color.WHITE;
         public static final String WIKIPEDIA_DEFAULT_IMAGE = "android.resource://" +
-        								CONTENT_AUTHORITY + "/" + R.drawable.wikipedia;
+        		CONTENT_AUTHORITY + "/" + R.drawable.wikipedia;
         
         public static final int GOOGLE_PLACES_PROVIDER = 2;
         public static final int GOOGLE_COLOR = Color.RED;
         
         public static final int UJA_PROVIDER = 3;
         public static final int UJA_COLOR = Color.GREEN;
+        public static final String UJA_DEFAULT_IMAGE = "android.resource://" +
+				CONTENT_AUTHORITY + "/" + R.drawable.uja_data;
         
         public static final int LOCAL_PROVIDER = 4;
         public static final int LOCAL_COLOR = Color.YELLOW;

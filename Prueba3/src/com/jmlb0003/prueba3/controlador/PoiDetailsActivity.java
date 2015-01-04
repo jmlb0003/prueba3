@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -33,6 +34,8 @@ public class PoiDetailsActivity extends ActionBarActivity {
 	private Poi mShowedPoi = null;
 	private RelativeLayout mContainer = null;
 	private ProgressBar mProgressBar = null;
+	
+	private String mWeb = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +95,7 @@ public class PoiDetailsActivity extends ActionBarActivity {
 			setName();
 			setDistance();
 			setDescription();
+			setSeeMoreButton();
 			setTimetable();
 			setPrice();
 		}
@@ -142,7 +146,7 @@ public class PoiDetailsActivity extends ActionBarActivity {
 		
 		new LoadPoisImagesTask(mShowedPoi, mProgressBar, img, this).execute();
 
-		img.setContentDescription("Fotografía de "+mShowedPoi.getName());
+		img.setContentDescription("Fotografía de " + mShowedPoi.getName());
 		
 	}
 	
@@ -175,6 +179,16 @@ public class PoiDetailsActivity extends ActionBarActivity {
 		}
 	}
 	
+	private void setSeeMoreButton() {
+		mWeb = mShowedPoi.getWebSite();
+		if (mWeb != null && !mWeb.isEmpty() && !mWeb.equals("null")) {
+			if (!mWeb.startsWith("http://") && !mWeb.startsWith("https://")) {
+				mWeb = "http://" + mWeb;
+			}
+			Button smButton = (Button) mContainer.findViewById(R.id.pi_details_see_more_button);
+			smButton.setVisibility(View.VISIBLE);
+		}
+	}
 	
 	private void setTimetable() {
 		TextView timetable = (TextView) mContainer.findViewById(R.id.pi_details_timetable);
@@ -248,12 +262,8 @@ public class PoiDetailsActivity extends ActionBarActivity {
 	}
 	
 	public void seeMore(View v) {
-		String web = mShowedPoi.getWebSite();
-		if (web != null && !web.isEmpty()) {
-			if (!web.startsWith("http://") && !web.startsWith("https://")) {
-				web = "http://" + web;
-			}			
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(web)));
+		if (mWeb != null) {		
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mWeb)));
 		}
 	}
 }

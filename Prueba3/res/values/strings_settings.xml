@@ -31,10 +31,14 @@
     <string name="ft_wiki_key" translatable="false">ft_wiki_key</string>
     <string name="ft_wiki_label">Incluir PIs de Wikipedia</string>
     <string name="ft_wiki_sum">Desactiva para que no se muestren los PIs de Wikipedia</string>
-    <!-- Filtro por horario de apertura -->
+    <!-- Filtro por proveedor (local) -->
     <string name="ft_local_key" translatable="false">ft_local_key</string>
     <string name="ft_local_label">Incluir PIs creados a mano</string>
     <string name="ft_local_sum">Desactiva para que no se muestren los PIs creados a mano</string>
+    <!-- Filtro por proveedor (local) -->
+    <string name="ft_pfc_server_key" translatable="false">ft_pfc_server_key</string>
+    <string name="ft_pfc_label">Incluir PIs del servidor del PFC</string>
+    <string name="ft_pfc_sum">Desactiva para que no se muestren los PIs de la base de datos propia en el servidor</string>
 
 
 </resources>

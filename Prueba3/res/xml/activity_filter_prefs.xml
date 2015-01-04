@@ -29,6 +29,11 @@
 			android:title="@string/ft_local_label"
 		   	android:summary="@string/ft_local_sum"
 		   	android:defaultValue="true" />
+	    <CheckBoxPreference
+			android:key="@string/ft_pfc_server_key"
+			android:title="@string/ft_pfc_label"
+		   	android:summary="@string/ft_pfc_sum"
+		   	android:defaultValue="true" />
 
     </PreferenceCategory>
 </PreferenceScreen>

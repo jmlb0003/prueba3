@@ -54,89 +54,7 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 	private BasicDetailsView mBasicDetails;
 	
 	private OnPoiTouchedListener mCallback;
-	
-	
-	
-	/***************Clase representante de un cuadro con información del PI***********************/
-	/** Demonstrates customizing the info window and/or its contents. 
-    class CustomInfoWindowAdapter implements InfoWindowAdapter {
-        // These a both viewgroups containing an ImageView with id "badge" and two TextViews with id
-        // "title" and "snippet".
-        private final View mWindow;
-        private final View mContents;
 
-        CustomInfoWindowAdapter() {
-            mWindow = mActivity.getLayoutInflater().inflate(R.layout.custom_info_window, null);
-            mContents = mActivity.getLayoutInflater().inflate(R.layout.custom_info_contents, null);
-        }
-
-        @Override
-        public View getInfoWindow(Marker marker) {
-//            if (mOptions.getCheckedRadioButtonId() != R.id.custom_info_window) {
-//                // This means that getInfoContents will be called.
-//                return null;
-//            }
-//            render(marker, mWindow);
-//            return mWindow;
-        	return null;
-        }
-
-        @Override
-        public View getInfoContents(Marker marker) {
-//            if (mOptions.getCheckedRadioButtonId() != R.id.custom_info_contents) {
-//                // This means that the default info contents will be used.
-//                return null;
-//            }
-            render(marker, mContents);
-            return mContents;
-        }
-
-        private void render(Marker marker, View view) {
-            int badge;
-            // Use the equals() method on a Poi to check for equals.  Do not use ==.
-            if (marker.equals(mBrisbane)) {
-                badge = R.drawable.badge_qld;
-            } else if (marker.equals(mAdelaide)) {
-                badge = R.drawable.badge_sa;
-            } else if (marker.equals(mSydney)) {
-                badge = R.drawable.badge_nsw;
-            } else if (marker.equals(mMelbourne)) {
-                badge = R.drawable.badge_victoria;
-            } else if (marker.equals(mPerth)) {
-                badge = R.drawable.badge_wa;
-            } else {
-                // Passing 0 to setImageResource will clear the image view.
-                badge = 0;
-            }
-            ((ImageView) view.findViewById(R.id.badge)).setImageResource(badge);
-
-            String title = marker.getTitle();
-            TextView titleUi = ((TextView) view.findViewById(R.id.title));
-            if (title != null) {
-                // Spannable string allows us to edit the formatting of the text.
-                SpannableString titleText = new SpannableString(title);
-                titleText.setSpan(new ForegroundColorSpan(Color.RED), 0, titleText.length(), 0);
-                titleUi.setText(titleText);
-            } else {
-                titleUi.setText("");
-            }
-
-            String snippet = marker.getSnippet();
-            TextView snippetUi = ((TextView) view.findViewById(R.id.snippet));
-            if (snippet != null && snippet.length() > 12) {
-                SpannableString snippetText = new SpannableString(snippet);
-                snippetText.setSpan(new ForegroundColorSpan(Color.MAGENTA), 0, 10, 0);
-                snippetText.setSpan(new ForegroundColorSpan(Color.BLUE), 12, snippet.length(), 0);
-                snippetUi.setText(snippetText);
-            } else {
-                snippetUi.setText("");
-            }
-        }
-    }
-	****************Fin de la clase CustomInfoWindowAdapter*******************************/
-
-		
-		
 		
 		
 	/**
@@ -291,15 +209,13 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
     	Log.d(LOG_TAG,"Setup Map: Añadiendo marcadores, etc...");
     	// Hide the zoom controls as the button panel will cover it.
         mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(false);	//Al pulsar un marker, se muestran iconos
+        mMap.setBuildingsEnabled(false);
         
         if (isVisible()) {
 	        // Add lots of markers to the map.
 	        addMarkersToMap();
 	        
-	        
-	//        // Setting an info window adapter allows us to change the both the contents and look of the
-	//        // info window.
-	//        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
 	        
 	        // Set listeners for marker events.  See the bottom of this class for their behavior.
 	        mMap.setOnMarkerClickListener(this);

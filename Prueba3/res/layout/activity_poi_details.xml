@@ -71,6 +71,17 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_below="@id/pi_details_distance_title" />
+	    
+	    <Button
+	        android:id="@+id/pi_details_see_more_button"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentRight="true"
+	        android:layout_alignParentEnd="true" 
+	        android:layout_alignTop="@id/pi_details_distance_title"
+	        android:text="@string/see_more"
+	        android:visibility="invisible"
+	        android:onClick="seeMore" />
 	
 	    <TextView 
 	        android:id="@+id/pi_details_description_title"
@@ -91,15 +102,6 @@
 	        android:layout_below="@id/pi_details_description_title"
 	        android:clickable="true"
 	        android:onClick="seeMore"/>
-	    <Button
-	        android:id="@+id/pi_details_see_more_button"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignParentRight="true"
-	        android:layout_alignParentEnd="true" 
-	        android:layout_below="@id/pi_details_description"
-	        android:text="@string/see_more"
-	        android:onClick="seeMore" />
 	    
 	    <TextView 
 	        android:id="@+id/pi_details_timetable_title"
@@ -110,7 +112,7 @@
 	        android:layout_height="wrap_content"
 	        android:layout_marginTop="@dimen/two_line_between_item_padding"
 	        android:layout_marginBottom="@dimen/two_line_title_padding"
-	        android:layout_below="@id/pi_details_see_more_button" />
+	        android:layout_below="@id/pi_details_description" />
 	    <TextView 
 	        android:id="@+id/pi_details_timetable"
 	        android:text="@string/hello_world"
@@ -132,7 +134,7 @@
 	        android:layout_marginStart="@dimen/price_title_margin"
 	        android:layout_toRightOf="@id/pi_details_timetable_title"
 	        android:layout_toEndOf="@id/pi_details_timetable_title"
-	        android:layout_below="@id/pi_details_see_more_button" />
+	        android:layout_below="@id/pi_details_description" />
 	    <TextView 
 	        android:id="@+id/pi_details_price"
 	        android:text="@string/hello_world"

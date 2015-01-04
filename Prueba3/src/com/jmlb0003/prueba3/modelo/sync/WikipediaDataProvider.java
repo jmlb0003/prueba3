@@ -26,7 +26,6 @@ import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
 public class WikipediaDataProvider extends NetworkDataProvider {
 	private static final String BASE_URL = "http://api.geonames.org/findNearbyWikipediaJSON";
 	private static final String LOG_TAG = "WikipediaProvider";
-	
 
     
     /**
@@ -37,16 +36,16 @@ public class WikipediaDataProvider extends NetworkDataProvider {
 				String locale, String username) {
     	//La opción gratuita de esta API no permite consultas con radius mayor que 20
     	radius = (radius>20)?20.0f:radius;
-    	//TODO: Como se podrían parametrizar los idiomas... (locale)
-		return BASE_URL+
+
+		return BASE_URL +
 				"?lat=" + lat +
 				"&lng=" + lon +
 				//La opción gratuita de esta API no permite consultas con radius mayor que 20
 				"&radius=" + radius +
 				"&maxRows=500" +
-				"&lang=" + locale+
+				"&lang=" + locale +
 				"&username=" + username;
-//http://api.geonames.org/findNearbyWikipediaJSON?lat=37.6759861&lng=-3.5661972&radius=15&maxRows=15&lang=es&username=jmlb0003
+//http://api.geonames.org/findNearbyWikipediaJSON?lat=37.6759861&lng=-3.5661972&radius=15&maxRows=500&lang=es&username=jmlb0003
 	}
 
 	
@@ -60,7 +59,6 @@ public class WikipediaDataProvider extends NetworkDataProvider {
 	 */
 	@Override
 	protected ArrayList<ContentValues> getDataFromJSON(JSONObject poisInJson) {
-
 		// Now we have a String representing the complete forecast in JSON Format.
         // Fortunately parsing is easy:  constructor takes the JSON string and converts it
         // into an Object hierarchy for us.
@@ -74,8 +72,8 @@ public class WikipediaDataProvider extends NetworkDataProvider {
         final String WIKI_LONGITUDE = "lng";
         final String WIKI_ALTITUDE = "elevation";
         final String WIKI_IMAGE = "thumbnailImg";
-        
-        
+
+
         try {
             if (!poisInJson.has(WIKI_ROOT)) {
             	return null;
@@ -85,7 +83,7 @@ public class WikipediaDataProvider extends NetworkDataProvider {
             if (poisArray == null) {
             	return null;
             }
-            
+
             // Insert the new weather information into the database
             ArrayList<ContentValues> cVVector = new ArrayList<ContentValues>(poisArray.length());
 
@@ -152,9 +150,7 @@ public class WikipediaDataProvider extends NetworkDataProvider {
 	                cVVector.add(poiValues);
 		        }else{
 		        	continue;
-		        }
-				
-				
+		        }				
 			}
 
 			return cVVector;

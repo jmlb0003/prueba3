@@ -5,6 +5,7 @@ package com.jmlb0003.prueba3.modelo.sync;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ import com.jmlb0003.prueba3.R;
 import com.jmlb0003.prueba3.controlador.ARDataSource;
 import com.jmlb0003.prueba3.modelo.data.PoiContract;
 import com.jmlb0003.prueba3.modelo.data.PoiContract.PoiEntry;
+import com.jmlb0003.prueba3.modelo.sync.Excepciones.NDPConectionException;
 
 
 
@@ -50,10 +52,10 @@ public class PoiDownloaderTask extends AsyncTask<Void, Integer, Void> {
      */
     public PoiDownloaderTask(Context context, Map<String,NetworkDataProvider> sources) {
         mContext = context;
-        Log.d(LOG_TAG, "creando el asyncTask");
+        Log.d(LOG_TAG, "downTask creando el asyncTask");
         Set<String> keySet = sources.keySet();
         for(String key: keySet) {
-        	Log.d(LOG_TAG, "Metiendo el source:"+key);
+        	Log.d(LOG_TAG, "downTask Metiendo el source:"+key);
         	mSources.put(key, sources.get(key));
         }        
     }
@@ -83,30 +85,40 @@ public class PoiDownloaderTask extends AsyncTask<Void, Integer, Void> {
 		long idLocation = insertCurrentLocation();
 		ContentValues idLocationValue = new ContentValues();
 		
+		Iterator<String> it = mSources.keySet().iterator();
 		
-		//Recorremos cada proveedor de PIs para descargar y parsear los datos
-        for (NetworkDataProvider source: mSources.values()) {
-        	ArrayList<ContentValues> poiData = new ArrayList<>();
-        	poiData = source.fetchData();
-        	
-        	//Si se han obtenido datos, se insertan en la BD a través del Content Provider
-        	if (poiData.size() > 0) {
-        		//Hacemos una trampa para añadir el idLocation al final de poiData
-        		idLocationValue.clear();
-        		idLocationValue.put(PoiContract.LocationEntry._ID, idLocation);        		
-        		poiData.add(idLocationValue);
-        		
-                ContentValues[] poisToInsert = new ContentValues[poiData.size()];
-                poiData.toArray(poisToInsert);
-                mContext.getContentResolver().bulkInsert(
-                		PoiEntry.CONTENT_URI, poisToInsert);
-                
-                
-                //Ahora cargamos en memoria los PIs de este proveedor
-                cargarPIs();
-            }
-        }
-        
+		while (it.hasNext()) {
+			ArrayList<ContentValues> poiData = new ArrayList<>();
+			String key = it.next();
+			NetworkDataProvider source = mSources.get(key);
+        	try {
+        		Log.d(LOG_TAG,"downTask 1 "+ key);
+				poiData = source.fetchData();
+				
+	        	//Si se han obtenido datos, se insertan en la BD a través del Content Provider
+	        	if (poiData.size() > 0) {
+	        		Log.d(LOG_TAG,"downTask 2 "+ poiData.size());
+	        		//Hacemos una trampa para añadir el idLocation al final de poiData
+	        		idLocationValue.clear();
+	        		idLocationValue.put(PoiContract.LocationEntry._ID, idLocation);        		
+	        		poiData.add(idLocationValue);
+	        		
+	                ContentValues[] poisToInsert = new ContentValues[poiData.size()];
+	                poiData.toArray(poisToInsert);
+	                mContext.getContentResolver().bulkInsert(
+	                		PoiEntry.CONTENT_URI, poisToInsert);
+	                
+	                
+	                //Ahora cargamos en memoria los PIs de este proveedor
+	                cargarPIs();
+	            }
+	        	Log.d(LOG_TAG,"downTask 3");
+			} catch (NullPointerException | NDPConectionException e) {
+				Log.e(LOG_TAG, "Error en el proveedor:" + key + "-" + e.getMessage());
+			}
+		}
+
+        Log.d(LOG_TAG,"downTask 4");
         
         mProgressDialog.dismiss();
         mProgressDialog = null;
