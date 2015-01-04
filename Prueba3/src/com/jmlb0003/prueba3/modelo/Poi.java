@@ -364,7 +364,11 @@ public class Poi implements Comparable<Poi> {
         return symbolContainer.getHeight() + mTextContainer.getHeight();
     }
     
-    public synchronized float getWidth() {
+    /**
+     * Método para obtener la anchura del PI incluyendo la anchura del nombre del PI
+     * @return Anchura del símbolo del PI incluyendo la anchura de su nombre
+     */
+    public synchronized float getTotalWidth() {
         if (symbolContainer == null || mTextContainer == null) {
         	return 0f;
         }
@@ -374,6 +378,11 @@ public class Poi implements Comparable<Poi> {
         
         
         return (w1>w2)?w1:w2;
+    }
+    
+    
+    public synchronized float getTouchWidth() {
+    	return (symbolContainer == null)? 0f : symbolContainer.getWidth();
     }
     
     
@@ -459,9 +468,9 @@ public class Poi implements Comparable<Poi> {
         isInView = false;
 
         symbolXyzRelativeToCameraView.get(symbolArray);
-        float x1 = symbolArray[0] + (getWidth()/2);
+        float x1 = symbolArray[0] + (getTotalWidth()/2);
         float y1 = symbolArray[1] + (getHeight()/2);
-        float x2 = symbolArray[0] - (getWidth()/2);
+        float x2 = symbolArray[0] - (getTotalWidth()/2);
         float y2 = symbolArray[1] - (getHeight()/2);
         
         if ( (x1 >= -1  &&  x2 <= sCam.getWidth()) &&  
@@ -526,7 +535,7 @@ public class Poi implements Comparable<Poi> {
     		return false;
     	}
 
-    	float symbolWidth = (symbolContainer == null)? 0f : symbolContainer.getWidth();
+    	float symbolWidth = getTouchWidth();
     	float symbolHeight = (symbolContainer == null)? 0f : symbolContainer.getHeight();
     	
         getScreenPosition().get(mScreenPositionArray);
@@ -597,7 +606,7 @@ public class Poi implements Comparable<Poi> {
         	return true;
         }
 
-        float halfWidth = otherPoi.getWidth()/2;	//Anchura, antes era el punto central
+        float halfWidth = otherPoi.getTotalWidth()/2;	//Anchura, antes era el punto central
         float halfHeight = otherPoi.getHeight()/2;	//Altura, antes era el punto central
 //        Log.d("POI","halfWidht: "+halfWidth+" halfHeight:"+halfHeight+"  Con getWi "+otherPoi.getWidth()+" y getHe:"+otherPoi.getHeight());
         if (halfWidth == 0f || halfHeight == 0f) {
@@ -651,7 +660,7 @@ public class Poi implements Comparable<Poi> {
 	    poi.getScreenPosition().get(mScreenPositionArray);
         float myX = mScreenPositionArray[0];
         float myY = mScreenPositionArray[1];
-        float adjWidth = poi.getWidth()/2;
+        float adjWidth = poi.getTotalWidth()/2;
         float adjHeight = poi.getHeight()/2;
 
         float x1 = myX-adjWidth;
@@ -701,7 +710,7 @@ public class Poi implements Comparable<Poi> {
         float x = mScreenPositionArray[0];
         float y = mScreenPositionArray[1];        
 
-        float width = getWidth();
+        float width = getTotalWidth();
         float height = getHeight();
         float halfWidth = width/2;
         float halfHeight = height/2;
@@ -755,7 +764,7 @@ public class Poi implements Comparable<Poi> {
         float y1 = symbolArray[1];
         float x2 = textArray[0];
         float y2 = textArray[1];
-        float width = getWidth();
+        float width = getTouchWidth();
         float height = getHeight();
         float adjX = (x1 + x2)/2;
         float adjY = (y1 + y2)/2;

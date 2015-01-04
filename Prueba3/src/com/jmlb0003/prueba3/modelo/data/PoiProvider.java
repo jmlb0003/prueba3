@@ -134,8 +134,8 @@ public class PoiProvider extends ContentProvider {
     
     /**
      * Método para generar una consulta con la que se obtienen los IDs de las posiciones que están
-     * dentro de un radio dado por MAX_DISTANCE. El radio es aproximado y está basado en la fórmula
-     * de la distancia de Manhattan o geometría taxicab. 
+     * dentro de un radio dado por el coeficiente MAX_DISTANCE. El radio es aproximado y está 
+     * basado en la fórmula de la distancia de Manhattan o geometría taxicab. 
      * @see Ver http://goodenoughpractices.blogspot.com.es/2011/08/query-by-proximity-in-android.html
      * @return Cadena con la consulta SQL que incluye parámetros ? para asignar el valor de la
      * latitud y la longitud actual.
@@ -159,9 +159,10 @@ public class PoiProvider extends ContentProvider {
     
     /**
      * Método que lanza una consulta sobre la Base de Datos para obtener los IDs de los PIs
-     * asociados a una posición.
-     * @param locationId ID de la posición
-     * @return Cursor con los PIs asociados a la posición identificada por locationId
+     * asociados a una entrada de la tabla Location.
+     * @param locationSubquery Subconsulta con la que se pueden obtener las localizaciones a las
+     * 							que se asocian los PIs.
+     * @return Cadena con la consulta SQL
      */
     private String getPoisByLocationIdQuery(String locationSubquery) {
     	String[] columns = {PoiContract.LocationPoiEntry.COLUMN_ID_POI};
@@ -343,35 +344,6 @@ public class PoiProvider extends ContentProvider {
             	
             	break;
             }
-//            // "search_suggest_query=?limit=50"
-//            case SEARCH_SUGGEST: {
-//            	if(selectionArgs != null && selectionArgs.length > 0 && 
-//            			!selectionArgs[0].equals("")) {
-//            		
-//	            	selection = PoiContract.PoiEntry.COLUMN_POI_NAME + " LIKE '%" + 
-//            			selectionArgs[0] + "%'";
-//	            	String[] columns = {
-//	            			BaseColumns._ID,
-//	            			PoiContract.PoiEntry._ID,
-//	            			PoiContract.PoiEntry.COLUMN_POI_NAME };
-//	            	
-//	            	
-//	            	Log.d(LOG_TAG,"el selection es:\n"+selection+"selectionArgs:"+selectionArgs.length+" son:"+selectionArgs[0]);
-//	            	retCursor = mOpenHelper.getReadableDatabase().query(
-//	                        PoiContract.PoiEntry.TABLE_NAME,
-//	                        columns,
-//	                        selection,
-//	                        null, null, null, null );
-//            	}else{
-//            		Log.d(LOG_TAG,"En el otro, projection tiene:\n"+projection);
-//            		retCursor = mOpenHelper.getReadableDatabase().query(
-//	                        PoiContract.PoiEntry.TABLE_NAME,
-//	                        projection,
-//	                        null, null, null, null, null );
-//            	}
-//            	
-//            	break;
-//            }
             // "location"
             case LOCATIONS: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
@@ -751,7 +723,7 @@ public class PoiProvider extends ContentProvider {
                             	rowCount++;
                             }                    		  
                     	}
-
+                    	c.close();
 
                     	ContentValues cv = new ContentValues();
                     	cv.put(PoiContract.LocationPoiEntry.COLUMN_ID_LOCATION, idLocation);
@@ -813,7 +785,7 @@ public class PoiProvider extends ContentProvider {
                             	rowCount++;
                             }
                     	}
-
+                    	c.close();
                         
                     }
                     db.setTransactionSuccessful();
