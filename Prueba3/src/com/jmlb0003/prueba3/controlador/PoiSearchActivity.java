@@ -33,6 +33,8 @@ public class PoiSearchActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_poi_search);
         
+        getSupportActionBar().setDisplayUseLogoEnabled(false);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);        
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mTextView = (TextView) findViewById(R.id.poi_search_text);

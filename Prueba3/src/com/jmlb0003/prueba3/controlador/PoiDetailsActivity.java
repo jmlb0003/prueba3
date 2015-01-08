@@ -85,7 +85,8 @@ public class PoiDetailsActivity extends ActionBarActivity {
 			mShowedPoi = ARDataSource.SelectedPoi;
 		}
 		
-		
+		getSupportActionBar().setDisplayShowTitleEnabled(true);
+		getSupportActionBar().setDisplayUseLogoEnabled(false);
 		setTitle(mShowedPoi.getName());
 		
 		mContainer = (RelativeLayout) findViewById(R.id.pi_details_id);
