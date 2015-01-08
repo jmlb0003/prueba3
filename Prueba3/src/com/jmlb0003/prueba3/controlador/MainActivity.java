@@ -147,6 +147,20 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 //            setSupportActionBar(toolbar);
 //        }
 		
+		//TODO: A ver como se pone el icono en la barra de accionessssss
+		/**************************
+		 * 
+		 * 
+		 * 
+		 * 
+		 * 
+		 * 
+		 * 
+		 * 
+		 * 
+		 * 
+		 * 
+		 */
         
         //Se obtiene el servicio para controlar las actualizaciones de ubicación del dispositivo
         sLocationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);

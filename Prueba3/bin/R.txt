@@ -789,7 +789,7 @@ int string title_section_modoMapa 0x7f080035
 int string title_source_filter 0x7f08006b
 int string wallet_buy_button_place_holder 0x7f080022
 int string you_are_here 0x7f080039
-int style AppBaseTheme 0x7f0700f2
+int style AppBaseTheme 0x7f0700f3
 int style AppTheme 0x7f0700f1
 int style AppTheme_Base 0x7f0700f0
 int style Base_TextAppearance_AppCompat 0x7f07009d
@@ -901,6 +901,7 @@ int style Base_Widget_AppCompat_Spinner 0x7f07007c
 int style Base_Widget_AppCompat_Spinner_DropDown_ActionBar 0x7f07007d
 int style Base_Widget_AppCompat_Toolbar 0x7f070094
 int style Base_Widget_AppCompat_Toolbar_Button_Navigation 0x7f070095
+int style MyActionBar 0x7f0700f2
 int style Platform_AppCompat 0x7f0700ce
 int style Platform_AppCompat_Dialog 0x7f0700d0
 int style Platform_AppCompat_Light 0x7f0700cf

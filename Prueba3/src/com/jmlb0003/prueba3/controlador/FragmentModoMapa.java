@@ -14,12 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
-import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -40,7 +38,7 @@ import com.jmlb0003.prueba3.vista.BasicDetailsView;
  *
  */
 public class FragmentModoMapa extends Fragment implements OnMarkerClickListener, 
-				OnMapClickListener, OnInfoWindowClickListener {
+				OnMapClickListener {
 	
 	/**Constante con el tag representativo de la clase para el logcat**/
 	private static final String LOG_TAG = "FragmentModoMapa";
@@ -220,7 +218,6 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
 	        // Set listeners for marker events.  See the bottom of this class for their behavior.
 	        mMap.setOnMarkerClickListener(this);
 	        mMap.setOnMapClickListener(this);
-	        mMap.setOnInfoWindowClickListener(this);
 	        
 	        
 	        double lat,lon;
@@ -282,15 +279,6 @@ public class FragmentModoMapa extends Fragment implements OnMarkerClickListener,
     			.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))  );
     	
     }
-    
-    
-
-
-
-	@Override
-	public void onInfoWindowClick(Marker marker) {
-		Toast.makeText(mActivity, "Click Info Window", Toast.LENGTH_SHORT).show();
-	}
 
 	
 	

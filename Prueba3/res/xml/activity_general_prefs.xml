@@ -10,7 +10,7 @@
     <PreferenceCategory
          android:title="@string/radar_preferences" >
      
-	    <com.jmlb0003.prueba3.utilidades.SeekBarPreferencias
+	    <com.jmlb0003.prueba3.utilidades.SeekBarPreference
 	        android:key="@string/pref_seekBar_distance_key"
 	        android:id="@+id/mySeekBarPreference"
 	        android:title="@string/pref_seekBar_distance_title"

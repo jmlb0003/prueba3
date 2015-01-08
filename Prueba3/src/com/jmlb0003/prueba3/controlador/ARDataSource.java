@@ -62,20 +62,22 @@ public abstract class ARDataSource {
     
     private static final Object RADIUS_LOCK = new Object();    
     
-    private static final Object AZIMUTH_LOCK = new Object();    
-    private static final Object PITCH_LOCK = new Object();    
-    private static final Object ROLL_LOCK = new Object();
+    private static final Object AZIMUTH_LOCK = new Object();
     
+    /** Variable en la que se almacena la distancia máxima del radar en forma de cadena para ser
+     * mostrada en el rótulo en pantalla **/
     private static String sZoomLevel = new String();
+    /** Variable en la que se almacena la última posición del dispositivo conocida **/
     private static Location sCurrentLocation = HARD_FIX;
+    /** Variable en la que se almacena la matriz de rotación dada la orientación del dispositivo **/
     private static Matrix sRotationMatrix = new Matrix();
-    
+    /** Variable donde se almacena el azimuth, variación del dispositivo en grados respecto del norte **/
     private static float sAzimuth = 0;
-    
+    /** Variable que almacena la distancia máxima del radar **/
     private static float sRadius;
     
     
-    /**Variable donde se almacena el valor de densidad de píxel de la pantalla del dispositivo**/
+    /** Variable donde se almacena el valor de densidad de píxel de la pantalla del dispositivo **/
     public static float PixelsDensity;
     
     /**Variable donde se almacena la referencia del PI seleccionado en pantalla**/

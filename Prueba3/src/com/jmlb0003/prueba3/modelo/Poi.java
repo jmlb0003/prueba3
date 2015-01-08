@@ -16,7 +16,7 @@ import android.util.Log;
 
 import com.jmlb0003.prueba3.controlador.ARDataSource;
 import com.jmlb0003.prueba3.utilidades.CameraModel;
-import com.jmlb0003.prueba3.utilidades.PosicionPI;
+import com.jmlb0003.prueba3.utilidades.PoiPosition;
 import com.jmlb0003.prueba3.utilidades.Utilities;
 import com.jmlb0003.prueba3.utilidades.Vector;
 import com.jmlb0003.prueba3.utilidades.Paintables.PaintableBox;
@@ -126,7 +126,7 @@ public class Poi implements Comparable<Poi> {
     /**Nombre del PI**/
     private String mName = null;
     /**Ubicación del PI en el mundo real **/
-    private volatile PosicionPI mPoiPhysicalLocation = new PosicionPI();
+    private volatile PoiPosition mPoiPhysicalLocation = new PoiPosition();
     /**Distancia en metros hasta el PI desde la posición del usuario **/
     private volatile double mDistance = 0.0;
     
@@ -498,7 +498,7 @@ public class Poi implements Comparable<Poi> {
 		}
 		
 		//Se calcula la posición relativa del PI desde la posición del usuario
-		PosicionPI.convLocationToVector(location, mPoiPhysicalLocation, 
+		PoiPosition.convLocationToVector(location, mPoiPhysicalLocation, 
 											locationXyzRelativeToPhysicalLocation);
 		mInitialY = locationXyzRelativeToPhysicalLocation.getY();
 		

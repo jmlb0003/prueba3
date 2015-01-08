@@ -81,10 +81,11 @@ public class FragmentModoCamara extends Fragment implements SensorEventListener,
     private Activity mActivity;
     private BasicDetailsView mBasicDetails;
     
+    ////Variables para agrupar puntos solapados
     private float mDx;
     private int mPoiIndex;
     private List<Poi> mGroupedPois = new ArrayList<>();
-    
+    ///////////////////////////////////////////////////
 
 	/** Interfaz para indicar a MainActivity que se ha pulsado un PI **/
     private OnPoiTouchedListener mCallback;

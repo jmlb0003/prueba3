@@ -127,8 +127,7 @@ public class PoiProvider extends ContentProvider {
     	);
     }
 
-    
-    //TODO: Buscar los cursores que no se cierran!
+
     
     /************* FUNCIONES DONDE SE CREAN LAS QUERYS CONTRA EL CONTENT PROVIDER *****************/
     

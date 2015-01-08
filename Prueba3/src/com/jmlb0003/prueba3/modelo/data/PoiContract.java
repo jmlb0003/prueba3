@@ -299,12 +299,6 @@ public class PoiContract {
             return CONTENT_URI.buildUpon().appendPath(POIS_BY_NAME)
             		.appendPath(name).build();
         }
-//
-        
-//
-//        public static String getDateFromUri(Uri uri) {
-//            return uri.getPathSegments().get(2);
-//        }
 
     }// Fin de PoiEntry
 

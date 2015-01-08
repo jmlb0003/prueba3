@@ -12,8 +12,17 @@
 	    
 	    <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColor">@color/text_secondary</item>
+        
+        <item name="actionBarStyle">@style/MyActionBar</item>
     </style>
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppTheme.Base" />    
+    
+    <!-- ActionBar style -->
+    <style name="MyActionBar" parent="@style/Widget.AppCompat.Light.ActionBar">
+        <item name="background">@color/primary</item>
+	    <item name="logo">@drawable/ic_launcher</item>
+	    <item name="displayOptions">useLogo|showHome</item>
+    </style>
 </resources>
