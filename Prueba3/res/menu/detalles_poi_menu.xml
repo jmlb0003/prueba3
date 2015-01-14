@@ -3,13 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.jmlb0003.prueba3.controlador.PoiDetailsActivity" >
-<!--
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never"/> -->
-
 
 	<item
         android:id="@+id/action_about"

@@ -36,7 +36,7 @@
     <!-- Strings de búsqueda -->
     <string name="search_hint">Buscar PIs</string>
     <string name="action_search">Búsqueda</string>
-    <string name="action_description">Léeme</string>
+    <string name="action_help">Ayuda</string>
 
     <!-- Search failure message. -->
     <string name="no_search_results">No se encontraron resultados para \"%s\"</string>

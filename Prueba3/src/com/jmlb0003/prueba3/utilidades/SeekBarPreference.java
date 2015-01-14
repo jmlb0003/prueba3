@@ -34,6 +34,7 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
 	private int mProgress;
 	private SeekBar mSeekBar;
 	private boolean mTrackingTouch;
+	private LinearLayout mSeekBarLayout, mPreferenceLayout;
 
 
 
@@ -44,6 +45,8 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
 	 */
 	public SeekBarPreference(Context context) {
 		this(context,null);
+		mSeekBarLayout = new LinearLayout(getContext());
+		mPreferenceLayout = new LinearLayout(getContext());
 	}
 	
 	
@@ -54,6 +57,8 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
 	 */
 	public SeekBarPreference(Context context, AttributeSet attrs) {		
 		super(context, attrs);
+		mSeekBarLayout = new LinearLayout(getContext());
+		mPreferenceLayout = new LinearLayout(getContext());
 		initPreference(context, attrs);
 	}
 	
@@ -66,6 +71,8 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
 	 */
 	public SeekBarPreference(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		mSeekBarLayout = new LinearLayout(getContext());
+		mPreferenceLayout = new LinearLayout(getContext());
 		initPreference(context, attrs);
 	}
 	
@@ -77,14 +84,16 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
 	 */
 	@Override
 	protected View onCreateView(ViewGroup parent) {
-	    LinearLayout preferenciaLayout = new LinearLayout(getContext());
-    	preferenciaLayout.setOrientation(LinearLayout.VERTICAL);
-    	preferenciaLayout.setPadding(Math.round(16/scale), Math.round(6/scale), 
-											Math.round(8/scale), Math.round(6/scale));
-
-	    	
-	    LinearLayout miSeekBarLayout = new LinearLayout(getContext());	    
-
+	    mPreferenceLayout.removeAllViews();
+	    mSeekBarLayout.removeAllViews();
+	    
+		mPreferenceLayout.setOrientation(LinearLayout.VERTICAL);
+	    mPreferenceLayout.setPadding(
+    			Math.round(14 * scale), //left
+    			Math.round(10 * scale), 	//top
+    			Math.round(14 * scale), 	//right
+    			Math.round(6 * scale));	//bottom
+    	
 	    
 	    FrameLayout.LayoutParams sbarParams = new FrameLayout.LayoutParams(
 	    											Math.round(scale * 200),
@@ -94,7 +103,9 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
 	    TextView titleText = new TextView(getContext());
 	    titleText.setId(0);
 	    titleText.setText(getTitle());
-	    titleText.setTextSize(18);
+	    titleText.setTextAppearance(getContext(), android.R.style.TextAppearance_Medium);
+	    titleText.setTextColor(getContext().getResources().getColor(R.color.black));
+	    
 	    
 	    TextView summaryText = new TextView(getContext());
 	    summaryText.setText(getSummary());
@@ -109,19 +120,20 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
 	    mIndicator = new TextView(getContext());
 	    mIndicator.setTextSize(12);
 	    mIndicator.setTypeface(Typeface.MONOSPACE, Typeface.ITALIC);
-	    mIndicator.setPadding(Math.round(20*scale), Math.round(3*scale), 0, 0);
-	    mIndicator.setText("" + mSeekBar.getProgress()+" km");
+	    mIndicator.setPadding(Math.round(20 * scale), Math.round(3 * scale), 0, 0);
+	    mIndicator.setText("" + mSeekBar.getProgress() + " km ");
 	    mSeekBar.setProgress(mProgress);
-	    	    	    
-	    miSeekBarLayout.addView(mSeekBar);
-	    miSeekBarLayout.addView(mIndicator);
-	    preferenciaLayout.addView(titleText);
-	    preferenciaLayout.addView(summaryText);
-	    preferenciaLayout.addView(miSeekBarLayout);
+	    
+	    
+	    mSeekBarLayout.addView(mSeekBar);
+	    mSeekBarLayout.addView(mIndicator);
+	    mPreferenceLayout.addView(titleText);
+	    mPreferenceLayout.addView(summaryText);
+	    mPreferenceLayout.addView(mSeekBarLayout);
 
 
 
-	    return preferenciaLayout;
+	    return mPreferenceLayout;
 	}// Fin de onCreateView
 	
 	

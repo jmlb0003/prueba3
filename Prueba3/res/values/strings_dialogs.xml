@@ -23,10 +23,12 @@
     <string name="alert_location2_negative_message">¡Ya queda menos!</string>
     
     <!-- Ventana de diálogo de Sobre mi -->
-    <string name="title_about">Sobre mí</string>
-    <string name="message_about">PFC de José Miguel López Bayona\nIngeniería Informática 2014\n\nhttp://joselopez.hol.es</string>
-    <string name="developer_webSite">Ir a la web</string>
-    <string name="my_website" translatable="false" >http://joselopez.hol.es</string>
+    <string name="title_about_me">Sobre mí</string>
+    <string name="message_about">PFC de José Miguel López Bayona\nIngeniería Informática 2014\n\n</string>
+    <string name="version">Versión</string>
+    <string name="app_version" translatable="false">0.3</string>
+    <string name="go_to_developer_website">Ir a la web</string>
+    <string name="my_website" translatable="false">http://joselopez.hol.es</string>
     
 
 </resources>

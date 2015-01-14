@@ -11,6 +11,7 @@
     <color name="basic_details_image_background">#88eeeeee</color>
     
     <!-- ************************************************** -->
+    <color name="black">#000000</color>
     <color name="black_overlay">#66000000</color>
     <color name="blue">#FF33B5E5</color>
     <color name="purple">#FFAA66CC</color>

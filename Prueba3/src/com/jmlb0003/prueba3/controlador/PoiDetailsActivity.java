@@ -234,8 +234,10 @@ public class PoiDetailsActivity extends ActionBarActivity {
 	private void showAbout() {
 		AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);
 
-		ventanaAlerta.setTitle(getString(R.string.title_about));
-		ventanaAlerta.setMessage(getString(R.string.message_about));
+		ventanaAlerta.setTitle(getString(R.string.action_about));
+		ventanaAlerta.setMessage(getString(R.string.message_about) + "\n" +
+	    		   		getString(R.string.my_website) + "\n\n" + getString(R.string.version) + 
+	    		   		" " + getString(R.string.app_version));
 
 
 		//Si se pulsa el botón de cancelar, cerrar la ventana de diálogo
@@ -245,7 +247,7 @@ public class PoiDetailsActivity extends ActionBarActivity {
 				dialog.cancel();
 			}
 		});
-		ventanaAlerta.setPositiveButton(getString(R.string.developer_webSite),
+		ventanaAlerta.setPositiveButton(getString(R.string.go_to_developer_website),
 				new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				startActivity(new Intent(
@@ -256,7 +258,7 @@ public class PoiDetailsActivity extends ActionBarActivity {
     		}
 		});
        
-		ventanaAlerta.setIcon(android.R.drawable.ic_dialog_info);
+		ventanaAlerta.setIcon(android.R.drawable.ic_menu_info_details);
 
 		//Mostrar la ventana
 		ventanaAlerta.show();

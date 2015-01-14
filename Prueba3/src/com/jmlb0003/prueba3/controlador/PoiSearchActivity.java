@@ -110,7 +110,7 @@ public class PoiSearchActivity extends ActionBarActivity {
                 //Search action
                 return true;
             case R.id.action_description:
-            	showDescription();
+            	showHowWorks();
             	return true;
             case R.id.action_about:
             	showAbout();
@@ -127,7 +127,7 @@ public class PoiSearchActivity extends ActionBarActivity {
      * Método para mostrar una ventana de diálogo con la descripción del funcionamiento de
      * las búsquedas en la app.
      */
-    private void showDescription() {
+    private void showHowWorks() {
  	   AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);
 
         ventanaAlerta.setTitle(getString(R.string.search_description_dialog_title));
@@ -142,7 +142,7 @@ public class PoiSearchActivity extends ActionBarActivity {
             }
         });
         
-        ventanaAlerta.setIcon(android.R.drawable.ic_dialog_alert);
+        ventanaAlerta.setIcon(android.R.drawable.ic_menu_help);
 
         //Mostrar la ventana
         ventanaAlerta.show();
@@ -156,8 +156,10 @@ public class PoiSearchActivity extends ActionBarActivity {
     private void showAbout() {
  	   AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);
 
-        ventanaAlerta.setTitle(getString(R.string.title_about));
-        ventanaAlerta.setMessage(getString(R.string.message_about));
+        ventanaAlerta.setTitle(getString(R.string.action_about));
+        ventanaAlerta.setMessage(getString(R.string.message_about) + "\n" +
+     		   		getString(R.string.my_website) + "\n\n" + getString(R.string.version) + 
+     		   		" " + getString(R.string.app_version));
 
 
         //Si se pulsa el botón de cancelar, cerrar la ventana de diálogo
@@ -167,7 +169,7 @@ public class PoiSearchActivity extends ActionBarActivity {
      	   				dialog.cancel();
      	   			}
         });
-        ventanaAlerta.setPositiveButton(getString(R.string.developer_webSite),
+        ventanaAlerta.setPositiveButton(getString(R.string.go_to_developer_website),
      		   new DialogInterface.OnClickListener() {
      	   			public void onClick(DialogInterface dialog, int which) {
      	   				startActivity(new Intent(
@@ -177,7 +179,7 @@ public class PoiSearchActivity extends ActionBarActivity {
      	   			}
         });
         
-        ventanaAlerta.setIcon(android.R.drawable.ic_dialog_info);
+        ventanaAlerta.setIcon(android.R.drawable.ic_menu_info_details);
 
         //Mostrar la ventana
         ventanaAlerta.show();

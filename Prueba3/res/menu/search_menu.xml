@@ -9,7 +9,7 @@
     <item
         android:id="@+id/action_description"
         android:orderInCategory="20"
-        android:title="@string/action_description"
+        android:title="@string/action_help"
         android:icon="@android:drawable/ic_dialog_alert"
         app:showAsAction="never" />
     <item

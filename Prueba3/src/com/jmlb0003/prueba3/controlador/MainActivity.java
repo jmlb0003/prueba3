@@ -146,21 +146,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 //        if (toolbar != null) {
 //            setSupportActionBar(toolbar);
 //        }
-		
-		//TODO: A ver como se pone el icono en la barra de accionessssss
-		/**************************
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
-		 */
+
         
         //Se obtiene el servicio para controlar las actualizaciones de ubicación del dispositivo
         sLocationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -332,8 +318,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	        	startActivity( new Intent(this,SettingsActivity.class) );
 	            return true;
 	        
-	        case R.id.action_help:
-	            //helpAction();
+	        case R.id.action_about:
+	            //aboutAction();
 	            showAbout();
 	            return true;
 	            
@@ -393,6 +379,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				Log.d("MAINACTIVITY","haylocation:"+hayLocation+" latitude y longitude:"+newLocation.getLatitude()+" "+newLocation.getLongitude() );
 				mostrarLocationAlert();
 			}
+		}
+		
+		if (newLocation.getAltitude() > 0) {
+			double altitude = newLocation.getAltitude();
+			newLocation.setAltitude(altitude-40);
 		}
 		
 		// Solo se tiene en cuenta la nueva ubicación si es mejor que la anterior 
@@ -691,8 +682,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
    private void showAbout() {
 	   AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);
 
-       ventanaAlerta.setTitle(getString(R.string.title_about));
-       ventanaAlerta.setMessage(getString(R.string.message_about));
+       ventanaAlerta.setTitle(getString(R.string.action_about));
+       ventanaAlerta.setMessage(getString(R.string.message_about) + "\n" +
+    		   getString(R.string.my_website) + "\n\n" + getString(R.string.version) + 
+    		   " " + getString(R.string.app_version));
 
 
        //Si se pulsa el botón de cancelar, cerrar la ventana de diálogo
@@ -702,7 +695,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     	   				dialog.cancel();
     	   			}
        });
-       ventanaAlerta.setPositiveButton(getString(R.string.developer_webSite),
+       ventanaAlerta.setPositiveButton(getString(R.string.go_to_developer_website),
     		   new DialogInterface.OnClickListener() {
     	   			public void onClick(DialogInterface dialog, int which) {
     	   				startActivity(new Intent(
@@ -712,7 +705,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     	   			}
        });
        
-       ventanaAlerta.setIcon(android.R.drawable.ic_dialog_info);
+       ventanaAlerta.setIcon(android.R.drawable.ic_menu_info_details);
 
        //Mostrar la ventana
        ventanaAlerta.show();
