@@ -393,7 +393,7 @@ public abstract class ARDataSource {
      * @param newMaxDistance Distancia máxima a la que pueden estar los PIs que se muestren en pantalla
      */
     public static void updateRadarDistance(float newMaxDistance) {
-    	if (newMaxDistance <= 0) {
+    	if (newMaxDistance < 0) {
     		return;
     	}
     	

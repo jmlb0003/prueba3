@@ -150,8 +150,7 @@ public class PoiSearchActivity extends ActionBarActivity {
     
     
     /**
-     * Método para mostrar una ventana de diálogo con la descripción del funcionamiento de
-     * las búsquedas en la app.
+     * Método para mostrar una ventana de diálogo con la información del desarrollador
      */
     private void showAbout() {
  	   AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);

@@ -211,7 +211,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         	updateData(mLocation);
         } else {
         	isShowedAlert = false;
-        	mostrarLocationAlert();
+        	showLocationAlert();
         }
         aplicarValoresDeAjustes();
     }// Fin de onResume()
@@ -377,7 +377,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		}else{
 			if (!hayLocation) {
 				Log.d("MAINACTIVITY","haylocation:"+hayLocation+" latitude y longitude:"+newLocation.getLatitude()+" "+newLocation.getLongitude() );
-				mostrarLocationAlert();
+				showLocationAlert();
 			}
 		}
 		
@@ -416,7 +416,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		if (!sLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER) &&
 				!sLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
 			
-			mostrarLocationSettingsAlert();
+			showLocationSettingsAlert();
 		}
 	}
 
@@ -460,7 +460,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				   new PoiDownloaderTask(this, NETWORK_POI_SOURCES).execute();
 				   new LocalPoiLoaderTask(this, LOCAL_POI_SOURCES).execute();
 			   }else{
-				   mostrarNetworkAlert();
+				   showNetworkAlert();
 			   }
 		   }
 		   poisByLocation.close();
@@ -477,6 +477,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     */
    private void aplicarValoresDeAjustes() {	   
 	   PreferenceManager.setDefaultValues(this, R.xml.activity_general_prefs, false);
+	   PreferenceManager.setDefaultValues(this, R.xml.activity_filter_prefs, true);
 	   //Obtenemos la distancia hasta la que se buscan PI en los ajustes
 	   SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	   ARDataSource.updateRadarDistance(prefs.getInt(getString(R.string.pref_seekBar_distance_key),0));
@@ -527,7 +528,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			}    	   
     	   
 			if (!isGPSEnabled && !isNetworkEnabled) {
-				mostrarLocationSettingsAlert();
+				showLocationSettingsAlert();
 			}
 			
 			now.setToNow();
@@ -570,7 +571,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     * Método para avisar de que no se puede obtener ubicación en el dispositivo. Se mostrará
     * un cuadro de diálogo que permite activar las funciones de localización.
     */
-   private void mostrarLocationSettingsAlert(){
+   private void showLocationSettingsAlert(){
        AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);
 
        ventanaAlerta.setTitle(getString(R.string.alert_location_title));
@@ -606,7 +607,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
    /**
     * Método para avisar de que no hay conexión a Internet para descargar datos.
     */
-   private void mostrarNetworkAlert () {
+   private void showNetworkAlert () {
 	   if (!isCreated) {
 		   return;
 	   }
@@ -647,7 +648,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
    /**
     * Método para avisar de que se está buscando una ubicación válida.
     */
-   private void mostrarLocationAlert () {
+   private void showLocationAlert () {
 	   if (!isShowedAlert) {
 		   AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);
 	
@@ -676,8 +677,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
    
    
    /**
-    * Método para mostrar una ventana de diálogo con la descripción del funcionamiento de
-    * las búsquedas en la app.
+    * Método para mostrar una ventana de diálogo con la información del desarrollador
     */
    private void showAbout() {
 	   AlertDialog.Builder ventanaAlerta = new AlertDialog.Builder(this);
